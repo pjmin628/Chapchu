@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>임용시험 플래시카드</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root, [data-theme="dark"]{
+  --bg:#0d1117; --panel:#161b22; --panel2:#1c2230; --border:#30363d;
+  --text:#e6edf3; --muted:#8b949e; --accent:#f0b429; --accent2:#388bfd;
+  --high:#f0b429; --vhigh:#fb7185; --ok:#3fb950;
+  --header-bg:rgba(13,17,23,.85);
+  --card-grad:linear-gradient(160deg,#161b22,#1c2230);
+  --card-shadow:0 12px 40px rgba(0,0,0,.4);
+  --tab-active-text:#1a1100;
+  --th-bg:rgba(56,139,253,.14); --td-bg:rgba(255,255,255,.015);
+  --glow1:rgba(56,139,253,.08); --glow2:rgba(240,180,41,.06);
+}
+[data-theme="light"]{
+  --bg:#f6f8fa; --panel:#ffffff; --panel2:#f0f3f7; --border:#d6dce3;
+  --text:#1f2328; --muted:#6b7480; --accent:#bf8700; --accent2:#0969da;
+  --high:#bf8700; --vhigh:#cf3a52; --ok:#1a7f37;
+  --header-bg:rgba(255,255,255,.88);
+  --card-grad:linear-gradient(160deg,#ffffff,#eef2f7);
+  --card-shadow:0 10px 30px rgba(140,150,170,.25);
+  --tab-active-text:#ffffff;
+  --th-bg:rgba(9,105,218,.1); --td-bg:rgba(0,0,0,.012);
+  --glow1:rgba(9,105,218,.06); --glow2:rgba(191,135,0,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,sans-serif;
+  background:var(--bg); color:var(--text);
+  display:flex; flex-direction:column; min-height:100vh;
+  background-image:radial-gradient(circle at 20% 0%,var(--glow1),transparent 40%),radial-gradient(circle at 80% 100%,var(--glow2),transparent 40%);
+  transition:background-color .25s,color .25s;
+}
+.topbar{
+  position:sticky; top:0; z-index:20;
+  background:var(--header-bg); backdrop-filter:blur(8px);
+}
+header{
+  padding:16px 16px 10px; text-align:center;
+  border-bottom:1px solid var(--border); position:relative;
+}
+header h1{font-size:18px; font-weight:900; letter-spacing:-.3px}
+header h1 .logo{margin-right:6px}
+header .sub{font-size:11px; color:var(--muted); margin-top:3px}
+.theme-btn{
+  position:absolute; top:14px; right:14px; width:38px; height:38px;
+  border-radius:50%; border:1px solid var(--border); background:var(--panel2);
+  color:var(--text); font-size:18px; cursor:pointer; display:flex;
+  align-items:center; justify-content:center; transition:.18s; font-family:inherit;
+}
+.theme-btn:active{transform:scale(.9)}
+.tabs{
+  display:flex; gap:6px; overflow-x:auto; padding:10px 12px;
+  scrollbar-width:none; border-bottom:1px solid var(--border);
+  background:var(--panel);
+}
+.tabs::-webkit-scrollbar{display:none}
+.tab{
+  flex:0 0 auto; padding:8px 14px; border-radius:999px;
+  border:1px solid var(--border); background:var(--panel2); color:var(--muted);
+  font-size:13px; font-weight:700; cursor:pointer; white-space:nowrap;
+  transition:.18s; font-family:inherit;
+}
+.tab .cnt{font-size:11px; opacity:.7; margin-left:4px; font-weight:500}
+.tab.active{background:var(--accent); color:var(--tab-active-text); border-color:var(--accent)}
+.wrap{
+  flex:1; display:flex; flex-direction:column; align-items:center;
+  justify-content:flex-start; padding:18px 14px 28px; gap:14px;
+}
+.meta{
+  width:100%; max-width:560px; display:flex; align-items:center;
+  justify-content:space-between; font-size:12px; color:var(--muted);
+}
+.meta .imp{display:flex; align-items:center; gap:6px}
+.toolbar{
+  width:100%; max-width:560px; display:flex; align-items:center; gap:8px;
+  margin-top:-4px;
+}
+.tool-btn{
+  padding:7px 12px; border-radius:999px; border:1px solid var(--border);
+  background:var(--panel2); color:var(--muted); font-size:12px; font-weight:700;
+  cursor:pointer; font-family:inherit; transition:.15s; white-space:nowrap;
+}
+.tool-btn:active{transform:scale(.94)}
+.tool-btn.active{background:var(--accent2); color:#fff; border-color:var(--accent2)}
+.order-tag{font-size:11px; color:var(--accent2); font-weight:700; margin-left:auto}
+.badge{padding:3px 9px; border-radius:999px; font-size:11px; font-weight:700; border:1px solid}
+.badge.high{color:var(--high); border-color:var(--high); background:rgba(240,180,41,.08)}
+.badge.vhigh{color:var(--vhigh); border-color:var(--vhigh); background:rgba(251,113,133,.1)}
+.scene{width:100%; max-width:560px; perspective:1600px; -webkit-perspective:1600px; flex:1; min-height:60vh; display:flex}
+.card{
+  position:relative; width:100%;
+  transform-style:preserve-3d; -webkit-transform-style:preserve-3d;
+  transition:transform .5s cubic-bezier(.4,.2,.2,1); cursor:pointer;
+}
+.card.flipped{transform:rotateY(180deg)}
+.face{
+  position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden;
+  border:1px solid var(--border); border-radius:18px; padding:22px 20px;
+  background:var(--card-grad);
+  overflow-y:auto; display:flex; flex-direction:column;
+  box-shadow:var(--card-shadow);
+  /* backface-visibility 미지원 브라우저 대비: 뒤집기 애니메이션 중간(0.25s)에 visibility 전환 */
+  transition:visibility 0s linear .25s;
+}
+.face::-webkit-scrollbar{width:5px}
+.face::-webkit-scrollbar-thumb{background:var(--border); border-radius:3px}
+.front{
+  align-items:center; justify-content:center; text-align:center;
+  transform:rotateY(0deg) translateZ(1px); -webkit-transform:rotateY(0deg) translateZ(1px);
+  visibility:visible;
+}
+.card.flipped .front{visibility:hidden}
+.front .q-label{
+  font-size:11px; font-weight:700; color:var(--accent2); letter-spacing:1px;
+  text-transform:uppercase; margin-bottom:14px;
+}
+.front .q-text{font-size:22px; font-weight:700; line-height:1.5; letter-spacing:-.4px}
+.front .hint{position:absolute; bottom:16px; font-size:11px; color:var(--muted)}
+.back{
+  transform:rotateY(180deg) translateZ(1px); -webkit-transform:rotateY(180deg) translateZ(1px);
+  visibility:hidden;
+}
+.card.flipped .back{visibility:visible}
+.back .a-label{
+  font-size:11px; font-weight:700; color:var(--ok); letter-spacing:1px;
+  text-transform:uppercase; margin-bottom:12px; flex:0 0 auto;
+}
+.back .a-body{font-size:15px; line-height:1.7; word-break:keep-all}
+.back .a-body h3{font-size:16px; color:var(--accent); margin:12px 0 6px; font-weight:700}
+.back .a-body h3:first-child{margin-top:0}
+.back .a-body .li{display:flex; gap:7px; margin:5px 0; align-items:flex-start}
+.back .a-body .li .mk{flex:0 0 auto; color:var(--accent2); font-weight:700}
+.back .a-body .li .tx{flex:1}
+.back .a-body p{margin:7px 0}
+.back .a-body .star{color:var(--high); font-weight:700}
+.back .a-body .star.vh{color:var(--vhigh)}
+.back .a-body table{
+  width:100%; border-collapse:collapse; margin:12px 0; font-size:13px;
+  border:1px solid var(--border); border-radius:8px; overflow:hidden;
+}
+.back .a-body th,.back .a-body td{
+  border:1px solid var(--border); padding:7px 9px; text-align:left; vertical-align:top; line-height:1.5;
+}
+.back .a-body th{background:var(--th-bg); color:var(--text); font-weight:700}
+.back .a-body td{background:var(--td-bg)}
+.controls{
+  width:100%; max-width:560px; display:flex; gap:10px; align-items:center;
+}
+.btn{
+  flex:1; padding:14px 10px; border-radius:14px; border:1px solid var(--border);
+  background:var(--panel2); color:var(--text); font-size:14px; font-weight:700;
+  cursor:pointer; font-family:inherit; transition:.15s;
+}
+.btn:active{transform:scale(.96)}
+.btn.flip{flex:1.5; background:var(--accent2); border-color:var(--accent2); color:#fff}
+.btn:disabled{opacity:.35; cursor:default}
+.dots{
+  width:100%; max-width:560px; display:flex; flex-wrap:wrap; gap:5px;
+  justify-content:center; padding-top:2px;
+}
+.dot{width:7px; height:7px; border-radius:50%; background:var(--border); transition:.15s}
+.dot.done{background:var(--ok)}
+.dot.cur{background:var(--accent); transform:scale(1.5)}
+.counter{font-weight:700; color:var(--text)}
+@media(max-width:420px){
+  .front .q-text{font-size:19px}
+  .back .a-body{font-size:14px}
+  .face{padding:18px 15px}
+}
+
+/* ---- 검색 UI ---- */
+.searchbar{
+  display:flex; align-items:center; gap:8px; padding:10px 12px;
+  background:var(--panel); border-bottom:1px solid var(--border);
+}
+.searchbar .search-icon{font-size:14px; opacity:.7; flex:0 0 auto}
+.searchbar input{
+  flex:1; min-width:0; padding:9px 12px; border-radius:999px;
+  border:1px solid var(--border); background:var(--panel2); color:var(--text);
+  font-size:13px; font-family:inherit; outline:none; transition:.15s;
+}
+.searchbar input:focus{border-color:var(--accent2)}
+.searchbar input::placeholder{color:var(--muted)}
+.search-clear{
+  flex:0 0 auto; width:30px; height:30px; border-radius:50%;
+  border:1px solid var(--border); background:var(--panel2); color:var(--muted);
+  font-size:12px; cursor:pointer; font-family:inherit; display:none;
+  align-items:center; justify-content:center; transition:.15s;
+}
+.search-clear:active{transform:scale(.9)}
+.search-clear.show{display:flex}
+.search-results{
+  width:100%; max-width:560px; display:flex; flex-direction:column; gap:10px;
+}
+.search-summary{font-size:12px; color:var(--muted); padding:2px 2px 4px}
+.search-summary b{color:var(--accent2)}
+.result-card{
+  border:1px solid var(--border); border-radius:14px; padding:14px 16px;
+  background:var(--card-grad); cursor:pointer; transition:.15s;
+  box-shadow:0 4px 14px rgba(0,0,0,.12);
+}
+.result-card:active{transform:scale(.985)}
+.result-card .rc-top{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:6px}
+.result-card .rc-subject{
+  font-size:11px; font-weight:700; color:var(--accent2);
+  background:rgba(56,139,253,.12); border:1px solid var(--accent2);
+  padding:2px 8px; border-radius:999px;
+}
+.result-card .rc-front{font-size:15px; font-weight:700; line-height:1.45; letter-spacing:-.3px}
+.result-card .rc-snippet{font-size:12.5px; color:var(--muted); line-height:1.55; margin-top:6px; word-break:keep-all}
+.result-card mark{background:rgba(240,180,41,.35); color:var(--text); border-radius:3px; padding:0 2px}
+.search-empty{text-align:center; color:var(--muted); font-size:13px; padding:40px 10px; line-height:1.7}
+
+</style>
+</head>
+<body>
+<div class="topbar">
+<header>
+  <button class="theme-btn" id="themeBtn" aria-label="테마 전환">🌙</button>
+  <h1><span class="logo">📚</span>임용시험 플래시카드</h1>
+  <div class="sub">앞면=주제·질문 · 뒷면=내용·정답 · 카드를 눌러 뒤집기</div>
+</header>
+<nav class="tabs" id="tabs"></nav>
+<div class="searchbar">
+  <span class="search-icon">🔍</span>
+  <input type="text" id="searchInput" placeholder="모든 과목에서 카드 검색 (주제·내용)" autocomplete="off">
+  <button class="search-clear" id="searchClear" aria-label="검색어 지우기">✕</button>
+</div>
+</div>
+<div class="wrap">
+  <div id="searchResults" class="search-results" style="display:none"></div>
+  <div class="meta">
+    <span class="counter" id="counter">1 / 1</span>
+    <span class="imp" id="imp"></span>
+  </div>
+  <div class="toolbar">
+    <button class="tool-btn" id="shuffleBtn">🔀 순서 섞기</button>
+    <button class="tool-btn" id="resetBtn">↺ 원래 순서</button>
+    <span class="order-tag" id="orderTag"></span>
+  </div>
+  <div class="scene">
+    <div class="card" id="card">
+      <div class="face front">
+        <div class="q-label">주제 · 질문</div>
+        <div class="q-text" id="frontText"></div>
+        <div class="hint">눌러서 정답 확인 ↻</div>
+      </div>
+      <div class="face back">
+        <div class="a-label">내용 · 정답</div>
+        <div class="a-body" id="backText"></div>
+      </div>
+    </div>
+  </div>
+  <div class="controls">
+    <button class="btn" id="prevBtn">← 이전</button>
+    <button class="btn flip" id="flipBtn">정답 확인 ↻</button>
+    <button class="btn" id="nextBtn">다음 →</button>
+  </div>
+  <div class="dots" id="dots"></div>
+</div>
+<script>
+const DATA = {"교육심리": [{"front": "[지능이론] 전통적 지능이론 — 종류 4가지", "importance": "normal", "back": "1) 스피어만의 G요인설(일반요인설)\n2) 써스톤의 다요인(PMA)설\n3) 길포드의 지능구조모형\n4) 카텔 & 혼의 위계적 요인설"}, {"front": "[지능이론] 스피어만 G요인설 — 지능 요인 2가지", "importance": "normal", "back": "1) 일반요인(G요인)\n2) 특수요인(S요인)"}, {"front": "[지능이론] 스피어만 G요인설 — 기본 입장", "importance": "normal", "back": "- 일반요인(G요인)만 중요하며, 지능이 높으면 모든 영역을 다 잘한다."}, {"front": "[지능이론] 써스톤 다요인(PMA)설 — 기본 입장", "importance": "normal", "back": "- 지능은 7개의 기본정신능력(PMA)으로 구성되며, 각 능력은 상호 독립적이다."}, {"front": "[지능이론] 써스톤 다요인(PMA)설 — 기본정신능력 7가지", "importance": "normal", "back": "1) 언어능력\n2) 공간능력\n3) 수리능력\n4) 추론능력\n5) 기억능력\n6) 지각능력\n7) 속도능력"}, {"front": "[지능이론] 길포드 지능구조모형 — 기본 입장", "importance": "normal", "back": "- 지능은 3차원의 조합으로 구성된다 (180개 복합요인)"}, {"front": "[지능이론] 길포드 지능구조모형 — 지능 구성 차원 3가지", "importance": "normal", "back": "1) 내용 차원\n2) 조작 차원\n3) 결과 차원"}, {"front": "[지능이론] 카텔 & 혼 위계적 요인설 — 지능의 종류 2가지", "importance": "normal", "back": "1) 유동성 지능\n2) 결정성 지능"}, {"front": "[지능이론] 카텔 & 혼 위계적 요인설 — 기본 입장", "importance": "normal", "back": "- 연령이 증가하면서 → 유동성 지능은 감소하고, 결정성 지능은 불변하거나 증가한다."}, {"front": "[다중지능] 가드너 다중지능이론 — 개념 2가지", "importance": "very_high", "back": "1) 지능은 단일 지능이 아니라 9개의 상호 독립적인 지능으로 구성된다.\n2) 지능은 자신의 문화적 상황 속에서 문제를 해결하거나 가치 있는 산물을 만들어내는 능력이다."}, {"front": "[다중지능] 가드너 다중지능이론 — 기본 입장 3가지", "importance": "very_high", "back": "1) 지능은 상호 독립적이며(상대적 중요성 동일) 서로 상호작용한다.\n2) 지능은 문화 의존적 & 상황 의존적이다.\n3) 지능은 교육 및 훈련으로 발달 가능하다."}, {"front": "[다중지능] 가드너 다중지능이론 — 학교의 역할", "importance": "very_high", "back": "- 사회에서 중시되는 다양한 능력을 증진시켜줘야 한다."}, {"front": "[다중지능] 가드너 다중지능이론 — 지능 측정 방법", "importance": "very_high", "back": "- 지능 측정은 다양한 방법으로 해야 한다."}, {"front": "[다중지능] 가드너 다중지능이론 — 다중지능 종류 9가지", "importance": "very_high", "back": "1) 언어 지능\n2) 논리-수학 지능\n3) 대인관계 지능\n4) 자연관찰 지능\n5) 음악 지능\n6) 공간 지능\n7) 신체운동 지능\n8) 개인 내적 지능\n9) 실존 지능"}, {"front": "[다중지능] 가드너 다중지능이론 — 교육적 시사점 2가지", "importance": "very_high", "back": "1) 지능은 9개의 독립된 능력으로 구성됨\n → 강점 지능은 강화 & 약점 지능은 보완해야 함\n → 학생의 개인차를 고려한 맞춤형 교육을 해야 함\n2) 지능은 문화 의존적 & 상황 의존적\n → 학습자 특성에 맞춘 수행평가를 통해 평가해야 함"}, {"front": "[삼원지능] 스턴버그 삼원지능이론 — 개념", "importance": "very_high", "back": "- 지능은 구성적 지능 / 경험적 지능 / 실제적 지능과 연관이 있다."}, {"front": "[삼원지능] 스턴버그 삼원지능이론 — 성공지능이란", "importance": "very_high", "back": "- 개인의 목표 달성에 도움을 주는 지능\n (구성적 지능 / 경험적 지능 / 실제적 지능이 균형 있게 유지된 것)"}, {"front": "[삼원지능] 스턴버그 삼원지능이론 — 삼원지능 종류 3가지", "importance": "very_high", "back": "1) 구성적 지능 (= 분석적)\n2) 경험적 지능 (= 창조적)\n3) 실제적 지능 (= 실천적)"}, {"front": "[삼원지능] 스턴버그 — 구성적(분석적) 지능 구성 3", "importance": "very_high", "back": "1) 메타요소\n2) 수행요소\n3) 지식습득요소"}, {"front": "[삼원지능] 스턴버그 — 경험적(창조적) 지능 구성 2", "importance": "very_high", "back": "1) 자동화\n2) 통찰력"}, {"front": "[삼원지능] 스턴버그 — 실제적(실천적) 지능 구성 3", "importance": "very_high", "back": "1) 환경적응\n2) 환경변화\n3) 환경선택"}, {"front": "[삼원지능] 스턴버그 삼원지능이론 — 교육적 시사점 2가지", "importance": "very_high", "back": "1) 3가지 지능은 모든 교과에 적용 가능 (3지능을 반영한 교과 수업이 필요함)\n2) 학생의 강점 강화 & 단점 보완하는 교육을 해야 함"}, {"front": "[감성지능] 골만 감성지능(EQ)이론 — 개념", "importance": "normal", "back": "- 지능은 자신과 타인의 감정을 정확히 인식 / 평가 / 표현하는 능력이다."}, {"front": "[감성지능] 골만 감성지능(EQ)이론 — EQ 구성요소 5가지", "importance": "normal", "back": "1) (자기) 감정인식능력\n2) (자기) 감정조절능력\n3) (자기) 동기화능력\n4) 타인의 감정인식능력\n5) 대인관계 관리능력"}, {"front": "[감성지능] 골만 감성지능(EQ)이론 — EQ 향상을 위한 교사 역할 3가지", "importance": "normal", "back": "1) 자신/타인의 정서를 인식 & 표현하는 기회를 제공해야 함\n2) 타인 상황을 총체적으로 인식 & 타인 정서를 공감하는 경험을 제공해야 함\n3) 다양한 상황 속 부정적 정서를 인식 & 조절하는 경험을 제공해야 함"}, {"front": "[지능검사] 지능검사 종류 4가지", "importance": "normal", "back": "1) 비네-시몬 검사\n2) 스탠포드-비네 검사\n3) 웩슬러 지능검사\n4) 문화공평검사 (문화공정성 검사, 문화평형검사)"}, {"front": "[지능검사] 비네-시몬 검사 — 특징 2가지", "importance": "normal", "back": "1) 최초의 지능검사임\n2) 학습부진아 판별 목적으로 고안됨"}, {"front": "[지능검사] 스탠포드-비네 검사 — 특징 2가지", "importance": "normal", "back": "1) 비율IQ(비율지능지수)를 최초 개발한 지능검사임\n (비율IQ = (정신연령 / 실제연령) × 100)\n2) 학업성취도 예언에 사용됨"}, {"front": "[지능검사] 웩슬러 지능검사 — 특징 & 편차IQ란", "importance": "normal", "back": "### 특징\n- 편차IQ를 도입함\n### 편차IQ란\n- 동일 연령집단 내 상대적 위치로 지능을 규정한 IQ"}, {"front": "[지능검사] 문화공평검사 — 특징 & 종류 3가지", "importance": "normal", "back": "### 특징\n- 피검자의 문화적 배경과 무관하게 지적 능력 등을 평가하는 비언어성 검사\n### 종류 3가지\n1) SOMPA (다문화 검사 체제)\n2) K-ABC (카우프만 검사)\n3) Raven 지능검사"}, {"front": "[지능검사] 지능지수(IQ) 해석 시 유의점 5가지", "importance": "normal", "back": "1) IQ는 지능의 하나의 지표일 뿐 맹신 X\n2) 표준오차 고려 필요 (모든 검사엔 오차 있음 → 단일 점수보다 점수 범위로 생각)\n3) IQ는 변화 가능\n4) IQ로 낙인 찍기 금지\n5) IQ 측정 시 플린효과 고려 필요"}, {"front": "[창의성] 창의성 개념 3가지 (퍼킨스 / 길포드 / 드 보노)", "importance": "normal", "back": "1) 퍼킨스: 주어진 문제 상황에서 새롭고/유용하고/가치 있는 것을 창출하는 능력\n2) 길포드: 문제의 창의적 해결을 위해선 확산적 사고 + 수렴적 사고가 필요\n3) 드 보노: 창의성은 수평적으로 사고하는 것"}, {"front": "[창의성] 창의성 개발의 원리 3가지", "importance": "normal", "back": "1) 판단보류의 원리\n2) 개방성의 원리\n3) 자율성의 원리"}, {"front": "[창의성] 창의성의 구성요소 5가지", "importance": "normal", "back": "1) 유창성\n2) 융통성\n3) 민감성\n4) 정교성\n5) 독창성"}, {"front": "[창의성] 창의성 교육의 활성화 방안 3가지", "importance": "normal", "back": "1) (외재적 동기보다) 내재적 동기 유발이 중요함\n2) 문제에 대해 새로운 관점에서 생각해 보도록 질문해야 함\n3) 학생들에게 자유를 부여 & 실수를 허용해야 함"}, {"front": "[창의성] 창의성 개발기법 종류 7가지", "importance": "normal", "back": "1) 브레인스토밍\n2) 시네틱스 교수법\n3) PMI법\n4) 육색 사고 모자\n5) 속성 열거법\n6) 체크리스트법\n7) SCAMPER법"}, {"front": "[창의성] 브레인스토밍 — 기본개념 & 기본 원리 4", "importance": "normal", "back": "### 기본개념\n- 자유롭게 의견을 제시해 최대한 많은 아이디어를 창출하는 기법\n### 기본 원리 4\n1) 양산\n2) 비판금지\n3) 자유분방\n4) 결합과 개선\ncf. 브레인라이팅"}, {"front": "[창의성] 시네틱스 교수법 — 학자·개념·방법·단계", "importance": "normal", "back": "### 학자\n- 고든\n### 기본개념\n- 관련 없어 보이는 요소들을 유추로 연결해 새로운 아이디어를 창출하는 기법\n### 방법 4\n1) 직접 유추 2) 의인 유추 3) 상징적 유추 4) 환상적 유추\n### 단계(방법) 4\n1) 이탈 → 2) 거치 → 3) 성찰 → 4) 자율"}, {"front": "[창의성] PMI법 — 학자 & 기본개념", "importance": "normal", "back": "### 학자\n- 드보노\n### 기본개념\n- 문제를 ①긍정적인 / ②부정적인 / ③흥미로운 면으로 나눠 생각시킴"}, {"front": "[창의성] 육색 사고 모자 — 학자 & 기본개념", "importance": "normal", "back": "### 학자\n- 드보노\n### 기본개념 2\n1) 본인 모자 색의 특정 사고만 하도록 함\n2) 한 번에 한 가지씩만 사고 → 여러 측면의 폭넓은 사고를 유도하는 기법"}, {"front": "[창의성] 속성열거법 — 학자 & 기본개념", "importance": "normal", "back": "### 학자\n- 크로포드\n### 기본개념\n- 어떤 대상의 주요 속성을 열거해 새로운 아이디어를 창출하는 기법"}, {"front": "[창의성] 체크리스트법 — 기본개념", "importance": "normal", "back": "- 점검 목록(checklist)을 미리 작성 & 다양한 사고를 능률적으로 전개하는 기법"}, {"front": "[창의성] SCAMPER법 — 기본개념 & 변형 방법 7", "importance": "normal", "back": "### 기본개념\n- 대상이나 문제를 다양한 방법으로 변형 → 새로운 아이디어를 창출하는 기법\n### 변형 방법 7\n1) 대체하기 (Substitute)\n2) 결합하기 (Combine)\n3) 적용하기 (Adapt)\n4) 수정하기 (Modify)\n5) 다른 용도로 활용 (Put other uses)\n6) 제거하기 (Elimination)\n7) 거꾸로 또는 재배열하기 (Rearrange or Reverse)"}, {"front": "[인지양식] 인지양식이란 & 교육적 시사점", "importance": "very_high", "back": "### 인지양식이란\n- 사물이나 정보를 지각/처리하는 개인만의 방식\n### 교육적 시사점\n- 학생의 인지양식에 맞게 수업 방식을 달리해야 함"}, {"front": "[인지양식] 인지양식 종류 3가지", "importance": "very_high", "back": "1) 위트킨의 장독립적-장의존적 인지양식\n2) 케이건의 충동형(속응형)-반성형(숙고형) 인지양식\n3) 콜브의 학습유형"}, {"front": "[인지양식] 위트킨 장독립-장의존 — 학자 & 양식 나누는 기준 & 유형 2", "importance": "very_high", "back": "### 학자\n- 위트킨\n### 양식 나누는 기준\n- 주어진 상황에서 정보를 받아들이는 방식에 따라\n### 인지양식 유형 2\n1) 장독립형\n2) 장의존형"}, {"front": "[인지양식] 장독립형 — 학습자 특성 5", "importance": "very_high", "back": "1) 대상을 독립적으로 파악하는 경향\n2) 주변 배경(환경)에 영향을 받지 않음\n3) 개인적 성향을 가짐\n4) 개별학습 선호\n5) 개인의 목표 추구를 통해 내적 동기가 유발되는 경향"}, {"front": "[인지양식] 장독립형 — 교수전략 4", "importance": "very_high", "back": "1) 강의법 선호함 (제공함)\n2) 비구조화된 학습자료 선호함 (제공함)\n3) 목표를 스스로 세우게 함\n4) 정확한 피드백 & 부정적 평가를 함께 사용함"}, {"front": "[인지양식] 장의존형 — 학습자 특성 5", "importance": "very_high", "back": "1) 대상을 전체적으로 파악하는 경향\n2) 주변 배경(환경)에 영향을 많이 받음\n3) 사회적 성향을 가짐\n4) 동료학습 선호\n5) 칭찬 및 보상 등에 의해 외적 동기가 유발되는 경향"}, {"front": "[인지양식] 장의존형 — 교수전략 4", "importance": "very_high", "back": "1) 협동학습 선호함 (제공함)\n2) 구조화된 학습자료 선호함 (제공함)\n3) 외적 보상을 계획해 제공함\n4) 외부 비판에 영향을 많이 받으므로, 부정적 피드백 & 부정적 평가를 지양함"}, {"front": "[인지양식] 케이건 충동형-반성형 — 학자 & 유형 2 & 구분 기준", "importance": "high", "back": "### 학자\n- 케이건\n### 인지양식 유형 2\n1) 충동형(속응형)\n2) 반성형(숙고형)\n### 구분 기준\n- 과제 해결에 대한 반응시간과 반응오류(오답 수)에 따라"}, {"front": "[인지양식] 충동형(속응형) — 학습자 특성 3", "importance": "high", "back": "1) 생각나는 대로 단순하게 답을 구함\n2) 정보처리가 빠르지만, 실수가 잦음\n3) 학업 성취도 낮음"}, {"front": "[인지양식] 충동형(속응형) — 교수전략 2", "importance": "high", "back": "1) 신중하게 사고하도록 가르침\n2) 학습 전체를 개괄적으로 훑어보게 함"}, {"front": "[인지양식] 반성형(숙고형) — 학습자 특성 3", "importance": "high", "back": "1) 여러 가지 대안을 탐색한 후 검토하여 답을 구함\n2) 정보처리가 느리지만, 실수가 적음\n3) 학업 성취도 높음"}, {"front": "[인지양식] 반성형(숙고형) — 교수전략 1", "importance": "high", "back": "1) 어려운 문제는 넘어갈 수 있게 함"}, {"front": "[인지양식] 콜브 학습유형 — 구분 기준 & 학습유형의 기준 2", "importance": "high", "back": "### 구분 기준\n- 정보지각방식과 정보처리방식에 따라 학습유형을 분류함\n### 학습유형의 기준 2\n1) 정보지각방식\n - 유형① 구체적 경험으로 지각하는 유형\n - 유형② 추상적으로 개념화하는 유형\n2) 정보처리방식\n - 유형① 활동적으로 실험하는 유형 (능동적 실행)\n - 유형② 반성적으로 관찰하는 유형"}, {"front": "[인지양식] 콜브 학습유형 4가지", "importance": "high", "back": "1) 적응형 (구체적 경험 & 활동적 실험)\n2) 발산형(확산형) (구체적 경험 & 반성적 관찰)\n3) 수렴형 (추상적 개념화 & 활동적 실험)\n4) 동화형 (추상적 개념화 & 반성적 관찰)"}, {"front": "[동기] 기대×가치이론(앳킨슨) — 기본개념", "importance": "high", "back": "- (과제 성공 기대) × (해당 과제 가치)를 곱한 값만큼 동기가 유발됨"}, {"front": "[동기] 기대×가치이론 — 성공 기대에 영향을 주는 요소 4", "importance": "high", "back": "1) 목표\n2) 과제 난이도\n3) 자기도식\n4) 정서적 기억"}, {"front": "[동기] 기대×가치이론 — 과제 가치에 영향을 주는 요소 4", "importance": "high", "back": "1) 내적가치 (흥미)\n2) 달성가치 (중요성)\n3) 비용가치 (과제를 위해 포기하는 것)\n4) 유용가치 (유용성)"}, {"front": "[동기] 기대×가치이론 — 시사점 3가지", "importance": "high", "back": "1) 기대와 가치 중 하나라도 0이 되면 동기가 유발되지 않음\n2) 성공 기대를 높이려면: 구체적인 목표를 세우고, 도전적인 과제와 긍정적인 피드백을 제공함\n3) 과제 가치를 높이려면: 학교에서 배우는 내용에 대한 중요성과 유용성을 강조함"}, {"front": "[동기] 성취동기이론(앳킨슨) — 기본개념", "importance": "normal", "back": "- 성취동기 = 성공추구경향(목표에 다가서려는 경향) − 실패회피경향(실패를 회피하려는 경향)"}, {"front": "[동기] 성취동기이론 — 성취동기 높은 사람 특징 2", "importance": "normal", "back": "1) 성공 가능성이 높은 중간 정도의 난이도의 과제를 선택함\n2) 실패 시 동기가 증가"}, {"front": "[동기] 성취동기이론 — 성취동기 낮은 사람 특징 2", "importance": "normal", "back": "1) 아주 쉬운 과제 또는 아주 어려운 과제를 선택함\n2) 성공 시 동기가 증가"}, {"front": "[동기] 성취동기이론 — 성취동기를 높이기 위한 방안 2", "importance": "normal", "back": "1) 성공추구경향 높이기: 과제 난이도 조절 & 실패 원인을 노력으로 귀인시킴\n2) 실패회피경향 낮추기: 실패를 인정하고, 실패가 주는 교훈을 생각시킴"}, {"front": "[동기] 귀인이론(와이너) — 기본개념", "importance": "very_high", "back": "- 성공/실패의 원인을 어디에 두느냐에 따라 학습동기에 영향을 줌"}, {"front": "[동기] 귀인이론 — 원인 종류 4가지", "importance": "very_high", "back": "1) 능력\n2) 노력\n3) 운\n4) 과제난이도"}, {"front": "[동기] 귀인이론 — 귀인의 차원 3가지", "importance": "very_high", "back": "1) 소재 (내적 vs 외적)\n2) 안정성 (불안정 vs 안정)\n3) 통제 가능성 (통제 가능 vs 불가능)\n- 사람들은 위 3가지 차원을 고려하여 성공/실패 원인을 인식함"}, {"front": "[동기] 귀인이론 — 노력의 귀인 요인", "importance": "very_high", "back": "- 내적 + 불안정적 + 통제 가능"}, {"front": "[동기] 귀인이론 — 시사점 2가지", "importance": "very_high", "back": "1) 외적<내적, 안정적<불안정적, 통제불가능<통제가능 요인에 귀인할 때 학습동기가 증가함\n (∴ 성공하든 실패하든 노력으로 귀인시켜야 함)\n2) '노력-성공' 인지론을 심어주어 노력으로 귀인시켜야 함"}, {"front": "[동기] 목표지향성 이론(드웩) — 기본개념 2", "importance": "high", "back": "1) 학생마다 목표지향성에 따라 학습동기가 설명됨\n2) 학생마다 목표지향성에 따라 과제 수행 과정 & 결과가 달라짐"}, {"front": "[동기] 목표지향성 이론 — 목표의 유형 2 (숙달목표 vs 수행목표)", "importance": "high", "table": "<table><tr><th>구분</th><th>숙달목표</th><th>수행목표</th></tr>\n<tr><td>정의</td><td>학습활동 자체에 초점한 목표</td><td>타인 능력과의 비교에 초점한 목표</td></tr>\n<tr><td>귀인</td><td>성공/실패 모두 노력으로 귀인</td><td>성공/실패 모두 능력으로 귀인</td></tr>\n<tr><td>실수</td><td>실수 인정 O</td><td>실수 인정 X</td></tr>\n<tr><td>비교</td><td>자기 자신과 비교</td><td>자신과 타인을 비교</td></tr>\n<tr><td>과제</td><td>도전적인 과제 선호</td><td>난이도보다 성취 가능성만 따짐</td></tr>\n<tr><td>도움</td><td>다른 사람의 도움 거부 안 함</td><td>다른 사람의 도움 거부함</td></tr></table>", "back": "숙달목표와 수행목표는 정의·귀인·실수·비교·과제·도움의 6가지 측면에서 대비된다."}, {"front": "[동기] 목표지향성 이론 — 시사점 3가지", "importance": "high", "back": "1) 교사는 (수행목표가 아닌) 숙달목표로 동기를 유발해야 함\n2) 교사는 학습자 수준에 맞는 과제(또는 도전적 과제)를 제공해야 함\n3) 교사는 구체적이고 객관적인 피드백을 제공해야 함 (피드백을 통해 성장함)"}, {"front": "[동기] 자기효능감 이론(반두라) — 자기효능감이란", "importance": "high", "back": "- (특정 과제를 성공적으로 수행할 수 있다는) 자신의 능력에 대한 믿음"}, {"front": "[동기] 자기효능감 이론 — 자기효능감의 형성 요인 4", "importance": "high", "back": "1) 성공 경험\n2) 대리 경험 (모델링)\n3) 사회적 설득 (칭찬, 격려, 지지)\n4) 신체적·정서적 상태 (정서적 안정감)"}, {"front": "[동기] 자기가치 이론(코빙톤) — 핵심 주장", "importance": "high", "back": "- 자기가치를 보호하려는 욕구가 행동을 결정한다."}, {"front": "[동기] 자기가치 이론 — 자기가치란", "importance": "high", "back": "- 자신의 가치에 대한 평가 또는 자기 자신에 대한 감정이나 정서적 반응 (= 자기존중감)"}, {"front": "[동기] 자기가치 이론 — 자기장애란 & 자기장애 전략 2", "importance": "high", "back": "### 자기장애란\n- 자기존중감을 보호하기 위한 자기보호 전략\n### 자기장애 전략 2\n1) 과제 수행을 마지막까지 미루기 → 자신의 수행을 실제 능력보다 낮게 만듦\n2) 실패를 능력이 아닌 노력 부족으로 돌림"}, {"front": "[동기] 자기가치 이론 — 교육적 시사점", "importance": "high", "back": "- 왜 학생들이 노력하지 않는지, 그 이유를 설명함"}, {"front": "[동기] 자기결정성 이론(데시와 라이언) — 핵심 주장", "importance": "very_high", "back": "- 인간은 본인 행동을 자율적으로 결정하고 싶은 욕구가 행동을 결정한다."}, {"front": "[동기] 자기결정성 이론 — 자기결정성이란", "importance": "very_high", "back": "- 자신의 행동/운명을 자율적으로 선택할 수 있다는 믿음"}, {"front": "[동기] 자기결정성 이론 — 기본욕구 3", "importance": "very_high", "back": "1) 자율성 욕구 (외적 압력보다는 본인 선택을 원함)\n2) 유능성 욕구 (능력 향상을 원함)\n3) 관계성 욕구 (다른 사람과 안정적 관계를 원함)"}, {"front": "[동기] 자기결정성 이론 — 교육적 시사점", "importance": "very_high", "back": "- 자율성·유능성·관계성 욕구 세 가지를 활용해 학생이 더 높은 동기를 가지게 할 수 있음"}, {"front": "[발달] 피아제 인지발달이론 — 인지발달이란", "importance": "very_high", "back": "- 인간과 환경의 상호작용으로 인지구조가 질적으로 변화되는 과정"}, {"front": "[발달] 피아제 — 인지기능이란 (적응·조직)", "importance": "very_high", "back": "환경에 적응하려는 선천적/불변적 경향성\n### 1-1) 적응 (환경에 맞춰 인지구조를 변화시키는 과정)\n- 하위과정① 동화 (새로운 정보를 기존 인지구조에 통합)\n- 하위과정② 조절 (기존 인지구조를 새로운 정보에 맞춰 수정)\n### 1-2) 조직\n- 본인 인지구조를 체계적으로 정리/통합하는 과정"}, {"front": "[발달] 피아제 — 인지도식이란", "importance": "very_high", "back": "- 인지구조의 기본 단위 (외부세계 이해의 틀 / 사고체계 / 정신적 표상 / 지식 체계 등)"}, {"front": "[발달] 피아제 — 인지적 불평형이란", "importance": "very_high", "back": "- 동화와 조절이 원활히 일어나지 않은 인지갈등상태"}, {"front": "[발달] 피아제 — 학습과정 3", "importance": "very_high", "back": "1) 기존 본인 인지도식에 새로운 지식이나 개념이 들어옴 → 불평형 상태가 됨\n2) 기존 인지구조에 새로운 개념이 포함되면 동화 과정 → 인지발달 발생\n3) 기존 인지구조가 변화하면 조절 과정 → 인지발달 발생"}, {"front": "[발달] 피아제 — 인지발달단계 4", "importance": "very_high", "back": "1) 감각운동기 (0~2세)\n2) 전조작기 (2~7세)\n3) 구체적 조작기 (7~11세)\n4) 형식적 조작기 (12세~)"}, {"front": "[발달] 피아제 — 감각운동기 특징", "importance": "very_high", "back": "- 감각 & 운동은 O 이지만, 사고능력은 X"}, {"front": "[발달] 피아제 — 전조작기 특징", "importance": "very_high", "back": "- 상징적 사고 & 물활론적 사고 & 자기중심적 사고 O"}, {"front": "[발달] 피아제 — 구체적 조작기 특징 4", "importance": "very_high", "back": "1) 보존개념\n2) 탈중심화\n3) 가역성\n4) 보상성\n발달"}, {"front": "[발달] 피아제 — 형식적 조작기 특징 4", "importance": "very_high", "back": "1) 조합적 사고\n2) 명제적 사고\n3) 추상적 사고\n4) 가설연역적 사고\n발달"}, {"front": "[발달] 피아제 인지발달이론 — 교육적 시사점 2", "importance": "very_high", "back": "1) 인지발달을 위해 적절히 인지갈등을 유발해야 함\n (∴ 적정한 곤란도를 가진 과제를 제시해야 함)\n2) 또래와의 사회적 상호작용은 인지불균형을 쉽게 유발함\n (∴ 비슷한 수준의 또래와 상호작용 기회를 제공해야 함)"}, {"front": "[발달] 비고츠키 인지발달이론 — 핵심 주장 2", "importance": "very_high", "back": "1) 타인과의 사회적 상호작용으로 인지발달이 일어남\n2) 언어가 인지발달에 큰 영향을 미침"}, {"front": "[발달] 비고츠키 — 언어의 발달순서 3", "importance": "very_high", "back": "1) 사회적 언어 (~3세) – 감정 전달용 초보적 언어\n2) 사적 언어 (3~7세) – 자신의 사고/행동 조절용 혼잣말\n3) 내적 언어 (7세~) – 사적 언어의 내면화 (속으로 생각)"}, {"front": "[발달] 비고츠키 — 근접발달영역(ZPD)란 & 관련 평가", "importance": "very_high", "back": "### 근접발달영역(ZPD)란\n- 실제적 발달수준과 잠재적 발달수준 사이의 영역\n### 관련 평가\n- 역동적 평가 (발달잠재력을 확인하는 평가)"}, {"front": "[발달] 비고츠키 — 비계설정이란 & 방법 & 유의점", "importance": "very_high", "back": "### 비계설정이란\n- 근접발달영역 내에서 제공되는 도움\n### 비계설정 방법\n- 나보다 뛰어난 누구든, 언어적 도움을 제공\n### 비계설정 유의점\n- 초반엔 많은 도움 → 점점 지원을 줄여야 함 (fading)"}, {"front": "[발달] 비고츠키 인지발달이론 — 교육적 시사점 4", "importance": "very_high", "back": "1) 교사는 근접발달영역(ZPD)을 발견해 맞춤 학습과제를 제시해야 함\n2) 교사는 (학생이 어려워할 때) 비계설정으로 맞춤 도움을 제공해야 함\n3) 교사는 능력 수준이 다른 이질집단의 협동학습을 촉진해야 함\n4) 교사는 허용적 교실환경을 만들어야 함 (학생들이 사적언어를 사용할 수 있도록)"}, {"front": "[발달] 프로이트 성격발달이론 — 기본 주장", "importance": "normal", "back": "- 인간 발달은 성적 에너지(리비도) 부위를 중심으로 단계별로 이뤄짐"}, {"front": "[발달] 프로이트 — 정신의 구조 3", "importance": "normal", "back": "1) 의식\n2) 전의식\n3) 무의식"}, {"front": "[발달] 프로이트 — 성격의 구조 3", "importance": "normal", "back": "1) id (원초아)\n2) ego (자아)\n3) superego (초자아)"}, {"front": "[발달] 프로이트 — 성격발달단계 5", "importance": "normal", "back": "1) 구강기 – 성격 원형 형성 (원초아 지배)\n2) 항문기\n3) 남근기 – 성격 발달의 결정적 시기\n4) 잠복기\n5) 생식기"}, {"front": "[발달] 프로이트 — 성격발달이론 주장 2", "importance": "normal", "back": "1) 각 단계에서 충분히 욕구를 만족시키면 다음 단계로 이행 / 욕구가 불충족·과잉 충족 시 고착 현상\n2) 개인의 발달은 id, ego, superego의 상호작용 결과임"}, {"front": "[발달] 에릭슨 심리·사회적 성격발달이론 — 기본 주장 2", "importance": "very_high", "back": "1) 사회적 관계에 따라 성격발달단계를 8단계로 나눔\n2) 발달 단계마다 결정적 시기와 심리사회적 위기가 있음 → 잘 극복 시 성격발달"}, {"front": "[발달] 에릭슨 — 성격발달단계 8 / 기본덕목 8", "importance": "very_high", "back": "1) 신뢰감 vs 불신감 / 희망 (0~18개월) *성격 발달에 가장 중요한 시기\n2) 자율성 vs 수치심 / 의지\n3) 주도성 vs 죄책감 / 목적\n4) 근면성 vs 열등감 / 능력 (6~12세)\n5) 자아정체성 vs 역할혼미 / 충성(충실) (12~18세) *또래와 상호작용 중요 시기\n6) 친밀감 vs 고립감 / 사랑\n7) 생산성 vs 침체감 / 배려\n8) 자아통합 vs 절망감 / 지혜"}, {"front": "[발달] 에릭슨 — 교육적 시사점 (중등 측면) 3", "importance": "very_high", "back": "1) 교사는 중고등학생들의 자아정체성 탐색이 중요하다는 것을 알고 있어야 함\n2) (자아정체감을 형성할 수 있게) 다양한 경험의 기회 제공이 필요\n3) 학생들이 심리적 유예를 보일 수 있음을 유의 → 기다려주는 자세가 필요"}, {"front": "[발달] 마샤 자아정체감 지위 이론 — 기본 개념", "importance": "very_high", "back": "- 위기와 참여를 기준으로 정체감 지위를 4가지 유형으로 분류함"}, {"front": "[발달] 마샤 — 정체감 지위 구분 기준 2", "importance": "very_high", "back": "1) 위기 (정체성을 찾으려고 고민하고 노력했는가)\n2) 참여 (가치, 신념 등에 능동적 의사결정을 내렸는가)"}, {"front": "[발달] 마샤 — 정체감의 유형 4", "importance": "very_high", "table": "<table><tr><th>정체감 유형</th><th>위기</th><th>참여</th></tr>\n<tr><td>정체성 혼미</td><td>X</td><td>X</td></tr>\n<tr><td>정체성 유예</td><td>O</td><td>X</td></tr>\n<tr><td>정체성 유실</td><td>X</td><td>O</td></tr>\n<tr><td>정체성 성취</td><td>O</td><td>O</td></tr></table>", "back": "1) 정체성 혼미 (위기 X, 참여 X)\n2) 정체성 유예 (위기 O, 참여 X)\n3) 정체성 유실 (위기 X, 참여 O)\n4) 정체성 성취 (위기 O, 참여 O)"}, {"front": "[발달] 마샤 — 정체감 형성 과정", "importance": "very_high", "back": "- 정체성 혼미 → 유예 → 성취"}, {"front": "[발달] 마샤 — 교육적 시사점 3", "importance": "very_high", "back": "1) '위기'를 경험하도록 다양한 경험을 제공해야 함\n2) '참여'할 수 있도록 다양한 모델링을 제시해 줘야 함\n3) 정체성 유예 단계에선 학생 스스로 정체성을 결정할 수 있도록 기다려줘야 함"}, {"front": "[발달] 콜버그 도덕성 발달이론 — 기본 개념 2", "importance": "high", "back": "1) 도덕성 발달 수준은 단계적으로 발전함 (인지 능력 발달 & 사회적 경험 성장에 따라)\n2) 도덕적 딜레마 상황을 제시하고, 도덕성 발달이론을 체계화함"}, {"front": "[발달] 콜버그 — 도덕성 발달단계 6", "importance": "high", "back": "### 전인습 수준 (개인욕구에 맞춤)\n1) 처벌회피·복종지향\n2) 개인적 욕구 충족지향\n### 인습 수준 (구성원 기준에 맞춤)\n3) 대인관계 조화지향\n4) 법과 질서 지향\n### 후인습 수준 (개인 양심에 맞춤)\n5) 사회 계약 지향\n6) 보편적 도덕원리 지향"}, {"front": "[발달] 콜버그 — 교육적 시사점 2", "importance": "high", "back": "1) 학교 도덕교육은 도덕적 판단능력을 길러주는 교육이어야 함 (사례 나열 X, 다양한 상황에서 스스로 판단해 행동하도록 O)\n2) 도덕적 딜레마 상황을 제시 → 학생들이 토론하게 해봄 = 도덕성 발달 교육"}, {"front": "[발달] 콜버그 — 한계점 3", "importance": "high", "back": "1) 도덕적 판단수준이 높다고 도덕적으로 행동하는 것은 아님\n2) 도덕 발달단계를 뚜렷하게 구분하기 어려움\n3) 여성의 도덕성 발달단계엔 적절하지 못함"}, {"front": "[발달] 셀만 사회적 조망수용이론 — 사회적 조망수용능력이란 & 갖춘 아동", "importance": "normal", "back": "### 사회적 조망수용능력이란\n- 타인의 관점, 입장, 사고, 감정 등을 추론하여 이해하는 능력\n### 사회적 조망수용능력을 갖춘 아동\n- 감정이입능력, 동정심, 사회적 문제해결능력을 지님"}, {"front": "[발달] 셀만 — 조망수용능력 단계 5", "importance": "normal", "back": "1) 자기중심적 조망수용 (0단계, 3-6세) *자신과 다른 관점 이해 X\n2) 사회정보적 조망수용 (1단계, 5-9세) *타인 관점이 다름은 이해하나 자신 입장에서 이해\n3) 자기반성적 조망수용 (2단계, 7-12세) *타인 관점에서 자신 이해하나 동시이해 X\n4) 상호적 조망수용 (3단계, 10-15세) *제3자 입장에서 객관적으로 자신/타인 동시이해\n5) 사회적 조망수용 (4단계, 청소년-성인기) *법/질서 등 사회가치체계에 근거 판단"}, {"front": "[발달] 셀만 — 교육적 시사점 2", "importance": "normal", "back": "1) 조망수용능력을 지도/훈련 시, 반사회적 행동 감소 & 감정이입 증가 & 친사회적 행동 증가\n2) 교사는 학생들이 높은 단계의 조망수용능력을 발달시킬 수 있게 도와줘야 함"}, {"front": "[발달] 브론펜브레너 생태학적 발달이론 — 기본 개념 2", "importance": "high", "back": "1) 사회적 환경이 어떻게 아동 발달에 영향을 미치는지 보여주는 이론\n2) 환경의 다차원적인 체계가 상호작용해 개인의 발달/행동에 영향을 미친다고 주장"}, {"front": "[발달] 브론펜브레너 — 개인을 둘러싼 환경 5", "importance": "high", "back": "1) 미시체계\n2) 중간체계\n3) 외체계\n4) 거시체계\n5) 시간체계\n- 연령이 증가하며 개인발달에 영향을 주는 환경 범위가 미시체계에서 점차 넓어짐"}, {"front": "[발달] 브론펜브레너 — 교육적 시사점 2", "importance": "high", "back": "1) 개인의 발달은 유전과 환경 모두의 영향을 받음\n2) 학생 이해는 다양한 환경과의 상호작용 속에서 가능함"}, {"front": "[학습] 파블로프 고전적 조건화 — 기본개념", "importance": "normal", "back": "- 중립 자극과 무조건 자극을 결합해 유기체에 반복적으로 제공함으로써, 조건 자극만으로 조건 반응을 유발 가능 (수동적 조건형성 이론)"}, {"front": "[학습] 파블로프 — 주요 키워드 6 (중·무·무·조·조·조)", "importance": "normal", "back": "1) 중립 자극\n2) 무조건 자극\n3) 무조건 반응\n4) 조건 자극\n5) 조건 반응\n6) 조건 형성"}, {"front": "[학습] 파블로프 — 조건형성 전/중/후", "importance": "normal", "back": "### 조건형성 전\n- 무조건 자극 → 무조건 반응 / 중립 자극 → 반응 없음\n### 조건형성 중\n- 중립 자극 + 무조건 자극 → 무조건 반응\n### 조건형성 후\n- 조건 자극 → 조건 반응"}, {"front": "[학습] 파블로프 — 고전적 조건형성의 원리 4", "importance": "normal", "back": "1) 시간의 원리\n2) 일관성의 원리\n3) 강도의 원리\n4) 계속성의 원리"}, {"front": "[학습] 파블로프 — 주요 현상 (조건형성 과정)", "importance": "normal", "back": "1) 자극 일반화\n2) 변별\n3) 소거\n4) 자발적 회복"}, {"front": "[학습] 파블로프 — 부적응행동의 교정 4", "importance": "normal", "back": "1) 소거\n2) 역조건형성 (= 상호제지)\n3) 체계적 둔감법\n4) 홍수법"}, {"front": "[학습] 손다이크 도구적 조건화 — 기본 주장 2", "importance": "normal", "back": "1) 행동 뒤에 수반되는 결과가 행동을 유발하는 것임\n2) 행동은 결과/목표 달성을 위한 도구일 뿐임"}, {"front": "[학습] 손다이크 — 시행착오설", "importance": "normal", "back": "- 시행횟수가 증가하면 → 목표에 도달하는 시간이 짧아지는 학습"}, {"front": "[학습] 손다이크 — 학습 원리 3", "importance": "normal", "back": "1) 효과의 법칙 (행동 결과가 만족스러울 때 학습이 촉진됨)\n2) 연습의 법칙 (반복 연습이 학습을 촉진)\n3) 준비성의 법칙 (학습자가 학습태세가 준비되어 있어야 함)"}, {"front": "[학습] 스키너 조작적 조건화 — 기본 주장", "importance": "very_high", "back": "- 행동의 결과(자극)에 의해 특정 행동의 빈도가 증가하거나 감소하여 학습이 일어남"}, {"front": "[학습] 스키너 — 강화 이론 키워드 2 (강화 vs 벌)", "importance": "very_high", "back": "1) 강화 - 특정 행동의 발생빈도를 증가시키는 것\n2) 벌 - 특정 행동의 발생빈도를 감소시키는 것"}, {"front": "[학습] 스키너 — 강화 조건 3", "importance": "very_high", "back": "1) 강화는 자주\n2) 강화는 반응 후 즉시\n3) 강화는 바람직한 행동 때만 줘야 함"}, {"front": "[학습] 스키너 — 벌의 조건 4", "importance": "very_high", "back": "1) 처벌 행동 구체적\n2) 즉시 처벌\n3) 처벌 이유 분명히\n4) 대안행동 분명히"}, {"front": "[학습] 스키너 — 벌의 대안 4", "importance": "very_high", "back": "1) 타임아웃\n2) 소거\n3) 상반행동강화\n4) 포만법"}, {"front": "[학습] 스키너 — 강화의 유형 4", "importance": "very_high", "back": "1) 정적 강화 (반응 후 유쾌자극 제시)\n2) 부적 강화 (반응 후 불쾌자극 제거)\n3) 적극적 벌(수여성 벌) (반응 후 불쾌자극 제시)\n4) 소극적 벌(제거성 벌) (반응 후 유쾌자극 제거)"}, {"front": "[학습] 스키너 — 강화계획의 유형 3", "importance": "very_high", "back": "1) 계속적 강화\n2) 간헐적 강화\n 2-1) 간격강화 - 고정/변동 간격강화\n 2-2) 비율강화 - 고정/변동 비율강화"}, {"front": "[학습] 스키너 — 강화계획의 효과 3", "importance": "very_high", "back": "1) 학습 초기엔 '계속적 강화', 후기엔 '간헐적 강화' 사용이 효과적\n2) 반응 지속성을 높이려면, 고정강화계획보다 변동강화계획이 효과적\n3) 간헐적 강화의 효과: 변동비율 > 고정비율 > 변동간격 > 고정간격 강화 순"}, {"front": "[학습] 스키너 — 행동수정기법 4", "importance": "very_high", "back": "1) 프리맥원리\n2) 토큰강화\n3) 행동조성\n4) 차별강화"}, {"front": "[학습] 반두라 사회인지이론(관찰학습) — 기본 주장 2", "importance": "very_high", "back": "1) 타인의 행동을 관찰/모방만으로도 학습 가능함\n2) 타인을 보고 자기효능감/보상기대감이 높아질 때 학습이 촉진됨"}, {"front": "[학습] 반두라 — 주요 키워드 6 (관·모·대·대·자·자)", "importance": "very_high", "back": "1) 관찰학습\n2) 모델링 (그대로 흉내)\n3) 대리 강화 (타인 행동 결과에 간접적 영향 받음)\n4) 대리적 조건형성\n5) 자기효능감\n6) 자기조절"}, {"front": "[학습] 반두라 — 관찰학습의 과정 4", "importance": "very_high", "back": "1) 주의집중\n2) 파지 (인지적 시연)\n3) 재생\n4) 동기화"}, {"front": "[학습] 반두라 — 교육적 시사점 4", "importance": "very_high", "back": "1) 교사가 솔선수범해야 함\n2) 학생들이 모델의 행동을 관찰 & 모방하도록 지도해야 함\n3) 잠재적 교육과정에 주의해야 함 (의도하지 않은 것도 모방 학습 가능)\n4) 기대한 강화인이 발생하지 않으면 벌인으로 작용 가능함 (∴ 꼭 기대를 충족시켜주기)"}, {"front": "[학습] 인지주의 학습이론 — 기본 주장", "importance": "normal", "back": "- 학습은 (상황 속 여러 정보들로) 인지구조를 형성하면서 일어남"}, {"front": "[학습] 인지주의 학습이론 — 학습원리 3", "importance": "normal", "back": "1) 인간은 환경에 적극적으로 반응하는 능동적 학습자임 (본인 인지구조를 재구성하며)\n2) 인간은 환경을 지각 시 요소 간의 관계를 전제로 지각함 (개별로 지각 X)\n3) 인간은 알고 있는 것에 기초해 정보를 구성해 받아들임 (정보를 기억에 기록 X)"}, {"front": "[학습] 인지주의 vs 행동주의 비교", "importance": "normal", "table": "<table><tr><th>구분</th><th>인지주의</th><th>행동주의</th></tr>\n<tr><td>문제해결방식</td><td>사고를 통한 통찰</td><td>과거 문제해결방식으로 시행착오 통해</td></tr>\n<tr><td>학습자 보는 관점</td><td>학습자는 능동적</td><td>학습자는 수동적</td></tr>\n<tr><td>교사의 역할</td><td>환경 조성 & 적극 참여 유도</td><td>환경 조성</td></tr></table>", "back": "인지주의와 행동주의는 문제해결방식·학습자 관점·교사 역할에서 대비된다."}, {"front": "[학습] 쾰러 통찰학습(아하 현상) — 기본 주장 2", "importance": "normal", "back": "1) 인간은 아무 관련 없는 상황 속 구성 요소들을 '수단'과 '목적'의 관계로 재구성하여 문제를 해결함\n2) 학습은 순간적인 통찰(아하 현상) 때문에 비약적으로 일어난 사고의 결과임"}, {"front": "[학습] 레빈 장이론 — 기본 주장 2", "importance": "normal", "back": "1) 인간은 특정 목표를 추구하려는 긴장 때문에 행동함 (물리적 환경 때문에 행동 X)\n2) 유기체 행동을 이해/예측하려면 물리적 환경뿐 아니라 심리적 환경 등 생활의 장 전체를 봐야 함"}, {"front": "[학습] 톨만 기호형태이론(기호형태설) — 기본 주장", "importance": "normal", "back": "- 학습은 특별한 강화가 없이도 다양한 상황 속에서 일어남"}, {"front": "[학습] 톨만 — 학습 과정 2", "importance": "normal", "back": "1) 학습자는 새로운 환경의 기호(sign)와 이미 의미를 가지고 있던 형태(gestalt)를 연결해 문제 해결 기대(expectation) 가설을 세움\n2) 가설을 적용한 시행착오를 통해 인지지도를 형성하며 학습"}, {"front": "[학습] 톨만 — 학습의 유형 3", "importance": "normal", "back": "1) 잠재학습\n2) 장소학습\n3) 보상기대"}, {"front": "[학습] 정보처리이론 — 기본 개념", "importance": "very_high", "back": "- 인간의 인지과정을 컴퓨터의 정보처리과정에 비유함"}, {"front": "[학습] 정보처리이론 — 전체적인 구조 3", "importance": "very_high", "back": "1) 정보저장소\n2) 정보처리과정\n3) 메타인지 (= 상위인지, = 초인지)"}, {"front": "[학습] 정보처리이론 — 정보저장소 3", "importance": "very_high", "back": "1) 감각기억\n2) 단기기억 (= 작업기억)\n - 일시적으로 정보를 저장하는 장소 / 용량 제한적 / 인지과부하 발생 가능\n3) 장기기억\n - 지식과 도식으로 구성"}, {"front": "[학습] 정보처리이론 — 인지과부하 해결 방안 2", "importance": "very_high", "back": "1) 청킹\n2) 자동화"}, {"front": "[학습] 정보처리이론 — 지식 종류 3 & 도식이란", "importance": "very_high", "back": "### 지식 종류 3\n1) 서술적 지식\n2) 절차적 지식\n3) 조건적 지식\n### 도식이란\n- 인간 기억 속에 축적된 지식의 구조 (본인 사고의 틀)"}, {"front": "[학습] 정보처리이론 — 정보처리과정 6", "importance": "very_high", "back": "1) 주의집중\n2) 지각\n3) 시연\n4) 부호화\n5) 인출 (인출 단서 / 부호화 특수성 / 설단 현상)\n6) 망각"}, {"front": "[학습] 정보처리이론 — 부호화 전략 5", "importance": "very_high", "back": "1) 정교화\n2) 조직화\n3) 심상화\n4) 맥락화\n5) 기억술"}, {"front": "[학습] 정보처리이론 — 메타인지란 & 구성요소 2", "importance": "very_high", "back": "### 메타인지란\n- 자신의 인지 과정을 이해하고 그를 토대로 자신의 인지과정을 조절 & 통제하는 능력\n### 메타인지 구성요소 2\n1) 메타인지적 지식 (자신의 인지과정에 대한 지식)\n2) 메타인지적 기술 (인지과정을 계획 & 점검 & 조절 & 평가하는 능력)"}, {"front": "[학습] 정보처리이론 — 메타인지가 학업성취에 미치는 영향 3", "importance": "very_high", "back": "1) 학습 효율성을 높여줌\n2) 학습내용에 대한 정확한 지식과 이해를 높여줌 (자신의 이해를 정확히 점검)\n3) 과제에 맞춰 효율적인 부호화 전략(인지전략)을 사용할 수 있게 함"}, {"front": "[학습] 정보처리이론 — 교육적 시사점 3", "importance": "very_high", "back": "1) 교사는 학생들의 선행지식을 파악하고, 새로운 내용을 연결해 주는 장치를 만들어야 함 (학생들은 선행지식을 토대로 부호화하니까)\n2) 교사는 학생들의 주의를 끄는 수업을 계획해야 함 (주의부터 기억과정이 시작)\n3) 너무 많은 내용을 한 번에 전달하려고 해서는 안 됨 (인지과부하 발생)"}, {"front": "[학습] 인본주의 학습이론 — 기본 주장 2", "importance": "normal", "back": "1) 인간은 능동적으로 학습하는 주체적 존재임 (단순히 외부자극에 반응하는 수동적 X)\n2) 학습은 개인의 성장과 발달을 위한 과정임"}, {"front": "[학습] 인본주의 학습이론 — 학습원리 4", "importance": "normal", "back": "1) 개인의 성장/발달을 위한 교육 중시\n2) 개인의 경험/의미를 고려한 교육 중시\n3) 개인의 자발성/자유의지를 존중하는 교육 중시\n4) 학습목표는 전인적 발달, 자아실현에 둠"}, {"front": "[학습] 매슬로우 욕구위계이론 — 기본 개념 2", "importance": "normal", "back": "1) 인간의 내적 욕구를 동기유발의 요인으로 봄 (동기(욕구)엔 5단계가 있다고 봄)\n2) 하위 동기가 충족되지 않으면 다음 단계의 상위 동기가 발생하지 않는다고 봄"}, {"front": "[학습] 매슬로우 — 욕구위계순서 5", "importance": "normal", "back": "1) 생리적 욕구\n2) 안전의 욕구\n3) 사랑과 소속의 욕구 (사회적 욕구)\n4) 존경의 욕구\n5) 자아실현의 욕구"}, {"front": "[학습] 매슬로우 — 시사점 4 (욕구 단계별)", "importance": "normal", "back": "1) (생리적·안전의 욕구) 학교는 학생들이 안전/편안한 환경에서 학습할 수 있게 해야 함\n2) (사회적 욕구) 학생 간 긍정적인 상호작용 촉진 기회를 제공해야 함\n3) (존경의 욕구) 학생의 성취에 긍정적인 피드백(칭찬, 보상)을 제공해야 함\n4) (자아실현의 욕구) 학생들이 본인 잠재력을 최대한 발휘할 수 있게 다양한 학습 기회를 제공해야 함"}, {"front": "[기타] 전이 — 전이란", "importance": "high", "back": "- 선행학습이 후행학습 또는 문제해결에 영향을 미치는 현상"}, {"front": "[기타] 전이 — 전이의 종류 7", "importance": "high", "back": "1) 긍정적 전이 (선행학습이 후행학습 촉진)\n2) 부정적 전이 (선행학습이 후행학습 방해)\n3) 영 전이 (선행학습이 후행학습에 영향 X)\n4) 수평적 전이 (선행·후행 난이도가 비슷할 때 나타나는 전이)\n5) 수직적 전이 (상위/하위 위치에 있을 때 나타나는 전이)\n6) 일반적 전이 (선행학습이 다른 영역에서도 적용됨)\n7) 특수적 전이 (선행학습이 유사 영역에서만 적용됨)"}, {"front": "[기타] 전이 — 전이이론 4", "importance": "high", "back": "1) 형식도야설 (교과 형식을 통해 잘 훈련되면 전이가 잘 됨)\n2) 동일요소설 (동일 요소가 있으면 전이가 잘 됨)\n3) 일반화설 (원리가 유사하면 전이가 잘 됨)\n4) 형태이조설 (전체 상황 관계를 잘 관찰해야 전이가 잘 됨)"}, {"front": "[기타] 방어기제 — 기본 개념", "importance": "normal", "back": "- 자아가 위협받는 상황에서 자신을 보호하려는 행위"}, {"front": "[기타] 방어기제 — 종류 7", "importance": "normal", "back": "1) 보상\n2) 합리화\n3) 투사 (= 책임전가)\n4) 승화\n5) 치환 (다른 대상에게 충동/욕구 표출)\n6) 반동형성\n7) 동일시 (뛰어난 사람 자랑 또는 따라함)"}, {"front": "[기타] 도피기제 — 기본 개념", "importance": "normal", "back": "- 현실의 어려운 상황에서 비현실적인 세계로 도피해 불안과 긴장을 해소하려는 행위"}, {"front": "[기타] 도피기제 — 종류 6", "importance": "normal", "back": "1) 고립 (현실 도피)\n2) 고착\n3) 퇴행 (이전 발달단계로 돌아감)\n4) 억압\n5) 백일몽\n6) 부정 (현실 부정)"}, {"front": "[기타] 칙센트미하이 몰입이론 — 몰입이란", "importance": "normal", "back": "- 몰입(Flow)은 무언가에 흠뻑 빠져 있는 심리적 상태"}, {"front": "[기타] 칙센트미하이 몰입이론 — 몰입의 조건 3", "importance": "normal", "back": "1) 활동의 목표가 분명해야 함\n2) 본인 행동에 대한 즉각적인 피드백이 있어야 함\n3) 개인의 수준과 과제의 난이도가 적절한 균형을 이뤄야 함"}], "교육과정": [{"front": "[교육과정 유형] 교육과정의 층위 — 공식화 정도에 따른 분류 3", "importance": "normal", "back": "1) 공식적 교육과정\n2) 잠재적 교육과정\n3) 영 교육과정"}, {"front": "[교육과정 유형] 교육과정의 층위 — 교육의 진행과정에 따른 분류 3", "importance": "normal", "back": "1) 계획된 교육과정\n2) 실행된 교육과정\n3) 경험된 교육과정"}, {"front": "[교육과정 유형] 교육과정의 층위 — 교육과정 결정 주체에 따른 분류 4", "importance": "normal", "back": "1) 국가수준 교육과정 (교육부)\n2) 지역수준 교육과정 (교육청)\n3) 학교수준 교육과정 (단위학교)\n4) 교실수준 교육과정 (교사)"}, {"front": "[교육과정 유형] 잠재적 교육과정 — 기본 개념", "importance": "very_high", "back": "- 학교에서 계획/의도하지 않았음에도 불구하고, 학교생활 중 은연 중에 겪는 경험의 총체"}, {"front": "[교육과정 유형] 잠재적 교육과정 — 나타나는 원천(원인) · 잭슨 3", "importance": "very_high", "back": "1) 군집성 (다양한 애들이 모여 어울림)\n2) 상찬(평가) (교사로부터 여러 평가를 받음)\n3) 권력관계 (학생들은 교사의 지시에 따라 행동)"}, {"front": "[교육과정 유형] 잠재적 교육과정 — 나타나는 원천(원인) · 김종서 4", "importance": "very_high", "back": "1) 군집성 (= 잭슨의 군집성)\n2) 위계성 (= 잭슨의 권력관계)\n3) 목적성 (교육실제 목적과 공식적 목적 사이에 괴리가 있음)\n4) 강요성 (학교 규칙/지시에 따라 행동)"}, {"front": "[교육과정 유형] 잠재적 교육과정 — 시사점 4 (교육목표·내용·방법·평가 측면)", "importance": "very_high", "back": "1) (교육목표 측면) 인지적 영역뿐 아니라 정의적 영역까지 고려해야 함\n2) (교육내용 측면) 교과서 위주 수업 X, 수업 영향을 다각도로 분석해 교육내용을 선정/조직해야 함\n3) (교육방법 측면) 교사는 솔선수범해야 함\n4) (교육평가 측면) 스크리븐의 탈목표 평가(의도치 않은 결과도 중시) 관점을 수용해야 함"}, {"front": "[교육과정 유형] 영 교육과정 — 기본 개념 2", "importance": "very_high", "back": "1) 공식적 교육과정에 포함되지 않아, 학생들이 학습하지 못한 교육과정\n2) 공식적 교육과정에 포함되었으나 학교에서 의도적으로 안 가르친 교육과정"}, {"front": "[교육과정 유형] 영 교육과정 — 발생 원인 3", "importance": "very_high", "back": "1) 교육과정 개발자의 타성\n2) 교사나 학생의 무능\n3) 정치적·사회적 요인 (교육정책, 사회관심사에 따라 갑자기 교육과정이 바뀌는 경우)"}, {"front": "[교육과정 유형] 영 교육과정 — 특징 3", "importance": "very_high", "back": "1) 공식적 교육과정의 필연적 부산물임\n2) 학생의 학습기회를 박탈함\n3) 특정 계급의 이데올로기적 산물임"}, {"front": "[교육과정 유형] 영 교육과정 — 의의 3", "importance": "very_high", "back": "1) (과목 선택의 중요성을 환기) 교육과정 개발에서의 실질적 문제를 제기함\n2) 공식적 교육과정 속 교육 목적과 교육내용의 가치를 되묻게 함 (더 중요한 게 빠진 건 아닐까 되돌아봄)\n3) 교육과정뿐 아니라 교재/수업의 측면에서도 교육 목적과 교육내용의 가치를 되묻게 함"}, {"front": "[교육과정 유형] 잠재적 교육과정 vs 영 교육과정 비교", "importance": "very_high", "table": "<table><tr><th>구분</th><th>잠재적 교육과정</th><th>영 교육과정</th></tr>\n<tr><td>공통점</td><td colspan=\"2\">교육과정에 명시되어 있지 않음</td></tr>\n<tr><td>차이점①</td><td>학교에서 의도 X</td><td>학교에서 의도적으로 배제함</td></tr>\n<tr><td>차이점②</td><td>교육환경의 잠재 기능에 초점</td><td>학습기회 박탈에 초점</td></tr></table>", "back": "잠재적 교육과정과 영 교육과정은 둘 다 명시되어 있지 않으나, 의도 여부와 초점(잠재 기능 vs 학습기회 박탈)에서 다르다."}, {"front": "[발달과정] 교과중심 교육과정(1920년대 이전) — 기본 개념", "importance": "high", "back": "- 학생들이 배우고 익혀야 하는 모든 교과와 교재를 중시하는 교육과정"}, {"front": "[발달과정] 교과중심 교육과정 — 특징 5 (목표·내용·방법·평가·이론근거)", "importance": "high", "back": "1) (교육목표) 문화유산을 다음 세대에 체계적으로 전달\n2) (교육내용) 문화유산을 논리적으로 조직한 내용 (= 교과)\n3) (교육방법) 교사 중심의 수업, 반복적인 학습, 암기, 훈련\n4) (교육평가) 지필시험\n5) (이론근거) 형식도야설 (운동하듯 단련)"}, {"front": "[발달과정] 교과중심 교육과정 — 장점 4", "importance": "high", "back": "1) 지식 전달이 쉬움 (교과로 체계적으로 조직되어)\n2) 학습활동 통제가 쉬움 (교사가 교육활동을 주도하니)\n3) 평가 및 측정이 쉬움 (객관적 기준으로 평가하면 됨)\n4) 교사와 학생에게 안정감을 줌 (사전에 계획되어 있음)"}, {"front": "[발달과정] 교과중심 교육과정 — 단점 4", "importance": "high", "back": "1) 학생들의 흥미와 필요가 무시됨\n2) 학생들에게 수동적인 학습 태도를 형성시킴\n3) 고등정신능력이 저하될 수 있음 (암기에 치중)\n4) 비실용적인 지식을 학습함 (실제 생활 문제와 거리)"}, {"front": "[발달과정] 교과중심 교육과정 — 조직 유형 4", "importance": "high", "back": "1) 분과형 교육과정\n2) 상관형 교육과정 (두 개 이상의 교과를 관련시켜 조직)\n3) 융합형 교육과정 (교과 간 공통 개념을 추출해 새로운 교과로 구성)\n4) 광역형 교육과정 (유사 교과를 묶어 하나의 교과로 통합)"}, {"front": "[발달과정] 경험중심 교육과정(1920년~1950년) — 기본 개념", "importance": "high", "back": "- 학교 지도하에 학생들이 겪는 모든 경험과 활동으로 구성된 교육과정"}, {"front": "[발달과정] 경험중심 교육과정 — 특징 4 (목표·내용·방법·평가)", "importance": "high", "back": "1) (교육목표) 전인교육 + 문제해결능력 함양\n2) (교육내용) 학생의 필요/흥미를 토대로 조직한 실제 생활 경험\n3) (교육방법) 학습자 중심 교육\n4) (교육평가) 실제 과제처리 능력을 확인하는 평가"}, {"front": "[발달과정] 경험중심 교육과정 — 장점 3", "importance": "high", "back": "1) 학생의 자발적 활동 촉진\n2) 실제적인 문제해결력 향상\n3) 민주적 태도와 생활양식 함양 (다양한 경험 속에서 타인과 협력 & 이해 증진)"}, {"front": "[발달과정] 경험중심 교육과정 — 단점 3", "importance": "high", "back": "1) 기초학력 저하 우려\n2) 교육 시간의 경제성 저하 (직접 경험에 근거한 수업은 시간이 많이 소요됨)\n3) 행정적 통제의 어려움 (사전에 계획되지 않은 상황이 많아 통제 어려움)"}, {"front": "[발달과정] 경험중심 교육과정 — 조직 유형 4", "importance": "high", "back": "1) 활동 중심 교육과정\n2) 생성(현성) 중심 교육과정 (학습 주제를 미리 계획 X)\n3) 생활영역 교육과정\n4) 중핵 교육과정 (학습자 흥미/요구/사회문제를 중심으로, 관련 내용을 주변 영역으로 교육과정을 통합)"}, {"front": "[발달과정] 학문중심 교육과정(1960년~1970년) — 기본 개념", "importance": "high", "back": "- 학문의 핵심적 지식과 원리를 체계적으로 조직 → 지식의 구조를 이해/탐구하는 능력을 기르는 교육과정"}, {"front": "[발달과정] 학문중심 교육과정 — 특징 4 (목표·내용·조직원리·방법)", "importance": "high", "back": "1) (교육목표) 교과 내 핵심 지식 & 원리 습득, 탐구능력 향상\n2) (교육내용) 지식의 구조\n3) (교육내용 조직원리) 나선형 교육과정\n4) (교육방법) 발견학습"}, {"front": "[발달과정] 학문중심 교육과정 — 지식의 구조란", "importance": "high", "back": "- 각 학문의 가장 중요한 개념과 원리, 아이디어를 구조적으로 조직한 것"}, {"front": "[발달과정] 학문중심 교육과정 — 나선형 교육과정이란", "importance": "high", "back": "- 학습자 발달단계에 따라 기본개념/원리를 반복하며 폭과 깊이를 점진적으로 확대하도록 조직한 교육과정"}, {"front": "[발달과정] 학문중심 교육과정 — 장점 3", "importance": "high", "back": "1) 높은 학습 전이가 가능 (기본 원리와 핵심 아이디어를 학습한 것은 전이가 잘 됨)\n2) 내재적 동기 유발\n3) 고등정신능력 향상 (탐구 & 발견 과정에서 적용력/분석력 등 향상)"}, {"front": "[발달과정] 학문중심 교육과정 — 단점 3", "importance": "high", "back": "1) 정의적 교육엔 소홀\n2) 실생활과 유리된 비실용성 (지식의 구조는 순수 지식만 강조)\n3) 상위권 학습자에게 유리한 교육 (하위권 학습자는 지식의 구조 발견이 어려움)"}, {"front": "[발달과정] 인간중심 교육과정(1970년대 이후) — 기본 개념", "importance": "normal", "back": "- 자아실현과 전인교육을 위해, 학교에서 의도하거나 의도하지 않은 모든 경험으로 이루어진 교육과정"}, {"front": "[발달과정] 인간중심 교육과정 — 특징 5 (목표·내용·방법·평가·통합)", "importance": "normal", "back": "1) (교육목표) 전인교육 (자아실현에 도움되는 교육)\n2) (교육내용) 학생이 학교생활을 하는 동안 갖게 되는 모든 경험\n3) (교육방법) 학생의 주체성을 존중 (학생 잠재력을 최대한 발휘할 수 있게 도움)\n4) (교육평가) 자율적 자기평가 지향\n5) 잠재적 교육과정과 통합 교육과정(교과+경험+학문 중심 교육과정) 중시"}, {"front": "[발달과정] 인간중심 교육과정 — 장점 3", "importance": "normal", "back": "1) 인간의 성장 가능성을 조화롭게 발달시킬 수 있음\n2) 학습자의 긍정적 자아개념 형성\n3) 교육/교육환경의 인간화에 기여 (학생을 능동적/적극적 학습자로 봄)"}, {"front": "[발달과정] 인간중심 교육과정 — 단점 2", "importance": "normal", "back": "1) 현실 적용의 어려움 (현실적 교육 환경에 적용 어려움)\n2) 개인주의 우려 (개인 성장만 중시함, 사회적 관계 경시함)"}, {"front": "[발달과정] 통합 교육과정 — 기본 개념", "importance": "very_high", "back": "- 학생의 관심/흥미/주제 등을 중심으로 교육내용을 통합하여 조직하는 교육과정"}, {"front": "[발달과정] 통합 교육과정 — 특징 4", "importance": "very_high", "back": "1) 학생의 흥미를 고려하여 교사와 함께 학습 주제를 계획함\n2) 학생·활동 중심 수업을 함 (교과중심 수업보다는 프로젝트 학습 등)\n3) 지식의 기본 원리를 강조 & 지식의 분절화를 방지함\n4) 교사는 안내자/조력자/학생 상담자의 역할을 수행함 (교사는 지식 전달자가 아님)"}, {"front": "[발달과정] 통합 교육과정 — 장점 3", "importance": "very_high", "back": "1) 지식의 팽창에 대비 가능 (통합 내용으로 학습하므로 폭발적 지식 증가에 대응)\n2) 교육과정의 효율적 운영 (통합 과정에서 중복 내용이 줄어듦)\n3) 문제해결력 향상 (학교 밖 실제 문제를 다룸)"}, {"front": "[발달과정] 통합 교육과정 — 단점 3", "importance": "very_high", "back": "1) 통합 교육과정 구성의 어려움 (교과목의 논리적 통합은 너무 어려움)\n2) 교사의 업무적 부담 가중 (교과 통합에 시간과 노력이 많이 들어감)\n3) 학생의 혼란 우려 (지식 체계보다 특정 주제/쟁점 중점의 교육과정을 구성하다 보니)"}, {"front": "[발달과정] 통합 교육과정 — 교과 통합의 일반적 원칙 3", "importance": "very_high", "back": "1) 중요성의 원칙\n2) 일관성의 원칙 (단원 내용과 활동이 단원 목표에 맞아야 함)\n3) 적합성의 원칙 (학습자 수준에/전인격적 성장 목표에 맞춤)"}, {"front": "[발달과정] 통합 교육과정 — 유형 (드레이크) 3", "importance": "very_high", "back": "1) 다학문적 통합\n2) 간학문적 통합\n3) 탈학문적 통합 (학문 간 경계를 초월, 실생활 주제로 문제 중심 교육과정 조직)"}, {"front": "[발달과정] 역량중심 교육과정 — 등장 배경", "importance": "high", "back": "- 미래의 불확실성으로 지식 중심 교육과정 설계가 중요하지 않아짐 → 미래 사회에 필요한 역량을 반영한 교육과정이 등장"}, {"front": "[발달과정] 역량중심 교육과정 — 기본 개념", "importance": "high", "back": "- 사회적 삶에서 필요한 역량을 중심으로 구성된 교육과정"}, {"front": "[발달과정] 역량중심 교육과정 — 특징 4 (목표·내용·방법·평가)", "importance": "high", "back": "1) (교육목표) 사회적 삶에서 필요한 역량의 발달\n2) (교육내용) 역량의 발달을 촉진할 수 있도록 지식이나 내용을 조직함\n3) (교육방법) (학생 참여가 많으므로) 학생 주도적 배움 중심의 수업 강조\n4) (교육평가) 수행평가 중시함"}, {"front": "[발달과정] 역량중심 교육과정 — 장점 1", "importance": "high", "back": "1) 융통성 있는 교육과정"}, {"front": "[발달과정] 역량중심 교육과정 — 단점 2", "importance": "high", "back": "1) 구체적인 대안 제시 부족\n2) 선정된 역량에 대한 정당성 부족 (다른 역량도 중요한데..)"}, {"front": "[교육과정 개발] 교육목표의 설정 — 교육목표의 기능 3", "importance": "high", "back": "1) 교육활동의 방향 제시\n2) 교육내용의 선정/조직의 기준 제시\n3) 교육평가의 기준 제시"}, {"front": "[교육과정 개발] 교육목표의 설정 — 교육목표 진술의 기준 2", "importance": "high", "back": "1) 구체적이고\n2) 명료한 행동 용어로 진술해야 함"}, {"front": "[교육과정 개발] 교육목표 분류 (블룸) 3", "importance": "high", "back": "1) 인지적 영역 (복잡성 원리의 6단계)\n2) 정의적 영역 (내면화 원리의 5단계)\n3) 심동적 영역"}, {"front": "[교육과정 개발] 블룸 — 인지적 영역 6 & 복잡성의 원리란", "importance": "high", "back": "### 인지적 영역 6\n1) 지식\n2) 이해 (번역/해석/추론)\n3) 적용\n4) 분석\n5) 종합\n6) 평가\n### 복잡성의 원리란\n- 교육목표가 단순한 수준 → 점차 복잡한 수준이 되는 것 (하위수준 능력이 상위수준 능력의 토대가 되는 원리)"}, {"front": "[교육과정 개발] 블룸 — 정의적 영역 5 & 내면화의 원리란", "importance": "high", "back": "### 정의적 영역 5\n1) 감수(수용)\n2) 반응\n3) 가치화\n4) 조직화\n5) 인격화\n### 내면화의 원리란\n- 태도/흥미/가치와 같은 정의적 특성을 개인이 내면화한 수준"}, {"front": "[교육과정 개발] 블룸 — 심동적 영역 7", "importance": "high", "back": "1) 지각\n2) 태세\n3) 유도반응\n4) 기계화\n5) 복합외현반응\n6) 적응\n7) 독창성"}, {"front": "[교육과정 개발] 블룸의 교육목표 분류의 개정 차원 2 (인지적 영역)", "importance": "high", "back": "1) 지식 차원 (학습자가 어떤 지식을 가지고 있는가)\n2) 인지과정 차원 (학습자가 지식을 어떻게 활용하는가)"}, {"front": "[교육과정 개발] 블룸 개정 — 지식 차원 4", "importance": "high", "back": "1) 사실적 지식\n2) 개념적 지식\n3) 절차적 지식\n4) 메타인지"}, {"front": "[교육과정 개발] 블룸 개정 — 인지과정 차원 6", "importance": "high", "back": "1) 기억\n2) 이해\n3) 적용\n4) 분석\n5) 평가\n6) 창안"}, {"front": "[교육과정 개발] 교육목표(행동목표) 진술방법 3 (타·메·그)", "importance": "high", "back": "1) 타일러의 진술 방법: 내용영역 + 행동영역\n2) 메이거의 진술 방법: 조건 + 준거 + 행동(도착점 행동)\n3) 그론룬드의 진술 방법: 일반적 수업목표 서술 후 → 명세적 수업목표 서술"}, {"front": "[교육과정 개발] 교육내용 선정의 원리 5", "importance": "very_high", "back": "1) 기회의 원리\n2) 만족의 원리\n3) 학습 가능성의 원리\n4) 일목표 다경험의 원리(동목표 다경험의 원리) (하나의 목표를 위해 여러 경험이 가능해야 함)\n5) 일경험 다성과의 원리(동경험 다성과의 원리) (하나의 경험으로 여러 목표 달성)"}, {"front": "[교육과정 개발] 교육내용 조직의 원리 2", "importance": "very_high", "back": "1) 수평적(횡적) 조직 원리 (비슷한 시기에 연관 교육내용을 배치 → 학습효과 올림)\n2) 수직적(종적) 조직 원리 (시간 순서에 따라 교육내용을 차례대로 배치 → 학습효과 올림)"}, {"front": "[교육과정 개발] 수평적(횡적) 조직 원리 3", "importance": "very_high", "back": "1) 범위 (폭과 깊이)\n2) 통합성 (내용을 서로 연결)\n3) 수평적 연계성 (동일 학년의 같은 수준)"}, {"front": "[교육과정 개발] 수직적(종적) 조직 원리 3", "importance": "very_high", "back": "1) 계속성 (같은 내용을 학년에 따라 반복)\n2) 계열성 (수준을 점차 높임)\n3) 수직적 연계성 (학습 종결점이 다음 학습 출발점과 잘 맞물리게)"}, {"front": "[개발모형] 교육과정 개발모형이란", "importance": "very_high", "back": "- 교육과정을 설계/구성/실행/평가하는 데에 필요한 절차(지침)을 제공하는 도구"}, {"front": "[개발모형] 타일러 합리적 교육과정 개발모형 — 개발절차 4", "importance": "very_high", "back": "1) 교육목표 설정\n2) 학습경험 선정\n3) 학습경험 조직\n4) 평가"}, {"front": "[개발모형] 타일러 — 단계① 교육목표의 설정 & 목표 거름체란", "importance": "very_high", "back": "### 단계① 교육목표의 설정\n1) 학습자 심리적 요구 + 사회적 요구(가치) + 교과 전문가의 견해에 따라 잠정적 목표를 설정한 후\n2) 교육철학과 교육심리학의 거름체를 통해 최종 교육목표를 설정함\n### 목표 거름체란\n1) 교육적으로 추구할 가치가 있나? (교육철학)\n2) 잠정적 목표를 달성할 수 있나? (교육심리학)"}, {"front": "[개발모형] 타일러 — 단계② 학습경험의 선정 원리 5", "importance": "very_high", "back": "1) 기회의 원리\n2) 만족의 원리\n3) 학습 가능성의 원리\n4) 일목표 다경험의 원리(동목표 다경험의 원리) (하나의 목표를 위해 여러 경험 가능해야 함)\n5) 일경험 다성과의 원리(동경험 다성과의 원리) (하나의 경험으로 여러 목표 달성)"}, {"front": "[개발모형] 타일러 — 단계③ 학습경험의 조직 원리 3", "importance": "very_high", "back": "1) 계속성 (같은 내용을 학년에 따라 반복)\n2) 계열성 (수준을 점차 높임)\n3) 통합성 (내용을 서로 연결)"}, {"front": "[개발모형] 타일러 — 단계④ 평가", "importance": "very_high", "back": "- 교육목표 도달 여부를 확인하기 위해 평가도구를 제작해야 함"}, {"front": "[개발모형] 타일러 합리적 교육과정 — 장점 3", "importance": "very_high", "back": "1) 체계적인 모형 (각 단계를 명확히 제시함)\n2) 실용성 (어떤 교과나 수업의 수준에서도 활용 및 적용이 가능함)\n3) 평가의 유용성 (교육목표를 명시적으로 제시하여 평가 결과 해석이 용이)"}, {"front": "[개발모형] 타일러 합리적 교육과정 — 단점 3", "importance": "very_high", "back": "1) 내용을 단순히 목표 달성의 수단으로 간주함\n2) 부수적 목표를 간과함 (수업 진행 중 생겨나는 목표를 간과)\n3) 실질적인 내용이 부족함 (실제 무엇을 가르쳐야 하는지 지침이 없음)"}, {"front": "[개발모형] 타바 귀납적 교육과정 개발모형 — 기본 주장 2", "importance": "very_high", "back": "1) 교육과정이 교사에 의해 개발되어야 함을 강조함\n2) 수업 수준에서 어떻게 교수학습활동을 할 것인지 (내용과 학습경험을 구별하여) 개발단계를 세분화함"}, {"front": "[개발모형] 타바 — 개발절차 5", "importance": "very_high", "back": "1) 시험 단원 개발\n2) 시험 단원 검증\n3) 시험 단원의 수정 및 보완\n4) 단원 구조화 (범위와 계열에 따라 배열)\n5) 새 단원 정착 및 보급"}, {"front": "[개발모형] 타바 — 시험 단원 개발 8가지 하위단계", "importance": "very_high", "back": "1) 요구진단\n2) 목표설정\n3) 내용선정\n4) 내용조직\n5) 학습경험선정\n6) 학습경험조직\n7) 평가내용·방법·수단 결정\n8) 균형과 계열성 검증"}, {"front": "[개발모형] 타바 — 특징 4", "importance": "very_high", "back": "1) 교사 중심 모형 (교사가 현장을 고려해 직접)\n2) 귀납적 모형\n3) 처방적 모형\n4) 역동적 모형 (요구진단을 계속하며 상황에 맞게 수정)"}, {"front": "[개발모형] 타바 — 장점 4", "importance": "very_high", "back": "1) 실제 수업 수준에 적합한 교육과정 개발 가능 (교사가 수업을 염두에 두고 교육과정을 짬)\n2) 단계적으로 교육과정 개발에 좋음 (귀납적 방식으로 교육과정을 개발해 나감)\n3) 교육과정 개발 절차가 자세히 제시돼 수업을 염두한 교사가 이용하기 용이\n4) 학생의 요구/필요에 부합하는 교육과정 개발 가능"}, {"front": "[개발모형] 타바 — 단점 2", "importance": "very_high", "back": "1) 국가나 지역수준의 교육과정을 교사에게 맡기는 것은 부적절할 수 있음\n2) 개별 교과의 시야에 매몰돼, 전체 교육과정을 보는 시야가 부족할 수 있음"}, {"front": "[개발모형] 스킬벡 학교중심 교육과정 개발모형(SBCD) — 기본 주장 2", "importance": "very_high", "back": "1) 전통적인 교육과정(교사를 배제한 교육과정) 개발모형의 경직성/비현실성을 비판\n2) 학교 현장의 교사들이 융통성 있게 교육과정 개발에 참여할 수 있도록 허용함"}, {"front": "[개발모형] 스킬벡 — 개발절차 5", "importance": "very_high", "back": "1) 상황분석 (내적, 외적 요인 분석)\n2) 목표 설정\n3) 프로그램 구성\n4) 판단과 실행\n5) 모니터링, 피드백, 평가, 재구성"}, {"front": "[개발모형] 스킬벡 — 내적요인/외적요인이란", "importance": "very_high", "back": "1) 내적요인 – 학생의 적성/능력, 교사의 가치관/태도, 학교 환경 등\n2) 외적요인 – 학부모 기대, 지역사회 가치, 이데올로기 등"}, {"front": "[개발모형] 스킬벡 — 특징 2", "importance": "very_high", "back": "1) 상황분석을 통해 학교 현실이 가장 잘 반영된 교육과정을 개발 가능\n2) 교육과정 개발절차의 어느 단계에서든지 개발을 시작할 수 있음 (서로 다른 단계를 동시에 고려 가능한 역동적 모형)"}, {"front": "[개발모형] 스킬벡 — 장점 3", "importance": "very_high", "back": "1) 교사의 자율성 및 전문성 향상 (교사가 직접 편성)\n2) 학습자 중심 교육 (상황분석할 때 학습자 수준/요구를 파악해 맞춤 편성)\n3) 학교에서 활용하기 적합함 (학교 현실 반영이 편리)"}, {"front": "[개발모형] 스킬벡 — 단점 2", "importance": "very_high", "back": "1) 통합성 부족함 (학교마다 교육과정이 다 달라질 수 있음)\n2) 객관적인 평가 기준 설정의 어려움 (요구에 맞춰 교육할수록 개방적 수업이 됨)"}, {"front": "[개발모형] 위긴스와 맥타이 백워드 설계 모형 — 기본 개념 2", "importance": "very_high", "back": "1) 학습경험 및 수업 계획보다 평가 계획을 먼저 세움\n2) 학생의 이해력 신장을 강조 (교육과정 설계는 학생이 배운 내용을 이해하는 데 초점을 두어야 한다!)"}, {"front": "[개발모형] 백워드 설계 모형 — 개발절차 3", "importance": "very_high", "back": "1) 교육목표 설정 (바라는 결과 확인하기)\n2) 교육평가 계획 (수용할 수 있는 증거 결정하기)\n3) 학습경험 및 수업 계획 (교육목표 도달을 위한 수업 계획)"}, {"front": "[개발모형] 백워드 설계 모형 — 특징 3", "importance": "very_high", "back": "1) 성취기준 강조 (국가 성취기준을 교육목표 설정 시 반영하자)\n2) 영속적 이해 강조 (전이 가능성이 높은 핵심 아이디어를 학습시키자)\n3) 구체적인 평가계획을 강조"}, {"front": "[개발모형] 백워드 설계 모형 — 장점 3", "importance": "very_high", "back": "1) 목표, 내용, 평가의 일치 (목표/평가를 먼저 짜고 그에 맞춰 내용을 짬)\n2) 교사의 교육에 대한 책무성이 강조 (목표/평가를 먼저 짜고, 그에 맞춰 수업을 설계함)\n3) 국가 교육과정 기준과 현장 수업이 일치 (국가 성취기준을 반영해 짜니까)"}, {"front": "[개발모형] 백워드 설계 모형 — 단점 3", "importance": "very_high", "back": "1) 교육내용이 그저 목표 달성의 수단이 될 수 있음\n2) 평가 의존적인 수업활동을 하게 될 가능성이 있음\n3) 학생의 관심/흥미가 배제될 가능성이 있음"}, {"front": "[개발모형] 슈왑 실제적 교육과정 개발모형 — 기본 개념 2", "importance": "very_high", "back": "1) 교육과정 연구가 실제적/절충적인 방향으로 진행될 때 교육의 질 향상이 이루어진다고 주장 (단순히 막 이론 연구만 하지 말고)\n2) 교육과정 이론의 좋고 나쁨의 판단은 '숙의'를 통해 가능하다고 봄"}, {"front": "[개발모형] 슈왑 — 실제적 교육과정 목적", "importance": "very_high", "back": "- (학습자가 지식만 추구하기보다는) 어떤 결정을 할 수 있는 능력을 기르는 것"}, {"front": "[개발모형] 슈왑 — 실제적 교육과정 의의 2", "importance": "very_high", "back": "1) (이론을 중시할 게 아니라) 구체적/일상적 교육과정 문제에 관심을 가져야 함을 주장함\n2) 교육과정은 (단순히 목표를 달성하는 것이 아니라) 지속적으로 수정되고 개선돼야 함을 주장함"}, {"front": "[개발모형] 워커 자연주의적 개발모형(숙의 모형) — 기본 개념", "importance": "high", "back": "- 교육과정이 현장의 실제 상황에서 어떻게 자연스레 개발되는지 그 과정을 설명하고자 함"}, {"front": "[개발모형] 워커 — 개발절차 3", "importance": "high", "back": "1) 강령(토대): (교육과정 개발자들끼리 논의해) 공감대 형성 → [자료]\n2) 숙의: 검토, 토의, 합의 → [정책]\n3) 설계"}, {"front": "[개발모형] 워커 — 특징 3", "importance": "high", "back": "1) 서술적 모형 (실제 따르는 절차를 서술한 모형)\n2) 과정 지향적 모형 (개발자들의 의견 타협 과정 '숙의'를 강조함)\n3) 비선형적·역동적 모형 (순서에 구애 없이 타협 조정 강조)"}, {"front": "[개발모형] 워커 — 장점 3", "importance": "high", "back": "1) 학생들의 개별적 흥미/능력/적성 반영 가능 (개발자들이 충분히 토의하니까)\n2) 구성원들의 합의 도출이 가능 (개발자들이 충분히 토의하니까)\n3) 현실적인 모형 (학교 현장을 잘 아는 교육과정 개발자들이 참여)"}, {"front": "[개발모형] 워커 — 단점 2", "importance": "high", "back": "1) 참여자가 강령 설정/숙의하는 데 상당한 시간이 소요\n2) 교육과정 설계가 완성된 뒤의 문제에 대해서는 언급이 없음"}, {"front": "[개발모형] 아이즈너 예술적 개발모형(예술적 접근 모형) — 기본 개념 2", "importance": "very_high", "back": "1) 교육과정 개발이란 교육적 상상력을 발휘하는 과정이라고 봄\n2) (학생들의 의미 형성을 위해) 학습자의 특성에 맞게 창의적으로 교육과정을 운영하자는 모형"}, {"front": "[개발모형] 아이즈너 — 개발절차(예술적 접근법) 7", "importance": "very_high", "back": "1) 목표설정: 행동적 목표 / 문제해결 목표 / 표현적 결과 모두 함께 고려\n2) 내용 선정\n3) 학습기회의 결정: 교육적 상상력 발휘\n4) 학습기회의 조직\n5) 내용영역의 조직\n6) 제시방법\n7) 평가: 참 평가 / 교육적 감식안 / 교육비평"}, {"front": "[개발모형] 아이즈너 — 교육적 상상력이란", "importance": "very_high", "back": "- (만족스런 학습 기회 제공을 위해) 교육목표/교육내용을 학생들에게 적합한 형태로 변형하는 능력"}, {"front": "[개발모형] 아이즈너 — 참 평가·교육적 감식안·교육비평이란", "importance": "very_high", "back": "### 참 평가란\n- 실생활 문제해결 능력을 기르는 데 도움되는 평가\n### 교육적 감식안이란\n- 학생들의 성취물 사이의 미묘한 질적 차이를 감식하는 능력\n### 교육비평이란\n- 미묘한 질적 차이를 학생과 학부모가 이해하기 쉽게 표현하는 것"}, {"front": "[개발모형] 아이즈너 — 특징 3", "importance": "very_high", "back": "1) 교육적 상상력을 중시함\n2) 교육적 감식안과 교육비평을 중시함\n3) 교육과정 관련 중요 의사결정들은 교사에 의해서 이루어져야 한다고 봄 (교사가 교육과정에 대해서는 예술가니까!)"}, {"front": "[개발모형] 아이즈너 — 장점 2", "importance": "very_high", "back": "1) 교사의 전문성이 강조됨 (교육적 상상력/감식안/교육비평을 다 잘해야 함)\n2) 타일러의 합리적 모형보다 융통성 있음 (교육과정 개발에서 교사 역할/현장경험 강조)"}, {"front": "[개발모형] 아이즈너 — 단점 2", "importance": "very_high", "back": "1) (공교육은 체계성/통일성이 필요한데) 공교육 현실에 적용하기 어려움\n2) 합리적 모형의 문제점은 제시했지만, 구체적인 대안 제시가 부족함"}, {"front": "[개발모형] 파이너 실존적 재개념화 모형 — 기본 개념 2", "importance": "normal", "back": "1) 교육과정이 (사회적 맥락 속에서) 개인의 고유한 경험이 되도록 재개념화되어야 한다고 주장함\n2) 쿠레레 방법론과 자서전적 방법론을 제시함"}, {"front": "[개발모형] 파이너 — 쿠레레 방법론 단계 4", "importance": "normal", "back": "1) 회귀: 과거로 돌아가 교육적 경험을 기억/묘사\n2) 전진: 미래 모습을 상상/묘사\n3) 분석: 현재 자신의 삶을 비판적으로 분석\n4) 종합: (과거 교육경험으로부터 현재 어떤 영향을 받았는지 생각해) 현재 의미를 창출"}, {"front": "[개발모형] 파이너 — 자서전적 방법 3", "importance": "normal", "back": "1) 자신의 교육경험을 자서전 방식으로 표현하기\n2) 자신의 교육경험을 비판적으로 성찰하기\n3) 타인의 교육경험 분석하기"}, {"front": "[개발모형] 파이너 — 시사점 2", "importance": "normal", "back": "1) 교사는 지식만 전달해선 안 됨. 학생과 함께 의미를 재구성해 나가야 함\n2) 자신을 이해하는 데 도움이 됨"}, {"front": "[개발모형] 애플 구조적 재개념화 모형 — 기본 개념", "importance": "normal", "back": "- 억압된 사회구조에 구속된 인간을 해방해야 한다고 주장함 (학생의 학습 실패는 사회체제/제도 때문이야)"}, {"front": "[개발모형] 애플 — 핵심내용 3", "importance": "normal", "back": "1) 학교교육과 교육과정 비판\n ① 학교는 문화재생산 기능을 함 (학교는 기성세대의 권력관계를 다음 세대에 전달함)\n2) 타일러의 기술공학적 논리 비판\n ① 학업성취도로만 판단함. 교육의 가치 무시\n3) 컴퓨터 교육에 대한 비판\n ① 교사들이 수업 중 컴퓨터를 많이 사용할수록 단순 노동자로 전락함"}, {"front": "[교육과정 실제] 교육과정의 결정 형태 3", "importance": "normal", "back": "1) 중앙집권형\n2) 지방분권형\n3) 절충형"}, {"front": "[교육과정 실제] 중앙집권형 — 개념 & 장점 3", "importance": "normal", "back": "### 개념\n- 국가(교육부)에서 소수 전문가가 교육과정을 결정 (교사 참여 배제)\n### 장점 3\n1) 전국적으로 통일된 교육과정을 가질 수 있음\n2) 전문 인력 투입 → 질 높은 수준의 교육과정 개발 가능\n3) 학교급, 학교 간 교육과정의 연계성 충족 가능"}, {"front": "[교육과정 실제] 중앙집권형 — 단점 4", "importance": "normal", "back": "1) 교육과정 운영의 획일화 및 경직화 가능\n2) 권위주의적 교육풍토 조성 가능성이 큼\n3) 교육과정 사소화가 발생할 수 있음 (교사들이 교육과정을 중요하게 생각하지 않음)\n4) (지역, 학교, 학생의 특성을 고려한) 다양한 교육과정의 운영 어려움"}, {"front": "[교육과정 실제] 지방분권형 — 개념 & 장점 3", "importance": "normal", "back": "### 개념\n- 시도교육청 단위에서 교사 및 인사의 참여로 교육과정을 결정\n### 장점 3\n1) 교육과정을 신속하고 유연하게 수정하고 운영 가능\n2) 교사들이 교육과정에 대해 주인의식을 가짐\n3) (지역, 학교, 학생의 특성을 고려한) 다양한 교육과정 개발 가능"}, {"front": "[교육과정 실제] 지방분권형 — 단점 3", "importance": "normal", "back": "1) 전국적으로 통일된 교육과정을 갖기 어려움\n2) 지역, 학교 간 격차가 심화될 가능성이 있음\n3) 학교급, 학교 간 교육과정 연계가 힘듦"}, {"front": "[교육과정 실제] 절충형 — 개념 & 특징", "importance": "normal", "back": "### 개념\n- 중앙집권형 + 지방분권형 절충\n### 특징\n- 우리나라 제6차 교육과정에서 절충 형태의 교육과정 체제를 채택하고 있음"}, {"front": "[교육과정 실제] 스나이더 교육과정 실행관점 — 실행 관점이란 & 기본 주장", "importance": "normal", "back": "### 교육과정 실행 관점이란\n- 교육과정 전개과정을 어떤 시각으로 보는가의 문제를 의미함\n### 기본 주장\n- 충실도 관점, 상호적응 관점, 형성(생성) 관점을 제시함"}, {"front": "[교육과정 실제] 스나이더 — 교육과정 운영(실행) 관점 3", "importance": "normal", "back": "1) 충실도 관점 (교육과정이 개발자 의도대로 충실히 실행되는가)\n2) 상호적응 관점 (교육과정은 개발자-실행자 간 상호작용으로 조정될 수 있다)\n3) 형성(생성) 관점 (교육과정은 교사와 학생이 함께 만들어가는 교육경험이다)"}, {"front": "[교육과정 실제] 홀의 교사 관심에 기초한 교육과정 적용모형(CBAM) — 기본 개념", "importance": "normal", "back": "- 교육과정의 실행 양태는 교사의 관심 수준에 따라 달라진다고 봄"}, {"front": "[교육과정 실제] 홀 CBAM — 관심 단계 6", "importance": "normal", "back": "1) 교사 자신과 관련된 관심\n 0. 지각단계\n 1. 정보단계\n 2. 개인단계\n2) 업무와 관련된 관심\n 3. 운영단계\n3) 결과에 관련된 관심\n 4. 결과단계\n 5. 협동단계\n 6. 개선단계"}, {"front": "[교육과정 실제] 학교 교육과정의 재구성 — 기본 개념", "importance": "high", "back": "- 국가 수준의 교육과정을 교사(또는 학교)가 학생 특성 및 교육 상황에 맞게 재구성하는 것"}, {"front": "[교육과정 실제] 교육과정 재구성 방법 3", "importance": "high", "back": "1) 교과 내 재구성\n2) 교과 간 재구성\n3) 교과와 창체활동의 연계를 통한 재구성"}, {"front": "[교육과정 실제] 교육과정 재구성의 장점 3", "importance": "high", "back": "1) 학교 실정에 맞춤 가능 & 교과 간 중복 피함 → 교육 효율성 증진 가능\n2) 학생의 적성을 고려한 교육 → 교육 다양성 증진 가능\n3) 교사의 전문성이 향상됨 (재구성 과정에서)"}, {"front": "[교육과정 실제] 교육과정 재구성을 위한 교사의 역할 3", "importance": "high", "back": "1) 국가 교육과정 기준을 자세히 분석해야 함\n2) 학교의 교육 여건을 파악해야 함\n3) 전문성 신장을 위한 지속적인 노력이 필요함"}, {"front": "[교육과정 실제] 렌줄리 교육과정 압축 — 기본 개념 2", "importance": "normal", "back": "1) 상위 학생들을 위해, 이미 숙달한 학습자료의 반복을 피하고 보다 도전적인 학습기회를 마련해 주기 위한 전략\n2) 일종의 교육과정 '재구성' 혹은 '핵심화' 과정"}, {"front": "[교육과정 실제] 렌줄리 교육과정 압축 — 방법 3", "importance": "normal", "back": "1) 좀 더 도전적으로 활동할 수 있는 추가 활동을 제공함\n2) 이미 알고 있는 내용과 반복되는 내용을 제거해 학습 속도를 올림\n3) 심화학습 제공함"}, {"front": "[2022 개정] 2022 개정 교육과정 — 기본 개념", "importance": "normal", "back": "- 7차 교육과정을 개정한 교육과정으로, 2025년부터 모든 중·고등학교에 적용됨"}, {"front": "[2022 개정] 2022 개정 교육과정 — 궁극의 목표 & 추구하는 인간상 4", "importance": "normal", "back": "### 교육과정의 궁극의 목표\n- 포용성과 창의성을 갖춘 주도적인 사람 배출\n### 추구하는 인간상 4\n1) 자기주도적인 사람\n2) 창의적인 사람\n3) 교양 있는 사람\n4) 더불어 사는 사람"}, {"front": "[2022 개정] 2022 개정 교육과정 — 핵심역량 6", "importance": "normal", "back": "1) 자기관리 역량\n2) 지식·정보처리 역량\n3) 창의적 사고 역량\n4) 심미적 감성 역량\n5) 협력적 소통 역량\n6) 공동체 역량"}, {"front": "[2022 개정] 2022 개정 교육과정 — 주요 변화내용 (중학교) 4", "importance": "normal", "back": "1) 자유학기제로 변경\n2) 진로연계 학기 (3-2학기) 도입\n3) 창의적 체험활동이 3영역(자율자치, 동아리, 진로)으로 변경\n4) 학교스포츠클럽 활동 개선 (매 학기 운영 폐지, 총 136시간으로 운영)"}, {"front": "[2022 개정] 2022 개정 교육과정 — 주요 변화내용 (고등학교) 2", "importance": "normal", "back": "1) 고교학점제 도입\n2) 과목 선택권 확대"}, {"front": "[2022 개정] 2022 개정 교육과정 — 이해를 위한 용어 5", "importance": "normal", "back": "1) 창의적 체험활동\n2) 학년군\n3) 교과군\n4) 집중이수\n5) 블록타임"}]};
+const subjects = Object.keys(DATA);
+let curSub = subjects[0];
+let idx = 0;
+let flipped = false;
+const seen = {};
+const order = {};
+const shuffledOn = {};
+subjects.forEach(s=>{
+  seen[s]=new Set();
+  order[s]=DATA[s].map((_,i)=>i);
+  shuffledOn[s]=false;
+});
+// current subject's cards in working order
+function curCards(){ return order[curSub].map(i=>DATA[curSub][i]); }
+
+const el=id=>document.getElementById(id);
+
+// ---- theme ----
+const themeBtn = el('themeBtn');
+
+function applyTheme(t){
+  document.documentElement.setAttribute('data-theme', t);
+  themeBtn.textContent = t === 'dark' ? '🌙' : '☀️';
+}
+
+const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+(function initTheme(){
+  let savedTheme = null;
+  try { savedTheme = localStorage.getItem('flashcard-theme'); } catch(e) {}
+  
+  if (savedTheme) {
+    applyTheme(savedTheme);
+  } else {
+    applyTheme(darkModeMediaQuery.matches ? 'dark' : 'light');
+  }
+})();
+
+themeBtn.onclick = () => {
+  const cur = document.documentElement.getAttribute('data-theme');
+  const newTheme = cur === 'dark' ? 'light' : 'dark';
+  applyTheme(newTheme);
+  try { localStorage.setItem('flashcard-theme', newTheme); } catch(e) {}
+};
+
+darkModeMediaQuery.addEventListener('change', (e) => {
+  let savedTheme = null;
+  try { savedTheme = localStorage.getItem('flashcard-theme'); } catch(err) {}
+  if (!savedTheme) {
+    applyTheme(e.matches ? 'dark' : 'light');
+  }
+});
+
+const tabsEl=el('tabs'), card=el('card'), frontText=el('frontText'),
+  backText=el('backText'), counter=el('counter'), impEl=el('imp'),
+  dotsEl=el('dots'), prevBtn=el('prevBtn'), nextBtn=el('nextBtn'), flipBtn=el('flipBtn');
+
+function buildTabs(){
+  tabsEl.innerHTML='';
+  subjects.forEach(s=>{
+    const b=document.createElement('button');
+    b.className='tab'+(s===curSub?' active':'');
+    b.innerHTML=`${s}<span class="cnt">${DATA[s].length}</span>`;
+    b.onclick=()=>{curSub=s; idx=0; flipped=false; buildTabs(); updateOrderUI(); render();};
+    tabsEl.appendChild(b);
+  });
+}
+
+function esc(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function renderBack(text, table){
+  const lines=text.split('\n');
+  let html='', listOpen=false;
+  const listMark=/^([-•]|[①-⑳]|[㉠-㉿]|[ⓐ-ⓩ]|[가-힣]\.|\d+[.)]|[ㄱ-ㅎ]\.)\s*/;
+  for(let raw of lines){
+    let line=raw.trimEnd();
+    if(!line.trim()){continue;}
+    if(line.startsWith('###')){
+      html+=`<h3>${esc(line.replace(/^###\s*/,''))}</h3>`; continue;
+    }
+    const m=line.match(listMark);
+    if(m){
+      const mk=m[1]; const rest=line.slice(m[0].length);
+      html+=`<div class="li"><span class="mk">${esc(mk)}</span><span class="tx">${stars(esc(rest))}</span></div>`;
+    } else {
+      html+=`<p>${stars(esc(line))}</p>`;
+    }
+  }
+  if(table){ html+=table; }
+  return html;
+}
+function stars(s){
+  s=s.replace(/★★+/g,m=>`<span class="star vh">${m}</span>`);
+  s=s.replace(/(^|[^v>])★/g,(_,p)=>`${p}<span class="star">★</span>`);
+  return s;
+}
+
+function render(){
+  const cards=curCards();
+  if(idx<0)idx=0; if(idx>=cards.length)idx=cards.length-1;
+  const c=cards[idx];
+  flipped=false; card.classList.remove('flipped');
+  frontText.textContent=c.front;
+  backText.innerHTML=renderBack(c.back||'', c.table||'');
+  counter.textContent=`${idx+1} / ${cards.length}`;
+  // importance badge
+  let imp='';
+  if(c.importance==='very_high') imp='<span class="badge vhigh">★★ 핵심</span>';
+  else if(c.importance==='high') imp='<span class="badge high">★ 중요</span>';
+  impEl.innerHTML=imp;
+  seen[curSub].add(idx);
+  // dots
+  dotsEl.innerHTML='';
+  cards.forEach((_,i)=>{
+    const d=document.createElement('div');
+    d.className='dot'+(i===idx?' cur':(seen[curSub].has(i)?' done':''));
+    d.onclick=()=>{idx=i; render();};
+    dotsEl.appendChild(d);
+  });
+  prevBtn.disabled=idx===0;
+  nextBtn.disabled=idx===cards.length-1;
+  flipBtn.textContent='정답 확인 ↻';
+  // reset scroll
+  document.querySelectorAll('.face').forEach(f=>f.scrollTop=0);
+}
+
+function doFlip(){
+  flipped=!flipped;
+  card.classList.toggle('flipped',flipped);
+  flipBtn.textContent=flipped?'문제 보기 ↻':'정답 확인 ↻';
+}
+card.onclick=doFlip;
+flipBtn.onclick=e=>{e.stopPropagation();doFlip();};
+prevBtn.onclick=()=>{if(idx>0){idx--;render();}};
+nextBtn.onclick=()=>{const n=curCards().length;if(idx<n-1){idx++;render();}};
+
+// ---- shuffle / reset ----
+const shuffleBtn=el('shuffleBtn'), resetBtn=el('resetBtn'), orderTag=el('orderTag');
+function shuffleArr(a){
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+function updateOrderUI(){
+  const on=shuffledOn[curSub];
+  shuffleBtn.classList.toggle('active',on);
+  orderTag.textContent = on ? '🔀 무작위 순서' : '';
+}
+shuffleBtn.onclick=()=>{
+  order[curSub]=shuffleArr(DATA[curSub].map((_,i)=>i));
+  shuffledOn[curSub]=true;
+  seen[curSub]=new Set();
+  idx=0; updateOrderUI(); render();
+};
+resetBtn.onclick=()=>{
+  order[curSub]=DATA[curSub].map((_,i)=>i);
+  shuffledOn[curSub]=false;
+  seen[curSub]=new Set();
+  idx=0; updateOrderUI(); render();
+};
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowLeft'){if(idx>0){idx--;render();}}
+  else if(e.key==='ArrowRight'){const n=curCards().length;if(idx<n-1){idx++;render();}}
+  else if(e.key===' '||e.key==='Enter'){e.preventDefault();doFlip();}
+});
+
+// swipe
+let sx=0;
+card.addEventListener('touchstart',e=>sx=e.touches[0].clientX,{passive:true});
+card.addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-sx;
+  if(Math.abs(dx)>60){
+    if(dx<0){const n=curCards().length;if(idx<n-1){idx++;render();}}
+    else {if(idx>0){idx--;render();}}
+  }
+},{passive:true});
+
+
+// ====== 검색 기능 ======
+const searchInput = el('searchInput');
+const searchClear = el('searchClear');
+const searchResults = el('searchResults');
+const wrapMain = document.querySelector('.wrap');
+// 카드 본문 영역(검색결과 제외 나머지) 토글용 - meta/toolbar/scene/controls/dots
+const normalEls = ['meta','toolbar','scene','controls','dots'].map(c=>document.querySelector('.'+c));
+
+// 검색 대상 텍스트: front + back + table(태그 제거)
+function plainText(c){
+  let t = (c.front||'') + ' ' + (c.back||'');
+  if(c.table){ t += ' ' + c.table.replace(/<[^>]+>/g,' '); }
+  return t.replace(/[#★]/g,'').replace(/\s+/g,' ');
+}
+function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function highlight(text, q){
+  const safe = escHtml(text);
+  if(!q) return safe;
+  const qe = q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  return safe.replace(new RegExp(qe,'gi'), m=>`<mark>${m}</mark>`);
+}
+// 매칭 위치 주변 스니펫 추출
+function snippet(c, q){
+  const body = ((c.back||'') + (c.table? ' '+c.table.replace(/<[^>]+>/g,' '):'')).replace(/[#★]/g,'').replace(/\n/g,' ').replace(/\s+/g,' ').trim();
+  if(!q) return body.slice(0,90);
+  const low = body.toLowerCase();
+  const pos = low.indexOf(q.toLowerCase());
+  if(pos<0) return body.slice(0,90);
+  const s = Math.max(0, pos-30);
+  const e = Math.min(body.length, pos+q.length+60);
+  return (s>0?'…':'') + body.slice(s,e) + (e<body.length?'…':'');
+}
+
+function runSearch(q){
+  q = q.trim();
+  searchClear.classList.toggle('show', q.length>0);
+  if(!q){ exitSearch(); return; }
+  // 검색 모드 진입: 카드 UI 숨김
+  normalEls.forEach(e=>{ if(e) e.style.display='none'; });
+  searchResults.style.display='flex';
+
+  const results = [];
+  subjects.forEach(s=>{
+    DATA[s].forEach((c,i)=>{
+      if(plainText(c).toLowerCase().includes(q.toLowerCase())){
+        results.push({subject:s, idx:i, card:c});
+      }
+    });
+  });
+
+  let html = `<div class="search-summary">검색결과 <b>${results.length}</b>개 · "${escHtml(q)}"</div>`;
+  if(results.length===0){
+    html += `<div class="search-empty">검색 결과가 없어요.<br>다른 키워드로 검색해 보세요.</div>`;
+  } else {
+    results.forEach(r=>{
+      let imp='';
+      if(r.card.importance==='very_high') imp=' <span class="badge vhigh" style="font-size:10px">★★ 핵심</span>';
+      else if(r.card.importance==='high') imp=' <span class="badge high" style="font-size:10px">★ 중요</span>';
+      html += `<div class="result-card" data-sub="${escHtml(r.subject)}" data-idx="${r.idx}">
+        <div class="rc-top"><span class="rc-subject">${escHtml(r.subject)}</span>${imp}</div>
+        <div class="rc-front">${highlight(r.card.front, q)}</div>
+        <div class="rc-snippet">${highlight(snippet(r.card,q), q)}</div>
+      </div>`;
+    });
+  }
+  searchResults.innerHTML = html;
+
+  // 결과 클릭 → 해당 카드로 이동
+  searchResults.querySelectorAll('.result-card').forEach(elc=>{
+    elc.onclick=()=>{
+      const sub = elc.getAttribute('data-sub');
+      const i = parseInt(elc.getAttribute('data-idx'),10);
+      // 원래 순서로 보정(섞여있을 수 있으므로 해당 카드 위치를 order에서 찾음)
+      curSub = sub;
+      // order 기준으로 idx 위치 찾기
+      const pos = order[curSub].indexOf(i);
+      idx = pos>=0 ? pos : 0;
+      flipped=false;
+      searchInput.value=''; searchClear.classList.remove('show');
+      exitSearch();
+      buildTabs(); updateOrderUI(); render();
+      window.scrollTo({top:0, behavior:'smooth'});
+    };
+  });
+}
+
+function exitSearch(){
+  searchResults.style.display='none';
+  searchResults.innerHTML='';
+  normalEls.forEach(e=>{ if(e) e.style.display=''; });
+}
+
+searchInput.addEventListener('input', e=>runSearch(e.target.value));
+searchClear.onclick=()=>{ searchInput.value=''; searchClear.classList.remove('show'); exitSearch(); searchInput.focus(); };
+
+
+buildTabs();
+updateOrderUI();
+render();
+</script>
+</body>
+</html>
