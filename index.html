@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>슈왑의 실제적 교육과정 개발모형 — 플래시카드</title>
+<style>
+  :root {
+    --bg: #f3efe6;
+    --surface: #ffffff;
+    --ink: #2a2620;
+    --muted: #7a7264;
+    --line: #d9d2c4;
+    --accent: #1f6f5c;
+    --accent-soft: #e0 efe9;
+    --accent-soft: #e3efea;
+    --back-bg: #fbf9f4;
+    --shadow: rgba(40,36,28,0.12);
+  }
+  html[data-theme="dark"] {
+    --bg: #16140f;
+    --surface: #211e17;
+    --ink: #ece6d8;
+    --muted: #9b9282;
+    --line: #36322a;
+    --accent: #5fcaa8;
+    --accent-soft: #1f2b27;
+    --back-bg: #1a1813;
+    --shadow: rgba(0,0,0,0.5);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "Apple SD Gothic Neo", "Pretendard", "Malgun Gothic", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    transition: background .35s ease, color .35s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 16px 48px;
+  }
+  header {
+    width: 100%;
+    max-width: 640px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 6px;
+  }
+  .titleblock .eyebrow {
+    font-size: 12px;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 700;
+  }
+  .titleblock h1 {
+    font-size: 22px;
+    font-weight: 800;
+    margin-top: 4px;
+    line-height: 1.25;
+  }
+  .titleblock .sub { font-size: 13px; color: var(--muted); margin-top: 3px; }
+  .toggle {
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--ink);
+    border-radius: 999px;
+    padding: 8px 14px;
+    font-size: 13px;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 6px;
+    transition: all .25s ease;
+    flex-shrink: 0;
+  }
+  .toggle:hover { border-color: var(--accent); }
+  .progress {
+    width: 100%; max-width: 640px;
+    margin: 18px 0 14px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .bar { flex: 1; height: 6px; background: var(--line); border-radius: 999px; overflow: hidden; }
+  .bar > span { display: block; height: 100%; background: var(--accent); width: 0; transition: width .3s ease; }
+  .count { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+  .scene { width: 100%; max-width: 640px; perspective: 1600px; }
+  .card {
+    position: relative;
+    width: 100%;
+    min-height: 320px;
+    cursor: pointer;
+    transform-style: preserve-3d;
+    transition: transform .55s cubic-bezier(.4,.2,.2,1);
+  }
+  .card.flipped { transform: rotateY(180deg); }
+  .face {
+    position: absolute; inset: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: 20px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    box-shadow: 0 12px 32px var(--shadow);
+    padding: 32px 30px;
+    display: flex; flex-direction: column;
+    transition: background .35s ease, border-color .35s ease;
+  }
+  .face .tag {
+    font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--accent); font-weight: 700; margin-bottom: 14px;
+  }
+  .face .q { font-size: 21px; font-weight: 700; line-height: 1.5; }
+  .back { transform: rotateY(180deg); background: var(--back-bg); }
+  .back .a { font-size: 16px; line-height: 1.7; color: var(--ink); }
+  .back .a strong { color: var(--accent); }
+  .hint { margin-top: auto; padding-top: 18px; font-size: 12.5px; color: var(--muted); }
+
+  .controls {
+    width: 100%; max-width: 640px;
+    margin-top: 22px;
+    display: flex; gap: 10px;
+  }
+  .btn {
+    flex: 1;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--ink);
+    border-radius: 12px;
+    padding: 14px;
+    font-size: 15px; font-weight: 600;
+    cursor: pointer;
+    transition: all .2s ease;
+  }
+  .btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+  .btn:disabled { opacity: .4; cursor: not-allowed; }
+  .btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .btn.primary:hover { filter: brightness(1.08); color: #fff; }
+  @media (prefers-reduced-motion: reduce) {
+    .card { transition: none; }
+  }
+  @media (max-width: 480px) {
+    .face .q { font-size: 19px; }
+    .titleblock h1 { font-size: 19px; }
+  }
+</style>
+</head>
+<body>
+  <header>
+    <div class="titleblock">
+      <div class="eyebrow">TOPIC 15·16 · 교육과정 개발</div>
+      <h1>백워드 설계 &amp; 슈왑의 실제적 모형</h1>
+      <div class="sub">위긴스·맥타이 / 슈왑 · 기출 15·12·10·07</div>
+    </div>
+    <button class="toggle" id="themeBtn" aria-label="테마 전환">🌙 다크</button>
+  </header>
+
+  <div class="progress">
+    <div class="bar"><span id="barFill"></span></div>
+    <div class="count" id="count">1 / 8</div>
+  </div>
+
+  <div class="scene">
+    <div class="card" id="card" role="button" tabindex="0" aria-label="카드 뒤집기">
+      <div class="face front">
+        <div class="tag">질문</div>
+        <div class="q" id="qText"></div>
+        <div class="hint">탭하거나 스페이스바를 눌러 정답 보기</div>
+      </div>
+      <div class="face back">
+        <div class="tag">정답</div>
+        <div class="a" id="aText"></div>
+        <div class="hint">탭하여 질문으로 돌아가기</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="btn" id="prev">← 이전</button>
+    <button class="btn" id="shuffle">🔀 셔플</button>
+    <button class="btn primary" id="next">다음 →</button>
+  </div>
+
+<script>
+const cards = [
+  // ── 위긴스와 맥타이의 백워드 설계 모형 (TOPIC 15) ──
+  { q: "백워드 설계 모형은 어떤 학자의 기본 틀을 따르는가? 그리고 왜 '백워드'인가?",
+    a: "<strong>타일러</strong>의 틀(목표가 모든 교육활동의 준거)을 따르되, 학습경험·수업 계획보다 <strong>평가 계획을 먼저</strong> 세우기 때문에 '백워드(역방향)' 설계라 부른다." },
+  { q: "백워드 설계에서 교육과정 설계의 초점은 무엇에 두어야 하는가?",
+    a: "학생이 배운 내용을 <strong>이해</strong>하는 데 초점을 둔다." },
+  { q: "백워드 설계의 개발 절차 3단계는?",
+    a: "① 교육목표 설정(바라는 결과 확인) → ② 교육평가 계획(수용할 수 있는 증거 결정) → ③ <strong>학습경험 및 수업 계획</strong>" },
+  { q: "1단계 '교육목표 설정'에서 하는 일은?",
+    a: "국가수준 <strong>성취기준을 분석</strong>해 학생이 배워야 할 교과의 핵심 아이디어(기본개념·원리)를 확인한 뒤 단원 목표를 설정한다." },
+  { q: "2단계 '교육평가 계획'에서 교사는 무엇을 하는가?",
+    a: "<strong>평가자의 입장</strong>에서 목표와 이해를 고려해 수행과제를 결정하고, 평가방법을 선택한 후 <strong>평가기준</strong>을 마련한다." },
+  { q: "백워드 설계가 강조하는 세 가지 특징은?",
+    a: "① <strong>성취기준</strong> 강조(국가교육과정 성취기준 반영) ② <strong>영속적 이해</strong> 강조(브루너 '지식의 구조' 토대, 전이 가능성 큰 핵심 아이디어) ③ <strong>구체적 평가계획</strong> 강조(내용 선정 전 평가안 미리 마련)" },
+  { q: "'영속적 이해'란 무엇인가?",
+    a: "상세한 내용을 잊은 후에도 머릿속에 남아 있는 <strong>포괄적인 개념</strong>. 위긴스·맥타이는 이해를 6가지 측면으로 구체화했다." },
+  { q: "위긴스·맥타이가 제시한 이해의 6가지 측면은? (낮음→높음 순)",
+    a: "<strong>설명 → 해석 → 적용 → 관점 → 공감 → 자기지식</strong>. '설명'에서 '자기지식'으로 갈수록 높은 수준의 이해이다." },
+  { q: "이해의 6측면 — '설명'과 '해석'은?",
+    a: "<strong>설명</strong>: 어떤 일의 이유·방법을 자세히 이야기하는 능력. <strong>해석</strong>: 자료의 의미를 파악하거나 번역하는 능력." },
+  { q: "이해의 6측면 — '적용'과 '관점'은?",
+    a: "<strong>적용</strong>: 배운 내용을 다른 상황에 응용하는 능력. <strong>관점</strong>: 다양한 관점을 고려하고 비판적 자세를 갖는 능력." },
+  { q: "이해의 6측면 — '공감'과 '자기지식'은?",
+    a: "<strong>공감</strong>: 다른 사람의 입장에서 생각하는 능력. <strong>자기지식</strong>: 자신의 무지를 알거나 자신의 사고를 반성할 수 있는 능력." },
+  { q: "백워드 설계의 장점 3가지는?",
+    a: "① 목표·내용·평가의 <strong>일치</strong> ② 교사의 <strong>책무성</strong> 강조 ③ 국가 교육과정 기준과 현장 수업의 일치" },
+  { q: "백워드 설계의 단점 3가지는?",
+    a: "① 교육내용이 목표 달성을 위한 <strong>수단</strong>으로 전락(목표를 우위에 두고 설계하기 때문) ② 평가 계획을 수업 계획보다 먼저 세우므로 <strong>평가에 의존적인 수업</strong>이 될 가능성 ③ 학문적 지식인 핵심 아이디어에 기반하므로 <strong>학생의 관심·흥미가 배제</strong>될 가능성" },
+
+  // ── 슈왑의 실제적 교육과정 개발모형 (TOPIC 16) ──
+  { q: "슈왑이 비판한, 기존 교육과정 연구가 매몰되어 있던 것은?",
+    a: "교육과정 <strong>개발의 이론</strong>에만 집착하는 경향. 그 결과 교육과정이 전문가가 아닌 비전문가에 의해 개발되고 있었다고 보았다." },
+  { q: "슈왑은 교육과정 연구가 어떤 방향으로 진행될 때 교육의 질이 향상된다고 보았나?",
+    a: "<strong>실제적</strong>이고 <strong>절충적인</strong> 방향으로 진행될 때." },
+  { q: "슈왑에 따르면 교육과정 이론의 좋고 나쁨을 판단하는 기준은?",
+    a: "그 이론이 <strong>구체적인 상황에서 얼마나 유용하게 적용될 수 있는가</strong>의 정도." },
+  { q: "이러한 이론의 유용성 판단을 가능하게 하는 과정은?",
+    a: "<strong>숙의(deliberation)</strong> — 다양한 이해관계자들이 모여 의견을 나누고 서로의 의견을 고려하며 교육과정 내용을 심도 있게 논하는 과정." },
+  { q: "실제적 교육과정의 목적은 무엇인가?",
+    a: "학습자들이 지식을 추구하기보다는 <strong>어떤 결정을 할 수 있는 능력</strong>을 기르는 것." },
+  { q: "교육과정이 중시해야 할 것은 일반적 이론인가, 아니면?",
+    a: "일반적 이론이 아니라 <strong>구체적·일상적인 교육과정 문제</strong>에 관심을 가져야 한다." },
+  { q: "교육과정의 '변증법적 특성'이란?",
+    a: "정해진 목표를 단순히 달성하는 것이 아니라, <strong>다양한 의견과 경험을 반영하여 지속적으로 수정·개선</strong>되어야 한다는 특성." },
+  { q: "슈왑과 워커(Walker)의 차이는?",
+    a: "<strong>슈왑</strong>은 구체적 개발 절차를 언급하지 않았으나, <strong>워커</strong>는 (자연주의적) 개발 절차를 제시했다." }
+];
+
+let idx = 0;
+const card = document.getElementById('card');
+const qText = document.getElementById('qText');
+const aText = document.getElementById('aText');
+const count = document.getElementById('count');
+const barFill = document.getElementById('barFill');
+const prevBtn = document.getElementById('prev');
+const nextBtn = document.getElementById('next');
+
+function render() {
+  card.classList.remove('flipped');
+  // small delay so content swaps while card is on front face
+  setTimeout(() => {
+    qText.innerHTML = cards[idx].q;
+    aText.innerHTML = cards[idx].a;
+  }, card.classList.contains('flipped') ? 280 : 0);
+  qText.innerHTML = cards[idx].q;
+  aText.innerHTML = cards[idx].a;
+  count.textContent = (idx + 1) + " / " + cards.length;
+  barFill.style.width = ((idx + 1) / cards.length * 100) + "%";
+  prevBtn.disabled = idx === 0;
+  nextBtn.disabled = idx === cards.length - 1;
+}
+
+function flip() { card.classList.toggle('flipped'); }
+
+card.addEventListener('click', flip);
+card.addEventListener('keydown', e => {
+  if (e.code === 'Space' || e.code === 'Enter') { e.preventDefault(); flip(); }
+});
+prevBtn.addEventListener('click', () => { if (idx > 0) { idx--; render(); } });
+nextBtn.addEventListener('click', () => { if (idx < cards.length - 1) { idx++; render(); } });
+
+const shuffleBtn = document.getElementById('shuffle');
+shuffleBtn.addEventListener('click', () => {
+  for (let i = cards.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [cards[i], cards[j]] = [cards[j], cards[i]];
+  }
+  idx = 0;
+  render();
+});
+document.addEventListener('keydown', e => {
+  if (e.code === 'ArrowLeft' && idx > 0) { idx--; render(); }
+  if (e.code === 'ArrowRight' && idx < cards.length - 1) { idx++; render(); }
+});
+
+// Theme
+const themeBtn = document.getElementById('themeBtn');
+const root = document.documentElement;
+const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+function setTheme(t) {
+  root.setAttribute('data-theme', t);
+  themeBtn.textContent = t === 'dark' ? '☀️ 라이트' : '🌙 다크';
+}
+setTheme(prefersDark ? 'dark' : 'light');
+themeBtn.addEventListener('click', () => {
+  setTheme(root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+});
+
+render();
+</script>
+</body>
+</html>
