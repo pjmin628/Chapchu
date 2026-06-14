@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<script>
+// 렌더링 직전: 시스템 테마를 html에 미리 적용 (다크↔라이트 깜빡임 방지)
+(function(){
+  try{
+    var light = window.matchMedia
+      && !window.matchMedia('(prefers-color-scheme: dark)').matches
+      && window.matchMedia('(prefers-color-scheme: light)').matches;
+    document.documentElement.setAttribute('data-theme', light ? 'light' : 'dark');
+  }catch(e){
+    document.documentElement.setAttribute('data-theme','dark');
+  }
+})();
+</script>
+<meta name="color-scheme" content="dark light">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>교육학 플래시카드</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root, [data-theme="dark"]{
+  --bg:#0d1117; --panel:#161b22; --panel2:#1c2230; --border:#30363d;
+  --text:#e6edf3; --muted:#8b949e; --accent:#f0b429; --accent2:#388bfd;
+  --high:#f0b429; --vhigh:#fb7185; --ok:#3fb950;
+  --header-bg:rgba(13,17,23,.85);
+  --card-grad:linear-gradient(160deg,#161b22,#1c2230);
+  --card-shadow:0 12px 40px rgba(0,0,0,.4);
+  --tab-active-text:#1a1100;
+  --th-bg:rgba(56,139,253,.14); --td-bg:rgba(255,255,255,.015);
+  --glow1:rgba(56,139,253,.08); --glow2:rgba(240,180,41,.06);
+}
+[data-theme="light"]{
+  --bg:#f6f8fa; --panel:#ffffff; --panel2:#f0f3f7; --border:#d6dce3;
+  --text:#1f2328; --muted:#6b7480; --accent:#bf8700; --accent2:#0969da;
+  --high:#bf8700; --vhigh:#cf3a52; --ok:#1a7f37;
+  --header-bg:rgba(255,255,255,.88);
+  --card-grad:linear-gradient(160deg,#ffffff,#eef2f7);
+  --card-shadow:0 10px 30px rgba(140,150,170,.25);
+  --tab-active-text:#ffffff;
+  --th-bg:rgba(9,105,218,.1); --td-bg:rgba(0,0,0,.012);
+  --glow1:rgba(9,105,218,.06); --glow2:rgba(191,135,0,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  font-family:'Noto Sans KR',-apple-system,BlinkMacSystemFont,sans-serif;
+  background:var(--bg); color:var(--text);
+  display:flex; flex-direction:column; min-height:100vh;
+  background-image:radial-gradient(circle at 20% 0%,var(--glow1),transparent 40%),radial-gradient(circle at 80% 100%,var(--glow2),transparent 40%);
+  transition:background-color .25s,color .25s;
+}
+.topbar{
+  position:sticky; top:0; z-index:20;
+  background:var(--header-bg); backdrop-filter:blur(8px);
+}
+header{
+  padding:16px 16px 10px; text-align:center;
+  border-bottom:1px solid var(--border); position:relative;
+}
+header h1{font-size:18px; font-weight:900; letter-spacing:-.3px}
+header h1 .logo{margin-right:6px}
+header .sub{font-size:11px; color:var(--muted); margin-top:3px}
+.theme-btn{
+  position:absolute; top:14px; right:14px; width:38px; height:38px;
+  border-radius:50%; border:1px solid var(--border); background:var(--panel2);
+  color:var(--text); font-size:18px; cursor:pointer; display:flex;
+  align-items:center; justify-content:center; transition:.18s; font-family:inherit;
+}
+.theme-btn:active{transform:scale(.9)}
+.tabs{
+  display:flex; gap:6px; overflow-x:auto; padding:10px 12px;
+  scrollbar-width:none; border-bottom:1px solid var(--border);
+  background:var(--panel);
+}
+.tabs::-webkit-scrollbar{display:none}
+.tab{
+  flex:0 0 auto; padding:8px 14px; border-radius:999px;
+  border:1px solid var(--border); background:var(--panel2); color:var(--muted);
+  font-size:13px; font-weight:700; cursor:pointer; white-space:nowrap;
+  transition:.18s; font-family:inherit;
+}
+.tab .cnt{font-size:11px; opacity:.7; margin-left:4px; font-weight:500}
+.tab.active{background:var(--accent); color:var(--tab-active-text); border-color:var(--accent)}
+.wrap{
+  flex:1; display:flex; flex-direction:column; align-items:center;
+  justify-content:flex-start; padding:18px 14px 28px; gap:14px;
+}
+.meta{
+  width:100%; max-width:560px; display:flex; align-items:center;
+  justify-content:space-between; font-size:12px; color:var(--muted);
+}
+.meta .imp{display:flex; align-items:center; gap:6px}
+.toolbar{
+  width:100%; max-width:560px; display:flex; align-items:center; gap:8px;
+  margin-top:-4px;
+}
+.tool-btn{
+  padding:7px 12px; border-radius:999px; border:1px solid var(--border);
+  background:var(--panel2); color:var(--muted); font-size:12px; font-weight:700;
+  cursor:pointer; font-family:inherit; transition:.15s; white-space:nowrap;
+}
+.tool-btn:active{transform:scale(.94)}
+.tool-btn.active{background:var(--accent2); color:#fff; border-color:var(--accent2)}
+.order-tag{font-size:11px; color:var(--accent2); font-weight:700; margin-left:auto}
+.badge{padding:3px 9px; border-radius:999px; font-size:11px; font-weight:700; border:1px solid}
+.badge.high{color:var(--high); border-color:var(--high); background:rgba(240,180,41,.08)}
+.badge.vhigh{color:var(--vhigh); border-color:var(--vhigh); background:rgba(251,113,133,.1)}
+.scene{width:100%; max-width:560px; perspective:1600px; -webkit-perspective:1600px; flex:1; min-height:60vh; display:flex}
+.card{
+  position:relative; width:100%;
+  transform-style:preserve-3d; -webkit-transform-style:preserve-3d;
+  transition:transform .5s cubic-bezier(.4,.2,.2,1); cursor:pointer;
+}
+.card.flipped{transform:rotateY(180deg)}
+.face{
+  position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden;
+  border:1px solid var(--border); border-radius:18px; padding:22px 20px;
+  background:var(--card-grad);
+  overflow-y:auto; display:flex; flex-direction:column;
+  box-shadow:var(--card-shadow);
+  /* backface-visibility 미지원 브라우저 대비: 뒤집기 애니메이션 중간(0.25s)에 visibility 전환 */
+  transition:visibility 0s linear .25s;
+}
+.face::-webkit-scrollbar{width:5px}
+.face::-webkit-scrollbar-thumb{background:var(--border); border-radius:3px}
+.front{
+  align-items:center; justify-content:center; text-align:center;
+  transform:rotateY(0deg) translateZ(1px); -webkit-transform:rotateY(0deg) translateZ(1px);
+  visibility:visible;
+}
+.card.flipped .front{visibility:hidden}
+.front .q-label{
+  font-size:11px; font-weight:700; color:var(--accent2); letter-spacing:1px;
+  text-transform:uppercase; margin-bottom:14px;
+}
+.front .q-text{font-size:22px; font-weight:700; line-height:1.5; letter-spacing:-.4px}
+.front .hint{position:absolute; bottom:16px; font-size:11px; color:var(--muted)}
+.back{
+  transform:rotateY(180deg) translateZ(1px); -webkit-transform:rotateY(180deg) translateZ(1px);
+  visibility:hidden;
+}
+.card.flipped .back{visibility:visible}
+.back .a-label{
+  font-size:11px; font-weight:700; color:var(--ok); letter-spacing:1px;
+  text-transform:uppercase; margin-bottom:12px; flex:0 0 auto;
+}
+.back .a-body{font-size:15px; line-height:1.7; word-break:keep-all}
+.back .a-body h3{font-size:16px; color:var(--accent); margin:12px 0 6px; font-weight:700}
+.back .a-body h3:first-child{margin-top:0}
+.back .a-body .li{display:flex; gap:7px; margin:5px 0; align-items:flex-start}
+.back .a-body .li .mk{flex:0 0 auto; color:var(--accent2); font-weight:700}
+.back .a-body .li .tx{flex:1}
+.back .a-body p{margin:7px 0}
+.back .a-body .star{color:var(--high); font-weight:700}
+.back .a-body .star.vh{color:var(--vhigh)}
+.back .a-body table{
+  width:100%; border-collapse:collapse; margin:12px 0; font-size:13px;
+  border:1px solid var(--border); border-radius:8px; overflow:hidden;
+}
+.back .a-body th,.back .a-body td{
+  border:1px solid var(--border); padding:7px 9px; text-align:left; vertical-align:top; line-height:1.5;
+}
+.back .a-body th{background:var(--th-bg); color:var(--text); font-weight:700}
+.back .a-body td{background:var(--td-bg)}
+.controls{
+  width:100%; max-width:560px; display:flex; gap:10px; align-items:center;
+}
+.btn{
+  flex:1; padding:14px 10px; border-radius:14px; border:1px solid var(--border);
+  background:var(--panel2); color:var(--text); font-size:14px; font-weight:700;
+  cursor:pointer; font-family:inherit; transition:.15s;
+}
+.btn:active{transform:scale(.96)}
+.btn.flip{flex:1.5; background:var(--accent2); border-color:var(--accent2); color:#fff}
+.btn:disabled{opacity:.35; cursor:default}
+.dots{
+  width:100%; max-width:560px; display:flex; flex-wrap:wrap; gap:5px;
+  justify-content:center; padding-top:2px;
+}
+.dot{width:7px; height:7px; border-radius:50%; background:var(--border); transition:.15s}
+.dot.done{background:var(--ok)}
+.dot.cur{background:var(--accent); transform:scale(1.5)}
+.counter{font-weight:700; color:var(--text)}
+@media(max-width:420px){
+  .front .q-text{font-size:19px}
+  .back .a-body{font-size:14px}
+  .face{padding:18px 15px}
+}
+
+/* ---- 검색 UI ---- */
+.searchbar{
+  display:flex; align-items:center; gap:8px; padding:10px 12px;
+  background:var(--panel); border-bottom:1px solid var(--border);
+}
+.searchbar .search-icon{font-size:14px; opacity:.7; flex:0 0 auto}
+.searchbar input{
+  flex:1; min-width:0; padding:9px 12px; border-radius:999px;
+  border:1px solid var(--border); background:var(--panel2); color:var(--text);
+  font-size:13px; font-family:inherit; outline:none; transition:.15s;
+}
+.searchbar input:focus{border-color:var(--accent2)}
+.searchbar input::placeholder{color:var(--muted)}
+.search-clear{
+  flex:0 0 auto; width:30px; height:30px; border-radius:50%;
+  border:1px solid var(--border); background:var(--panel2); color:var(--muted);
+  font-size:12px; cursor:pointer; font-family:inherit; display:none;
+  align-items:center; justify-content:center; transition:.15s;
+}
+.search-clear:active{transform:scale(.9)}
+.search-clear.show{display:flex}
+.search-results{
+  width:100%; max-width:560px; display:flex; flex-direction:column; gap:10px;
+}
+.search-summary{font-size:12px; color:var(--muted); padding:2px 2px 4px}
+.search-summary b{color:var(--accent2)}
+.result-card{
+  border:1px solid var(--border); border-radius:14px; padding:14px 16px;
+  background:var(--card-grad); cursor:pointer; transition:.15s;
+  box-shadow:0 4px 14px rgba(0,0,0,.12);
+}
+.result-card:active{transform:scale(.985)}
+.result-card .rc-top{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:6px}
+.result-card .rc-subject{
+  font-size:11px; font-weight:700; color:var(--accent2);
+  background:rgba(56,139,253,.12); border:1px solid var(--accent2);
+  padding:2px 8px; border-radius:999px;
+}
+.result-card .rc-front{font-size:15px; font-weight:700; line-height:1.45; letter-spacing:-.3px}
+.result-card .rc-snippet{font-size:12.5px; color:var(--muted); line-height:1.55; margin-top:6px; word-break:keep-all}
+.result-card mark{background:rgba(240,180,41,.35); color:var(--text); border-radius:3px; padding:0 2px}
+.search-empty{text-align:center; color:var(--muted); font-size:13px; padding:40px 10px; line-height:1.7}
+
+</style>
+</head>
+<body>
+<div class="topbar">
+<header>
+  <button class="theme-btn" id="themeBtn" aria-label="테마 전환">🌙</button>
+  <h1><span class="logo">📚</span>교육학 플래시카드</h1>
+  <div class="sub">앞면=주제·질문 · 뒷면=내용·정답 · 카드를 눌러 뒤집기</div>
+  <div class="sub">키보드: ← → 카드 이동 · Space/Enter 뒤집기</div>
+</header>
+<nav class="tabs" id="tabs"></nav>
+<div class="searchbar">
+  <span class="search-icon">🔍</span>
+  <input type="text" id="searchInput" placeholder="모든 과목에서 카드 검색 (주제·내용)" autocomplete="off">
+  <button class="search-clear" id="searchClear" aria-label="검색어 지우기">✕</button>
+</div>
+</div>
+<div class="wrap">
+  <div id="searchResults" class="search-results" style="display:none"></div>
+  <div class="meta">
+    <span class="counter" id="counter">1 / 1</span>
+    <span class="imp" id="imp"></span>
+  </div>
+  <div class="toolbar">
+    <button class="tool-btn" id="shuffleBtn">🔀 순서 섞기</button>
+    <button class="tool-btn" id="resetBtn">↺ 원래 순서</button>
+    <span class="order-tag" id="orderTag"></span>
+  </div>
+  <div class="scene">
+    <div class="card" id="card">
+      <div class="face front">
+        <div class="q-label">주제 · 질문</div>
+        <div class="q-text" id="frontText"></div>
+        <div class="hint">눌러서 정답 확인 ↻</div>
+      </div>
+      <div class="face back">
+        <div class="a-label">내용 · 정답</div>
+        <div class="a-body" id="backText"></div>
+      </div>
+    </div>
+  </div>
+  <div class="controls">
+    <button class="btn" id="prevBtn">← 이전</button>
+    <button class="btn flip" id="flipBtn">정답 확인 ↻</button>
+    <button class="btn" id="nextBtn">다음 →</button>
+  </div>
+  <div class="dots" id="dots"></div>
+</div>
+<script>
+const DATA = {
+
+// ===================== 교육심리 (176장) =====================
+  "교육심리": [
+    {"front": "[지능이론] 전통적 지능이론 — 종류 4가지", "importance": "normal", "back": "1) 스피어만의 G요인설(일반요인설)\n2) 써스톤의 다요인(PMA)설\n3) 길포드의 지능구조모형\n4) 카텔 & 혼의 위계적 요인설"},
+    {"front": "[지능이론] 스피어만 G요인설 — 지능 요인 2가지", "importance": "normal", "back": "1) 일반요인(G요인)\n2) 특수요인(S요인)"},
+    {"front": "[지능이론] 스피어만 G요인설 — 기본 입장", "importance": "normal", "back": "- 일반요인(G요인)만 중요하며, 지능이 높으면 모든 영역을 다 잘한다."},
+    {"front": "[지능이론] 써스톤 다요인(PMA)설 — 기본 입장", "importance": "normal", "back": "- 지능은 7개의 기본정신능력(PMA)으로 구성되며, 각 능력은 상호 독립적이다."},
+    {"front": "[지능이론] 써스톤 다요인(PMA)설 — 기본정신능력 7가지", "importance": "normal", "back": "1) 언어능력\n2) 공간능력\n3) 수리능력\n4) 추론능력\n5) 기억능력\n6) 지각능력\n7) 속도능력"},
+    {"front": "[지능이론] 길포드 지능구조모형 — 기본 입장", "importance": "normal", "back": "- 지능은 3차원의 조합으로 구성된다 (180개 복합요인)"},
+    {"front": "[지능이론] 길포드 지능구조모형 — 지능 구성 차원 3가지", "importance": "normal", "back": "1) 내용 차원\n2) 조작 차원\n3) 결과 차원"},
+    {"front": "[지능이론] 카텔 & 혼 위계적 요인설 — 지능의 종류 2가지", "importance": "normal", "back": "1) 유동성 지능\n2) 결정성 지능"},
+    {"front": "[지능이론] 카텔 & 혼 위계적 요인설 — 기본 입장", "importance": "normal", "back": "- 연령이 증가하면서 → 유동성 지능은 감소하고, 결정성 지능은 불변하거나 증가한다."},
+    {"front": "[다중지능] 가드너 다중지능이론 — 개념 2가지", "importance": "very_high", "back": "1) 지능은 단일 지능이 아니라 9개의 상호 독립적인 지능으로 구성된다.\n2) 지능은 자신의 문화적 상황 속에서 문제를 해결하거나 가치 있는 산물을 만들어내는 능력이다."},
+    {"front": "[다중지능] 가드너 다중지능이론 — 기본 입장 3가지", "importance": "very_high", "back": "1) 지능은 상호 독립적이며(상대적 중요성 동일) 서로 상호작용한다.\n2) 지능은 문화 의존적 & 상황 의존적이다.\n3) 지능은 교육 및 훈련으로 발달 가능하다."},
+    {"front": "[다중지능] 가드너 다중지능이론 — 학교의 역할", "importance": "very_high", "back": "- 사회에서 중시되는 다양한 능력을 증진시켜줘야 한다."},
+    {"front": "[다중지능] 가드너 다중지능이론 — 지능 측정 방법", "importance": "very_high", "back": "- 지능 측정은 다양한 방법으로 해야 한다."},
+    {"front": "[다중지능] 가드너 다중지능이론 — 다중지능 종류 9가지", "importance": "very_high", "back": "1) 언어 지능\n2) 논리-수학 지능\n3) 대인관계 지능\n4) 자연관찰 지능\n5) 음악 지능\n6) 공간 지능\n7) 신체운동 지능\n8) 개인 내적 지능\n9) 실존 지능"},
+    {"front": "[다중지능] 가드너 다중지능이론 — 교육적 시사점 2가지", "importance": "very_high", "back": "1) 지능은 9개의 독립된 능력으로 구성됨\n → 강점 지능은 강화 & 약점 지능은 보완해야 함\n → 학생의 개인차를 고려한 맞춤형 교육을 해야 함\n2) 지능은 문화 의존적 & 상황 의존적\n → 학습자 특성에 맞춘 수행평가를 통해 평가해야 함"},
+    {"front": "[삼원지능] 스턴버그 삼원지능이론 — 개념", "importance": "very_high", "back": "- 지능은 구성적 지능 / 경험적 지능 / 실제적 지능과 연관이 있다."},
+    {"front": "[삼원지능] 스턴버그 삼원지능이론 — 성공지능이란", "importance": "very_high", "back": "- 개인의 목표 달성에 도움을 주는 지능\n (구성적 지능 / 경험적 지능 / 실제적 지능이 균형 있게 유지된 것)"},
+    {"front": "[삼원지능] 스턴버그 삼원지능이론 — 삼원지능 종류 3가지", "importance": "very_high", "back": "1) 구성적 지능 (= 분석적)\n2) 경험적 지능 (= 창조적)\n3) 실제적 지능 (= 실천적)"},
+    {"front": "[삼원지능] 스턴버그 — 구성적(분석적) 지능 구성 3", "importance": "very_high", "back": "1) 메타요소\n2) 수행요소\n3) 지식습득요소"},
+    {"front": "[삼원지능] 스턴버그 — 경험적(창조적) 지능 구성 2", "importance": "very_high", "back": "1) 자동화\n2) 통찰력"},
+    {"front": "[삼원지능] 스턴버그 — 실제적(실천적) 지능 구성 3", "importance": "very_high", "back": "1) 환경적응\n2) 환경변화\n3) 환경선택"},
+    {"front": "[삼원지능] 스턴버그 삼원지능이론 — 교육적 시사점 2가지", "importance": "very_high", "back": "1) 3가지 지능은 모든 교과에 적용 가능 (3지능을 반영한 교과 수업이 필요함)\n2) 학생의 강점 강화 & 단점 보완하는 교육을 해야 함"},
+    {"front": "[감성지능] 골만 감성지능(EQ)이론 — 개념", "importance": "normal", "back": "- 지능은 자신과 타인의 감정을 정확히 인식 / 평가 / 표현하는 능력이다."},
+    {"front": "[감성지능] 골만 감성지능(EQ)이론 — EQ 구성요소 5가지", "importance": "normal", "back": "1) (자기) 감정인식능력\n2) (자기) 감정조절능력\n3) (자기) 동기화능력\n4) 타인의 감정인식능력\n5) 대인관계 관리능력"},
+    {"front": "[감성지능] 골만 감성지능(EQ)이론 — EQ 향상을 위한 교사 역할 3가지", "importance": "normal", "back": "1) 자신/타인의 정서를 인식 & 표현하는 기회를 제공해야 함\n2) 타인 상황을 총체적으로 인식 & 타인 정서를 공감하는 경험을 제공해야 함\n3) 다양한 상황 속 부정적 정서를 인식 & 조절하는 경험을 제공해야 함"},
+    {"front": "[지능검사] 지능검사 종류 4가지", "importance": "normal", "back": "1) 비네-시몬 검사\n2) 스탠포드-비네 검사\n3) 웩슬러 지능검사\n4) 문화공평검사 (문화공정성 검사, 문화평형검사)"},
+    {"front": "[지능검사] 비네-시몬 검사 — 특징 2가지", "importance": "normal", "back": "1) 최초의 지능검사임\n2) 학습부진아 판별 목적으로 고안됨"},
+    {"front": "[지능검사] 스탠포드-비네 검사 — 특징 2가지", "importance": "normal", "back": "1) 비율IQ(비율지능지수)를 최초 개발한 지능검사임\n (비율IQ = (정신연령 / 실제연령) × 100)\n2) 학업성취도 예언에 사용됨"},
+    {"front": "[지능검사] 웩슬러 지능검사 — 특징 & 편차IQ란", "importance": "normal", "back": "### 특징\n- 편차IQ를 도입함\n### 편차IQ란\n- 동일 연령집단 내 상대적 위치로 지능을 규정한 IQ"},
+    {"front": "[지능검사] 문화공평검사 — 특징 & 종류 3가지", "importance": "normal", "back": "### 특징\n- 피검자의 문화적 배경과 무관하게 지적 능력 등을 평가하는 비언어성 검사\n### 종류 3가지\n1) SOMPA (다문화 검사 체제)\n2) K-ABC (카우프만 검사)\n3) Raven 지능검사"},
+    {"front": "[지능검사] 지능지수(IQ) 해석 시 유의점 5가지", "importance": "normal", "back": "1) IQ는 지능의 하나의 지표일 뿐 맹신 X\n2) 표준오차 고려 필요 (모든 검사엔 오차 있음 → 단일 점수보다 점수 범위로 생각)\n3) IQ는 변화 가능\n4) IQ로 낙인 찍기 금지\n5) IQ 측정 시 플린효과 고려 필요"},
+    {"front": "[창의성] 창의성 개념 3가지 (퍼킨스 / 길포드 / 드 보노)", "importance": "normal", "back": "1) 퍼킨스: 주어진 문제 상황에서 새롭고/유용하고/가치 있는 것을 창출하는 능력\n2) 길포드: 문제의 창의적 해결을 위해선 확산적 사고 + 수렴적 사고가 필요\n3) 드 보노: 창의성은 수평적으로 사고하는 것"},
+    {"front": "[창의성] 창의성 개발의 원리 3가지", "importance": "normal", "back": "1) 판단보류의 원리\n2) 개방성의 원리\n3) 자율성의 원리"},
+    {"front": "[창의성] 창의성의 구성요소 5가지", "importance": "normal", "back": "1) 유창성\n2) 융통성\n3) 민감성\n4) 정교성\n5) 독창성"},
+    {"front": "[창의성] 창의성 교육의 활성화 방안 3가지", "importance": "normal", "back": "1) (외재적 동기보다) 내재적 동기 유발이 중요함\n2) 문제에 대해 새로운 관점에서 생각해 보도록 질문해야 함\n3) 학생들에게 자유를 부여 & 실수를 허용해야 함"},
+    {"front": "[창의성] 창의성 개발기법 종류 7가지", "importance": "normal", "back": "1) 브레인스토밍\n2) 시네틱스 교수법\n3) PMI법\n4) 육색 사고 모자\n5) 속성 열거법\n6) 체크리스트법\n7) SCAMPER법"},
+    {"front": "[창의성] 브레인스토밍 — 기본개념 & 기본 원리 4", "importance": "normal", "back": "### 기본개념\n- 자유롭게 의견을 제시해 최대한 많은 아이디어를 창출하는 기법\n### 기본 원리 4\n1) 양산\n2) 비판금지\n3) 자유분방\n4) 결합과 개선\ncf. 브레인라이팅"},
+    {"front": "[창의성] 시네틱스 교수법 — 학자·개념·방법·단계", "importance": "normal", "back": "### 학자\n- 고든\n### 기본개념\n- 관련 없어 보이는 요소들을 유추로 연결해 새로운 아이디어를 창출하는 기법\n### 방법 4\n1) 직접 유추 2) 의인 유추 3) 상징적 유추 4) 환상적 유추\n### 단계(방법) 4\n1) 이탈 → 2) 거치 → 3) 성찰 → 4) 자율"},
+    {"front": "[창의성] PMI법 — 학자 & 기본개념", "importance": "normal", "back": "### 학자\n- 드보노\n### 기본개념\n- 문제를 ①긍정적인 / ②부정적인 / ③흥미로운 면으로 나눠 생각시킴"},
+    {"front": "[창의성] 육색 사고 모자 — 학자 & 기본개념", "importance": "normal", "back": "### 학자\n- 드보노\n### 기본개념 2\n1) 본인 모자 색의 특정 사고만 하도록 함\n2) 한 번에 한 가지씩만 사고 → 여러 측면의 폭넓은 사고를 유도하는 기법"},
+    {"front": "[창의성] 속성열거법 — 학자 & 기본개념", "importance": "normal", "back": "### 학자\n- 크로포드\n### 기본개념\n- 어떤 대상의 주요 속성을 열거해 새로운 아이디어를 창출하는 기법"},
+    {"front": "[창의성] 체크리스트법 — 기본개념", "importance": "normal", "back": "- 점검 목록(checklist)을 미리 작성 & 다양한 사고를 능률적으로 전개하는 기법"},
+    {"front": "[창의성] SCAMPER법 — 기본개념 & 변형 방법 7", "importance": "normal", "back": "### 기본개념\n- 대상이나 문제를 다양한 방법으로 변형 → 새로운 아이디어를 창출하는 기법\n### 변형 방법 7\n1) 대체하기 (Substitute)\n2) 결합하기 (Combine)\n3) 적용하기 (Adapt)\n4) 수정하기 (Modify)\n5) 다른 용도로 활용 (Put other uses)\n6) 제거하기 (Elimination)\n7) 거꾸로 또는 재배열하기 (Rearrange or Reverse)"},
+    {"front": "[인지양식] 인지양식이란 & 교육적 시사점", "importance": "very_high", "back": "### 인지양식이란\n- 사물이나 정보를 지각/처리하는 개인만의 방식\n### 교육적 시사점\n- 학생의 인지양식에 맞게 수업 방식을 달리해야 함"},
+    {"front": "[인지양식] 인지양식 종류 3가지", "importance": "very_high", "back": "1) 위트킨의 장독립적-장의존적 인지양식\n2) 케이건의 충동형(속응형)-반성형(숙고형) 인지양식\n3) 콜브의 학습유형"},
+    {"front": "[인지양식] 위트킨 장독립-장의존 — 학자 & 양식 나누는 기준 & 유형 2", "importance": "very_high", "back": "### 학자\n- 위트킨\n### 양식 나누는 기준\n- 주어진 상황에서 정보를 받아들이는 방식에 따라\n### 인지양식 유형 2\n1) 장독립형\n2) 장의존형"},
+    {"front": "[인지양식] 장독립형 — 학습자 특성 5", "importance": "very_high", "back": "1) 대상을 독립적으로 파악하는 경향\n2) 주변 배경(환경)에 영향을 받지 않음\n3) 개인적 성향을 가짐\n4) 개별학습 선호\n5) 개인의 목표 추구를 통해 내적 동기가 유발되는 경향"},
+    {"front": "[인지양식] 장독립형 — 교수전략 4", "importance": "very_high", "back": "1) 강의법 선호함 (제공함)\n2) 비구조화된 학습자료 선호함 (제공함)\n3) 목표를 스스로 세우게 함\n4) 정확한 피드백 & 부정적 평가를 함께 사용함"},
+    {"front": "[인지양식] 장의존형 — 학습자 특성 5", "importance": "very_high", "back": "1) 대상을 전체적으로 파악하는 경향\n2) 주변 배경(환경)에 영향을 많이 받음\n3) 사회적 성향을 가짐\n4) 동료학습 선호\n5) 칭찬 및 보상 등에 의해 외적 동기가 유발되는 경향"},
+    {"front": "[인지양식] 장의존형 — 교수전략 4", "importance": "very_high", "back": "1) 협동학습 선호함 (제공함)\n2) 구조화된 학습자료 선호함 (제공함)\n3) 외적 보상을 계획해 제공함\n4) 외부 비판에 영향을 많이 받으므로, 부정적 피드백 & 부정적 평가를 지양함"},
+    {"front": "[인지양식] 케이건 충동형-반성형 — 학자 & 유형 2 & 구분 기준", "importance": "high", "back": "### 학자\n- 케이건\n### 인지양식 유형 2\n1) 충동형(속응형)\n2) 반성형(숙고형)\n### 구분 기준\n- 과제 해결에 대한 반응시간과 반응오류(오답 수)에 따라"},
+    {"front": "[인지양식] 충동형(속응형) — 학습자 특성 3", "importance": "high", "back": "1) 생각나는 대로 단순하게 답을 구함\n2) 정보처리가 빠르지만, 실수가 잦음\n3) 학업 성취도 낮음"},
+    {"front": "[인지양식] 충동형(속응형) — 교수전략 2", "importance": "high", "back": "1) 신중하게 사고하도록 가르침\n2) 학습 전체를 개괄적으로 훑어보게 함"},
+    {"front": "[인지양식] 반성형(숙고형) — 학습자 특성 3", "importance": "high", "back": "1) 여러 가지 대안을 탐색한 후 검토하여 답을 구함\n2) 정보처리가 느리지만, 실수가 적음\n3) 학업 성취도 높음"},
+    {"front": "[인지양식] 반성형(숙고형) — 교수전략 1", "importance": "high", "back": "1) 어려운 문제는 넘어갈 수 있게 함"},
+    {"front": "[인지양식] 콜브 학습유형 — 구분 기준 & 학습유형의 기준 2", "importance": "high", "back": "### 구분 기준\n- 정보지각방식과 정보처리방식에 따라 학습유형을 분류함\n### 학습유형의 기준 2\n1) 정보지각방식\n - 유형① 구체적 경험으로 지각하는 유형\n - 유형② 추상적으로 개념화하는 유형\n2) 정보처리방식\n - 유형① 활동적으로 실험하는 유형 (능동적 실행)\n - 유형② 반성적으로 관찰하는 유형"},
+    {"front": "[인지양식] 콜브 학습유형 4가지", "importance": "high", "back": "1) 적응형 (구체적 경험 & 활동적 실험)\n2) 발산형(확산형) (구체적 경험 & 반성적 관찰)\n3) 수렴형 (추상적 개념화 & 활동적 실험)\n4) 동화형 (추상적 개념화 & 반성적 관찰)"},
+    {"front": "[동기] 기대×가치이론(앳킨슨) — 기본개념", "importance": "high", "back": "- (과제 성공 기대) × (해당 과제 가치)를 곱한 값만큼 동기가 유발됨"},
+    {"front": "[동기] 기대×가치이론 — 성공 기대에 영향을 주는 요소 4", "importance": "high", "back": "1) 목표\n2) 과제 난이도\n3) 자기도식\n4) 정서적 기억"},
+    {"front": "[동기] 기대×가치이론 — 과제 가치에 영향을 주는 요소 4", "importance": "high", "back": "1) 내적가치 (흥미)\n2) 달성가치 (중요성)\n3) 비용가치 (과제를 위해 포기하는 것)\n4) 유용가치 (유용성)"},
+    {"front": "[동기] 기대×가치이론 — 시사점 3가지", "importance": "high", "back": "1) 기대와 가치 중 하나라도 0이 되면 동기가 유발되지 않음\n2) 성공 기대를 높이려면: 구체적인 목표를 세우고, 도전적인 과제와 긍정적인 피드백을 제공함\n3) 과제 가치를 높이려면: 학교에서 배우는 내용에 대한 중요성과 유용성을 강조함"},
+    {"front": "[동기] 성취동기이론(앳킨슨) — 기본개념", "importance": "normal", "back": "- 성취동기 = 성공추구경향(목표에 다가서려는 경향) − 실패회피경향(실패를 회피하려는 경향)"},
+    {"front": "[동기] 성취동기이론 — 성취동기 높은 사람 특징 2", "importance": "normal", "back": "1) 성공 가능성이 높은 중간 정도의 난이도의 과제를 선택함\n2) 실패 시 동기가 증가"},
+    {"front": "[동기] 성취동기이론 — 성취동기 낮은 사람 특징 2", "importance": "normal", "back": "1) 아주 쉬운 과제 또는 아주 어려운 과제를 선택함\n2) 성공 시 동기가 증가"},
+    {"front": "[동기] 성취동기이론 — 성취동기를 높이기 위한 방안 2", "importance": "normal", "back": "1) 성공추구경향 높이기: 과제 난이도 조절 & 실패 원인을 노력으로 귀인시킴\n2) 실패회피경향 낮추기: 실패를 인정하고, 실패가 주는 교훈을 생각시킴"},
+    {"front": "[동기] 귀인이론(와이너) — 기본개념", "importance": "very_high", "back": "- 성공/실패의 원인을 어디에 두느냐에 따라 학습동기에 영향을 줌"},
+    {"front": "[동기] 귀인이론 — 원인 종류 4가지", "importance": "very_high", "back": "1) 능력\n2) 노력\n3) 운\n4) 과제난이도"},
+    {"front": "[동기] 귀인이론 — 귀인의 차원 3가지", "importance": "very_high", "back": "1) 소재 (내적 vs 외적)\n2) 안정성 (불안정 vs 안정)\n3) 통제 가능성 (통제 가능 vs 불가능)\n- 사람들은 위 3가지 차원을 고려하여 성공/실패 원인을 인식함"},
+    {"front": "[동기] 귀인이론 — 노력의 귀인 요인", "importance": "very_high", "back": "- 내적 + 불안정적 + 통제 가능"},
+    {"front": "[동기] 귀인이론 — 시사점 2가지", "importance": "very_high", "back": "1) 외적<내적, 안정적<불안정적, 통제불가능<통제가능 요인에 귀인할 때 학습동기가 증가함\n (∴ 성공하든 실패하든 노력으로 귀인시켜야 함)\n2) '노력-성공' 인지론을 심어주어 노력으로 귀인시켜야 함"},
+    {"front": "[동기] 목표지향성 이론(드웩) — 기본개념 2", "importance": "high", "back": "1) 학생마다 목표지향성에 따라 학습동기가 설명됨\n2) 학생마다 목표지향성에 따라 과제 수행 과정 & 결과가 달라짐"},
+    {"front": "[동기] 목표지향성 이론 — 목표의 유형 2 (숙달목표 vs 수행목표)", "importance": "high", "back": "숙달목표와 수행목표는 정의·귀인·실수·비교·과제·도움의 6가지 측면에서 대비된다.", "table": "<table><tr><th>구분</th><th>숙달목표</th><th>수행목표</th></tr>\n<tr><td>정의</td><td>학습활동 자체에 초점한 목표</td><td>타인 능력과의 비교에 초점한 목표</td></tr>\n<tr><td>귀인</td><td>성공/실패 모두 노력으로 귀인</td><td>성공/실패 모두 능력으로 귀인</td></tr>\n<tr><td>실수</td><td>실수 인정 O</td><td>실수 인정 X</td></tr>\n<tr><td>비교</td><td>자기 자신과 비교</td><td>자신과 타인을 비교</td></tr>\n<tr><td>과제</td><td>도전적인 과제 선호</td><td>난이도보다 성취 가능성만 따짐</td></tr>\n<tr><td>도움</td><td>다른 사람의 도움 거부 안 함</td><td>다른 사람의 도움 거부함</td></tr></table>"},
+    {"front": "[동기] 목표지향성 이론 — 시사점 3가지", "importance": "high", "back": "1) 교사는 (수행목표가 아닌) 숙달목표로 동기를 유발해야 함\n2) 교사는 학습자 수준에 맞는 과제(또는 도전적 과제)를 제공해야 함\n3) 교사는 구체적이고 객관적인 피드백을 제공해야 함 (피드백을 통해 성장함)"},
+    {"front": "[동기] 자기효능감 이론(반두라) — 자기효능감이란", "importance": "high", "back": "- (특정 과제를 성공적으로 수행할 수 있다는) 자신의 능력에 대한 믿음"},
+    {"front": "[동기] 자기효능감 이론 — 자기효능감의 형성 요인 4", "importance": "high", "back": "1) 성공 경험\n2) 대리 경험 (모델링)\n3) 사회적 설득 (칭찬, 격려, 지지)\n4) 신체적·정서적 상태 (정서적 안정감)"},
+    {"front": "[동기] 자기가치 이론(코빙톤) — 핵심 주장", "importance": "high", "back": "- 자기가치를 보호하려는 욕구가 행동을 결정한다."},
+    {"front": "[동기] 자기가치 이론 — 자기가치란", "importance": "high", "back": "- 자신의 가치에 대한 평가 또는 자기 자신에 대한 감정이나 정서적 반응 (= 자기존중감)"},
+    {"front": "[동기] 자기가치 이론 — 자기장애란 & 자기장애 전략 2", "importance": "high", "back": "### 자기장애란\n- 자기존중감을 보호하기 위한 자기보호 전략\n### 자기장애 전략 2\n1) 과제 수행을 마지막까지 미루기 → 자신의 수행을 실제 능력보다 낮게 만듦\n2) 실패를 능력이 아닌 노력 부족으로 돌림"},
+    {"front": "[동기] 자기가치 이론 — 교육적 시사점", "importance": "high", "back": "- 왜 학생들이 노력하지 않는지, 그 이유를 설명함"},
+    {"front": "[동기] 자기결정성 이론(데시와 라이언) — 핵심 주장", "importance": "very_high", "back": "- 인간은 본인 행동을 자율적으로 결정하고 싶은 욕구가 행동을 결정한다."},
+    {"front": "[동기] 자기결정성 이론 — 자기결정성이란", "importance": "very_high", "back": "- 자신의 행동/운명을 자율적으로 선택할 수 있다는 믿음"},
+    {"front": "[동기] 자기결정성 이론 — 기본욕구 3", "importance": "very_high", "back": "1) 자율성 욕구 (외적 압력보다는 본인 선택을 원함)\n2) 유능성 욕구 (능력 향상을 원함)\n3) 관계성 욕구 (다른 사람과 안정적 관계를 원함)"},
+    {"front": "[동기] 자기결정성 이론 — 교육적 시사점", "importance": "very_high", "back": "- 자율성·유능성·관계성 욕구 세 가지를 활용해 학생이 더 높은 동기를 가지게 할 수 있음"},
+    {"front": "[발달] 피아제 인지발달이론 — 인지발달이란", "importance": "very_high", "back": "- 인간과 환경의 상호작용으로 인지구조가 질적으로 변화되는 과정"},
+    {"front": "[발달] 피아제 — 인지기능이란 (적응·조직)", "importance": "very_high", "back": "환경에 적응하려는 선천적/불변적 경향성\n### 1-1) 적응 (환경에 맞춰 인지구조를 변화시키는 과정)\n- 하위과정① 동화 (새로운 정보를 기존 인지구조에 통합)\n- 하위과정② 조절 (기존 인지구조를 새로운 정보에 맞춰 수정)\n### 1-2) 조직\n- 본인 인지구조를 체계적으로 정리/통합하는 과정"},
+    {"front": "[발달] 피아제 — 인지도식이란", "importance": "very_high", "back": "- 인지구조의 기본 단위 (외부세계 이해의 틀 / 사고체계 / 정신적 표상 / 지식 체계 등)"},
+    {"front": "[발달] 피아제 — 인지적 불평형이란", "importance": "very_high", "back": "- 동화와 조절이 원활히 일어나지 않은 인지갈등상태"},
+    {"front": "[발달] 피아제 — 학습과정 3", "importance": "very_high", "back": "1) 기존 본인 인지도식에 새로운 지식이나 개념이 들어옴 → 불평형 상태가 됨\n2) 기존 인지구조에 새로운 개념이 포함되면 동화 과정 → 인지발달 발생\n3) 기존 인지구조가 변화하면 조절 과정 → 인지발달 발생"},
+    {"front": "[발달] 피아제 — 인지발달단계 4", "importance": "very_high", "back": "1) 감각운동기 (0~2세)\n2) 전조작기 (2~7세)\n3) 구체적 조작기 (7~11세)\n4) 형식적 조작기 (12세~)"},
+    {"front": "[발달] 피아제 — 감각운동기 특징", "importance": "very_high", "back": "- 감각 & 운동은 O 이지만, 사고능력은 X"},
+    {"front": "[발달] 피아제 — 전조작기 특징", "importance": "very_high", "back": "- 상징적 사고 & 물활론적 사고 & 자기중심적 사고 O"},
+    {"front": "[발달] 피아제 — 구체적 조작기 특징 4", "importance": "very_high", "back": "1) 보존개념\n2) 탈중심화\n3) 가역성\n4) 보상성\n발달"},
+    {"front": "[발달] 피아제 — 형식적 조작기 특징 4", "importance": "very_high", "back": "1) 조합적 사고\n2) 명제적 사고\n3) 추상적 사고\n4) 가설연역적 사고\n발달"},
+    {"front": "[발달] 피아제 인지발달이론 — 교육적 시사점 2", "importance": "very_high", "back": "1) 인지발달을 위해 적절히 인지갈등을 유발해야 함\n (∴ 적정한 곤란도를 가진 과제를 제시해야 함)\n2) 또래와의 사회적 상호작용은 인지불균형을 쉽게 유발함\n (∴ 비슷한 수준의 또래와 상호작용 기회를 제공해야 함)"},
+    {"front": "[발달] 비고츠키 인지발달이론 — 핵심 주장 2", "importance": "very_high", "back": "1) 타인과의 사회적 상호작용으로 인지발달이 일어남\n2) 언어가 인지발달에 큰 영향을 미침"},
+    {"front": "[발달] 비고츠키 — 언어의 발달순서 3", "importance": "very_high", "back": "1) 사회적 언어 (~3세) – 감정 전달용 초보적 언어\n2) 사적 언어 (3~7세) – 자신의 사고/행동 조절용 혼잣말\n3) 내적 언어 (7세~) – 사적 언어의 내면화 (속으로 생각)"},
+    {"front": "[발달] 비고츠키 — 근접발달영역(ZPD)란 & 관련 평가", "importance": "very_high", "back": "### 근접발달영역(ZPD)란\n- 실제적 발달수준과 잠재적 발달수준 사이의 영역\n### 관련 평가\n- 역동적 평가 (발달잠재력을 확인하는 평가)"},
+    {"front": "[발달] 비고츠키 — 비계설정이란 & 방법 & 유의점", "importance": "very_high", "back": "### 비계설정이란\n- 근접발달영역 내에서 제공되는 도움\n### 비계설정 방법\n- 나보다 뛰어난 누구든, 언어적 도움을 제공\n### 비계설정 유의점\n- 초반엔 많은 도움 → 점점 지원을 줄여야 함 (fading)"},
+    {"front": "[발달] 비고츠키 인지발달이론 — 교육적 시사점 4", "importance": "very_high", "back": "1) 교사는 근접발달영역(ZPD)을 발견해 맞춤 학습과제를 제시해야 함\n2) 교사는 (학생이 어려워할 때) 비계설정으로 맞춤 도움을 제공해야 함\n3) 교사는 능력 수준이 다른 이질집단의 협동학습을 촉진해야 함\n4) 교사는 허용적 교실환경을 만들어야 함 (학생들이 사적언어를 사용할 수 있도록)"},
+    {"front": "[발달] 프로이트 성격발달이론 — 기본 주장", "importance": "normal", "back": "- 인간 발달은 성적 에너지(리비도) 부위를 중심으로 단계별로 이뤄짐"},
+    {"front": "[발달] 프로이트 — 정신의 구조 3", "importance": "normal", "back": "1) 의식\n2) 전의식\n3) 무의식"},
+    {"front": "[발달] 프로이트 — 성격의 구조 3", "importance": "normal", "back": "1) id (원초아)\n2) ego (자아)\n3) superego (초자아)"},
+    {"front": "[발달] 프로이트 — 성격발달단계 5", "importance": "normal", "back": "1) 구강기 – 성격 원형 형성 (원초아 지배)\n2) 항문기\n3) 남근기 – 성격 발달의 결정적 시기\n4) 잠복기\n5) 생식기"},
+    {"front": "[발달] 프로이트 — 성격발달이론 주장 2", "importance": "normal", "back": "1) 각 단계에서 충분히 욕구를 만족시키면 다음 단계로 이행 / 욕구가 불충족·과잉 충족 시 고착 현상\n2) 개인의 발달은 id, ego, superego의 상호작용 결과임"},
+    {"front": "[발달] 에릭슨 심리·사회적 성격발달이론 — 기본 주장 2", "importance": "very_high", "back": "1) 사회적 관계에 따라 성격발달단계를 8단계로 나눔\n2) 발달 단계마다 결정적 시기와 심리사회적 위기가 있음 → 잘 극복 시 성격발달"},
+    {"front": "[발달] 에릭슨 — 성격발달단계 8 / 기본덕목 8", "importance": "very_high", "back": "1) 신뢰감 vs 불신감 / 희망 (0~18개월) *성격 발달에 가장 중요한 시기\n2) 자율성 vs 수치심 / 의지\n3) 주도성 vs 죄책감 / 목적\n4) 근면성 vs 열등감 / 능력 (6~12세)\n5) 자아정체성 vs 역할혼미 / 충성(충실) (12~18세) *또래와 상호작용 중요 시기\n6) 친밀감 vs 고립감 / 사랑\n7) 생산성 vs 침체감 / 배려\n8) 자아통합 vs 절망감 / 지혜"},
+    {"front": "[발달] 에릭슨 — 교육적 시사점 (중등 측면) 3", "importance": "very_high", "back": "1) 교사는 중고등학생들의 자아정체성 탐색이 중요하다는 것을 알고 있어야 함\n2) (자아정체감을 형성할 수 있게) 다양한 경험의 기회 제공이 필요\n3) 학생들이 심리적 유예를 보일 수 있음을 유의 → 기다려주는 자세가 필요"},
+    {"front": "[발달] 마샤 자아정체감 지위 이론 — 기본 개념", "importance": "very_high", "back": "- 위기와 참여를 기준으로 정체감 지위를 4가지 유형으로 분류함"},
+    {"front": "[발달] 마샤 — 정체감 지위 구분 기준 2", "importance": "very_high", "back": "1) 위기 (정체성을 찾으려고 고민하고 노력했는가)\n2) 참여 (가치, 신념 등에 능동적 의사결정을 내렸는가)"},
+    {"front": "[발달] 마샤 — 정체감의 유형 4", "importance": "very_high", "back": "1) 정체성 혼미 (위기 X, 참여 X)\n2) 정체성 유예 (위기 O, 참여 X)\n3) 정체성 유실 (위기 X, 참여 O)\n4) 정체성 성취 (위기 O, 참여 O)", "table": "<table><tr><th>정체감 유형</th><th>위기</th><th>참여</th></tr>\n<tr><td>정체성 혼미</td><td>X</td><td>X</td></tr>\n<tr><td>정체성 유예</td><td>O</td><td>X</td></tr>\n<tr><td>정체성 유실</td><td>X</td><td>O</td></tr>\n<tr><td>정체성 성취</td><td>O</td><td>O</td></tr></table>"},
+    {"front": "[발달] 마샤 — 정체감 형성 과정", "importance": "very_high", "back": "- 정체성 혼미 → 유예 → 성취"},
+    {"front": "[발달] 마샤 — 교육적 시사점 3", "importance": "very_high", "back": "1) '위기'를 경험하도록 다양한 경험을 제공해야 함\n2) '참여'할 수 있도록 다양한 모델링을 제시해 줘야 함\n3) 정체성 유예 단계에선 학생 스스로 정체성을 결정할 수 있도록 기다려줘야 함"},
+    {"front": "[발달] 콜버그 도덕성 발달이론 — 기본 개념 2", "importance": "high", "back": "1) 도덕성 발달 수준은 단계적으로 발전함 (인지 능력 발달 & 사회적 경험 성장에 따라)\n2) 도덕적 딜레마 상황을 제시하고, 도덕성 발달이론을 체계화함"},
+    {"front": "[발달] 콜버그 — 도덕성 발달단계 6", "importance": "high", "back": "### 전인습 수준 (개인욕구에 맞춤)\n1) 처벌회피·복종지향\n2) 개인적 욕구 충족지향\n### 인습 수준 (구성원 기준에 맞춤)\n3) 대인관계 조화지향\n4) 법과 질서 지향\n### 후인습 수준 (개인 양심에 맞춤)\n5) 사회 계약 지향\n6) 보편적 도덕원리 지향"},
+    {"front": "[발달] 콜버그 — 교육적 시사점 2", "importance": "high", "back": "1) 학교 도덕교육은 도덕적 판단능력을 길러주는 교육이어야 함 (사례 나열 X, 다양한 상황에서 스스로 판단해 행동하도록 O)\n2) 도덕적 딜레마 상황을 제시 → 학생들이 토론하게 해봄 = 도덕성 발달 교육"},
+    {"front": "[발달] 콜버그 — 한계점 3", "importance": "high", "back": "1) 도덕적 판단수준이 높다고 도덕적으로 행동하는 것은 아님\n2) 도덕 발달단계를 뚜렷하게 구분하기 어려움\n3) 여성의 도덕성 발달단계엔 적절하지 못함"},
+    {"front": "[발달] 셀만 사회적 조망수용이론 — 사회적 조망수용능력이란 & 갖춘 아동", "importance": "normal", "back": "### 사회적 조망수용능력이란\n- 타인의 관점, 입장, 사고, 감정 등을 추론하여 이해하는 능력\n### 사회적 조망수용능력을 갖춘 아동\n- 감정이입능력, 동정심, 사회적 문제해결능력을 지님"},
+    {"front": "[발달] 셀만 — 조망수용능력 단계 5", "importance": "normal", "back": "1) 자기중심적 조망수용 (0단계, 3-6세) *자신과 다른 관점 이해 X\n2) 사회정보적 조망수용 (1단계, 5-9세) *타인 관점이 다름은 이해하나 자신 입장에서 이해\n3) 자기반성적 조망수용 (2단계, 7-12세) *타인 관점에서 자신 이해하나 동시이해 X\n4) 상호적 조망수용 (3단계, 10-15세) *제3자 입장에서 객관적으로 자신/타인 동시이해\n5) 사회적 조망수용 (4단계, 청소년-성인기) *법/질서 등 사회가치체계에 근거 판단"},
+    {"front": "[발달] 셀만 — 교육적 시사점 2", "importance": "normal", "back": "1) 조망수용능력을 지도/훈련 시, 반사회적 행동 감소 & 감정이입 증가 & 친사회적 행동 증가\n2) 교사는 학생들이 높은 단계의 조망수용능력을 발달시킬 수 있게 도와줘야 함"},
+    {"front": "[발달] 브론펜브레너 생태학적 발달이론 — 기본 개념 2", "importance": "high", "back": "1) 사회적 환경이 어떻게 아동 발달에 영향을 미치는지 보여주는 이론\n2) 환경의 다차원적인 체계가 상호작용해 개인의 발달/행동에 영향을 미친다고 주장"},
+    {"front": "[발달] 브론펜브레너 — 개인을 둘러싼 환경 5", "importance": "high", "back": "1) 미시체계\n2) 중간체계\n3) 외체계\n4) 거시체계\n5) 시간체계\n- 연령이 증가하며 개인발달에 영향을 주는 환경 범위가 미시체계에서 점차 넓어짐"},
+    {"front": "[발달] 브론펜브레너 — 교육적 시사점 2", "importance": "high", "back": "1) 개인의 발달은 유전과 환경 모두의 영향을 받음\n2) 학생 이해는 다양한 환경과의 상호작용 속에서 가능함"},
+    {"front": "[학습] 파블로프 고전적 조건화 — 기본개념", "importance": "normal", "back": "- 중립 자극과 무조건 자극을 결합해 유기체에 반복적으로 제공함으로써, 조건 자극만으로 조건 반응을 유발 가능 (수동적 조건형성 이론)"},
+    {"front": "[학습] 파블로프 — 주요 키워드 6 (중·무·무·조·조·조)", "importance": "normal", "back": "1) 중립 자극\n2) 무조건 자극\n3) 무조건 반응\n4) 조건 자극\n5) 조건 반응\n6) 조건 형성"},
+    {"front": "[학습] 파블로프 — 조건형성 전/중/후", "importance": "normal", "back": "### 조건형성 전\n- 무조건 자극 → 무조건 반응 / 중립 자극 → 반응 없음\n### 조건형성 중\n- 중립 자극 + 무조건 자극 → 무조건 반응\n### 조건형성 후\n- 조건 자극 → 조건 반응"},
+    {"front": "[학습] 파블로프 — 고전적 조건형성의 원리 4", "importance": "normal", "back": "1) 시간의 원리\n2) 일관성의 원리\n3) 강도의 원리\n4) 계속성의 원리"},
+    {"front": "[학습] 파블로프 — 주요 현상 (조건형성 과정)", "importance": "normal", "back": "1) 자극 일반화\n2) 변별\n3) 소거\n4) 자발적 회복"},
+    {"front": "[학습] 파블로프 — 부적응행동의 교정 4", "importance": "normal", "back": "1) 소거\n2) 역조건형성 (= 상호제지)\n3) 체계적 둔감법\n4) 홍수법"},
+    {"front": "[학습] 손다이크 도구적 조건화 — 기본 주장 2", "importance": "normal", "back": "1) 행동 뒤에 수반되는 결과가 행동을 유발하는 것임\n2) 행동은 결과/목표 달성을 위한 도구일 뿐임"},
+    {"front": "[학습] 손다이크 — 시행착오설", "importance": "normal", "back": "- 시행횟수가 증가하면 → 목표에 도달하는 시간이 짧아지는 학습"},
+    {"front": "[학습] 손다이크 — 학습 원리 3", "importance": "normal", "back": "1) 효과의 법칙 (행동 결과가 만족스러울 때 학습이 촉진됨)\n2) 연습의 법칙 (반복 연습이 학습을 촉진)\n3) 준비성의 법칙 (학습자가 학습태세가 준비되어 있어야 함)"},
+    {"front": "[학습] 스키너 조작적 조건화 — 기본 주장", "importance": "very_high", "back": "- 행동의 결과(자극)에 의해 특정 행동의 빈도가 증가하거나 감소하여 학습이 일어남"},
+    {"front": "[학습] 스키너 — 강화 이론 키워드 2 (강화 vs 벌)", "importance": "very_high", "back": "1) 강화 - 특정 행동의 발생빈도를 증가시키는 것\n2) 벌 - 특정 행동의 발생빈도를 감소시키는 것"},
+    {"front": "[학습] 스키너 — 강화 조건 3", "importance": "very_high", "back": "1) 강화는 자주\n2) 강화는 반응 후 즉시\n3) 강화는 바람직한 행동 때만 줘야 함"},
+    {"front": "[학습] 스키너 — 벌의 조건 4", "importance": "very_high", "back": "1) 처벌 행동 구체적\n2) 즉시 처벌\n3) 처벌 이유 분명히\n4) 대안행동 분명히"},
+    {"front": "[학습] 스키너 — 벌의 대안 4", "importance": "very_high", "back": "1) 타임아웃\n2) 소거\n3) 상반행동강화\n4) 포만법"},
+    {"front": "[학습] 스키너 — 강화의 유형 4", "importance": "very_high", "back": "1) 정적 강화 (반응 후 유쾌자극 제시)\n2) 부적 강화 (반응 후 불쾌자극 제거)\n3) 적극적 벌(수여성 벌) (반응 후 불쾌자극 제시)\n4) 소극적 벌(제거성 벌) (반응 후 유쾌자극 제거)"},
+    {"front": "[학습] 스키너 — 강화계획의 유형 3", "importance": "very_high", "back": "1) 계속적 강화\n2) 간헐적 강화\n 2-1) 간격강화 - 고정/변동 간격강화\n 2-2) 비율강화 - 고정/변동 비율강화"},
+    {"front": "[학습] 스키너 — 강화계획의 효과 3", "importance": "very_high", "back": "1) 학습 초기엔 '계속적 강화', 후기엔 '간헐적 강화' 사용이 효과적\n2) 반응 지속성을 높이려면, 고정강화계획보다 변동강화계획이 효과적\n3) 간헐적 강화의 효과: 변동비율 > 고정비율 > 변동간격 > 고정간격 강화 순"},
+    {"front": "[학습] 스키너 — 행동수정기법 4", "importance": "very_high", "back": "1) 프리맥원리\n2) 토큰강화\n3) 행동조성\n4) 차별강화"},
+    {"front": "[학습] 반두라 사회인지이론(관찰학습) — 기본 주장 2", "importance": "very_high", "back": "1) 타인의 행동을 관찰/모방만으로도 학습 가능함\n2) 타인을 보고 자기효능감/보상기대감이 높아질 때 학습이 촉진됨"},
+    {"front": "[학습] 반두라 — 주요 키워드 6 (관·모·대·대·자·자)", "importance": "very_high", "back": "1) 관찰학습\n2) 모델링 (그대로 흉내)\n3) 대리 강화 (타인 행동 결과에 간접적 영향 받음)\n4) 대리적 조건형성\n5) 자기효능감\n6) 자기조절"},
+    {"front": "[학습] 반두라 — 관찰학습의 과정 4", "importance": "very_high", "back": "1) 주의집중\n2) 파지 (인지적 시연)\n3) 재생\n4) 동기화"},
+    {"front": "[학습] 반두라 — 교육적 시사점 4", "importance": "very_high", "back": "1) 교사가 솔선수범해야 함\n2) 학생들이 모델의 행동을 관찰 & 모방하도록 지도해야 함\n3) 잠재적 교육과정에 주의해야 함 (의도하지 않은 것도 모방 학습 가능)\n4) 기대한 강화인이 발생하지 않으면 벌인으로 작용 가능함 (∴ 꼭 기대를 충족시켜주기)"},
+    {"front": "[학습] 인지주의 학습이론 — 기본 주장", "importance": "normal", "back": "- 학습은 (상황 속 여러 정보들로) 인지구조를 형성하면서 일어남"},
+    {"front": "[학습] 인지주의 학습이론 — 학습원리 3", "importance": "normal", "back": "1) 인간은 환경에 적극적으로 반응하는 능동적 학습자임 (본인 인지구조를 재구성하며)\n2) 인간은 환경을 지각 시 요소 간의 관계를 전제로 지각함 (개별로 지각 X)\n3) 인간은 알고 있는 것에 기초해 정보를 구성해 받아들임 (정보를 기억에 기록 X)"},
+    {"front": "[학습] 인지주의 vs 행동주의 비교", "importance": "normal", "back": "인지주의와 행동주의는 문제해결방식·학습자 관점·교사 역할에서 대비된다.", "table": "<table><tr><th>구분</th><th>인지주의</th><th>행동주의</th></tr>\n<tr><td>문제해결방식</td><td>사고를 통한 통찰</td><td>과거 문제해결방식으로 시행착오 통해</td></tr>\n<tr><td>학습자 보는 관점</td><td>학습자는 능동적</td><td>학습자는 수동적</td></tr>\n<tr><td>교사의 역할</td><td>환경 조성 & 적극 참여 유도</td><td>환경 조성</td></tr></table>"},
+    {"front": "[학습] 쾰러 통찰학습(아하 현상) — 기본 주장 2", "importance": "normal", "back": "1) 인간은 아무 관련 없는 상황 속 구성 요소들을 '수단'과 '목적'의 관계로 재구성하여 문제를 해결함\n2) 학습은 순간적인 통찰(아하 현상) 때문에 비약적으로 일어난 사고의 결과임"},
+    {"front": "[학습] 레빈 장이론 — 기본 주장 2", "importance": "normal", "back": "1) 인간은 특정 목표를 추구하려는 긴장 때문에 행동함 (물리적 환경 때문에 행동 X)\n2) 유기체 행동을 이해/예측하려면 물리적 환경뿐 아니라 심리적 환경 등 생활의 장 전체를 봐야 함"},
+    {"front": "[학습] 톨만 기호형태이론(기호형태설) — 기본 주장", "importance": "normal", "back": "- 학습은 특별한 강화가 없이도 다양한 상황 속에서 일어남"},
+    {"front": "[학습] 톨만 — 학습 과정 2", "importance": "normal", "back": "1) 학습자는 새로운 환경의 기호(sign)와 이미 의미를 가지고 있던 형태(gestalt)를 연결해 문제 해결 기대(expectation) 가설을 세움\n2) 가설을 적용한 시행착오를 통해 인지지도를 형성하며 학습"},
+    {"front": "[학습] 톨만 — 학습의 유형 3", "importance": "normal", "back": "1) 잠재학습\n2) 장소학습\n3) 보상기대"},
+    {"front": "[학습] 정보처리이론 — 기본 개념", "importance": "very_high", "back": "- 인간의 인지과정을 컴퓨터의 정보처리과정에 비유함"},
+    {"front": "[학습] 정보처리이론 — 전체적인 구조 3", "importance": "very_high", "back": "1) 정보저장소\n2) 정보처리과정\n3) 메타인지 (= 상위인지, = 초인지)"},
+    {"front": "[학습] 정보처리이론 — 정보저장소 3", "importance": "very_high", "back": "1) 감각기억\n2) 단기기억 (= 작업기억)\n - 일시적으로 정보를 저장하는 장소 / 용량 제한적 / 인지과부하 발생 가능\n3) 장기기억\n - 지식과 도식으로 구성"},
+    {"front": "[학습] 정보처리이론 — 인지과부하 해결 방안 2", "importance": "very_high", "back": "1) 청킹\n2) 자동화"},
+    {"front": "[학습] 정보처리이론 — 지식 종류 3 & 도식이란", "importance": "very_high", "back": "### 지식 종류 3\n1) 서술적 지식\n2) 절차적 지식\n3) 조건적 지식\n### 도식이란\n- 인간 기억 속에 축적된 지식의 구조 (본인 사고의 틀)"},
+    {"front": "[학습] 정보처리이론 — 정보처리과정 6", "importance": "very_high", "back": "1) 주의집중\n2) 지각\n3) 시연\n4) 부호화\n5) 인출 (인출 단서 / 부호화 특수성 / 설단 현상)\n6) 망각"},
+    {"front": "[학습] 정보처리이론 — 부호화 전략 5", "importance": "very_high", "back": "1) 정교화\n2) 조직화\n3) 심상화\n4) 맥락화\n5) 기억술"},
+    {"front": "[학습] 정보처리이론 — 메타인지란 & 구성요소 2", "importance": "very_high", "back": "### 메타인지란\n- 자신의 인지 과정을 이해하고 그를 토대로 자신의 인지과정을 조절 & 통제하는 능력\n### 메타인지 구성요소 2\n1) 메타인지적 지식 (자신의 인지과정에 대한 지식)\n2) 메타인지적 기술 (인지과정을 계획 & 점검 & 조절 & 평가하는 능력)"},
+    {"front": "[학습] 정보처리이론 — 메타인지가 학업성취에 미치는 영향 3", "importance": "very_high", "back": "1) 학습 효율성을 높여줌\n2) 학습내용에 대한 정확한 지식과 이해를 높여줌 (자신의 이해를 정확히 점검)\n3) 과제에 맞춰 효율적인 부호화 전략(인지전략)을 사용할 수 있게 함"},
+    {"front": "[학습] 정보처리이론 — 교육적 시사점 3", "importance": "very_high", "back": "1) 교사는 학생들의 선행지식을 파악하고, 새로운 내용을 연결해 주는 장치를 만들어야 함 (학생들은 선행지식을 토대로 부호화하니까)\n2) 교사는 학생들의 주의를 끄는 수업을 계획해야 함 (주의부터 기억과정이 시작)\n3) 너무 많은 내용을 한 번에 전달하려고 해서는 안 됨 (인지과부하 발생)"},
+    {"front": "[학습] 인본주의 학습이론 — 기본 주장 2", "importance": "normal", "back": "1) 인간은 능동적으로 학습하는 주체적 존재임 (단순히 외부자극에 반응하는 수동적 X)\n2) 학습은 개인의 성장과 발달을 위한 과정임"},
+    {"front": "[학습] 인본주의 학습이론 — 학습원리 4", "importance": "normal", "back": "1) 개인의 성장/발달을 위한 교육 중시\n2) 개인의 경험/의미를 고려한 교육 중시\n3) 개인의 자발성/자유의지를 존중하는 교육 중시\n4) 학습목표는 전인적 발달, 자아실현에 둠"},
+    {"front": "[학습] 매슬로우 욕구위계이론 — 기본 개념 2", "importance": "normal", "back": "1) 인간의 내적 욕구를 동기유발의 요인으로 봄 (동기(욕구)엔 5단계가 있다고 봄)\n2) 하위 동기가 충족되지 않으면 다음 단계의 상위 동기가 발생하지 않는다고 봄"},
+    {"front": "[학습] 매슬로우 — 욕구위계순서 5", "importance": "normal", "back": "1) 생리적 욕구\n2) 안전의 욕구\n3) 사랑과 소속의 욕구 (사회적 욕구)\n4) 존경의 욕구\n5) 자아실현의 욕구"},
+    {"front": "[학습] 매슬로우 — 시사점 4 (욕구 단계별)", "importance": "normal", "back": "1) (생리적·안전의 욕구) 학교는 학생들이 안전/편안한 환경에서 학습할 수 있게 해야 함\n2) (사회적 욕구) 학생 간 긍정적인 상호작용 촉진 기회를 제공해야 함\n3) (존경의 욕구) 학생의 성취에 긍정적인 피드백(칭찬, 보상)을 제공해야 함\n4) (자아실현의 욕구) 학생들이 본인 잠재력을 최대한 발휘할 수 있게 다양한 학습 기회를 제공해야 함"},
+    {"front": "[기타] 전이 — 전이란", "importance": "high", "back": "- 선행학습이 후행학습 또는 문제해결에 영향을 미치는 현상"},
+    {"front": "[기타] 전이 — 전이의 종류 7", "importance": "high", "back": "1) 긍정적 전이 (선행학습이 후행학습 촉진)\n2) 부정적 전이 (선행학습이 후행학습 방해)\n3) 영 전이 (선행학습이 후행학습에 영향 X)\n4) 수평적 전이 (선행·후행 난이도가 비슷할 때 나타나는 전이)\n5) 수직적 전이 (상위/하위 위치에 있을 때 나타나는 전이)\n6) 일반적 전이 (선행학습이 다른 영역에서도 적용됨)\n7) 특수적 전이 (선행학습이 유사 영역에서만 적용됨)"},
+    {"front": "[기타] 전이 — 전이이론 4", "importance": "high", "back": "1) 형식도야설 (교과 형식을 통해 잘 훈련되면 전이가 잘 됨)\n2) 동일요소설 (동일 요소가 있으면 전이가 잘 됨)\n3) 일반화설 (원리가 유사하면 전이가 잘 됨)\n4) 형태이조설 (전체 상황 관계를 잘 관찰해야 전이가 잘 됨)"},
+    {"front": "[기타] 방어기제 — 기본 개념", "importance": "normal", "back": "- 자아가 위협받는 상황에서 자신을 보호하려는 행위"},
+    {"front": "[기타] 방어기제 — 종류 7", "importance": "normal", "back": "1) 보상\n2) 합리화\n3) 투사 (= 책임전가)\n4) 승화\n5) 치환 (다른 대상에게 충동/욕구 표출)\n6) 반동형성\n7) 동일시 (뛰어난 사람 자랑 또는 따라함)"},
+    {"front": "[기타] 도피기제 — 기본 개념", "importance": "normal", "back": "- 현실의 어려운 상황에서 비현실적인 세계로 도피해 불안과 긴장을 해소하려는 행위"},
+    {"front": "[기타] 도피기제 — 종류 6", "importance": "normal", "back": "1) 고립 (현실 도피)\n2) 고착\n3) 퇴행 (이전 발달단계로 돌아감)\n4) 억압\n5) 백일몽\n6) 부정 (현실 부정)"},
+    {"front": "[기타] 칙센트미하이 몰입이론 — 몰입이란", "importance": "normal", "back": "- 몰입(Flow)은 무언가에 흠뻑 빠져 있는 심리적 상태"},
+    {"front": "[기타] 칙센트미하이 몰입이론 — 몰입의 조건 3", "importance": "normal", "back": "1) 활동의 목표가 분명해야 함\n2) 본인 행동에 대한 즉각적인 피드백이 있어야 함\n3) 개인의 수준과 과제의 난이도가 적절한 균형을 이뤄야 함"}
+  ],
+
+// ===================== 교육과정 (125장) =====================
+  "교육과정": [
+    {"front": "[교육과정 유형] 교육과정의 층위 — 공식화 정도에 따른 분류 3", "importance": "normal", "back": "1) 공식적 교육과정\n2) 잠재적 교육과정\n3) 영 교육과정"},
+    {"front": "[교육과정 유형] 교육과정의 층위 — 교육의 진행과정에 따른 분류 3", "importance": "normal", "back": "1) 계획된 교육과정\n2) 실행된 교육과정\n3) 경험된 교육과정"},
+    {"front": "[교육과정 유형] 교육과정의 층위 — 교육과정 결정 주체에 따른 분류 4", "importance": "normal", "back": "1) 국가수준 교육과정 (교육부)\n2) 지역수준 교육과정 (교육청)\n3) 학교수준 교육과정 (단위학교)\n4) 교실수준 교육과정 (교사)"},
+    {"front": "[교육과정 유형] 잠재적 교육과정 — 기본 개념", "importance": "very_high", "back": "- 학교에서 계획/의도하지 않았음에도 불구하고, 학교생활 중 은연 중에 겪는 경험의 총체"},
+    {"front": "[교육과정 유형] 잠재적 교육과정 — 나타나는 원천(원인) · 잭슨 3", "importance": "very_high", "back": "1) 군집성 (다양한 애들이 모여 어울림)\n2) 상찬(평가) (교사로부터 여러 평가를 받음)\n3) 권력관계 (학생들은 교사의 지시에 따라 행동)"},
+    {"front": "[교육과정 유형] 잠재적 교육과정 — 나타나는 원천(원인) · 김종서 4", "importance": "very_high", "back": "1) 군집성 (= 잭슨의 군집성)\n2) 위계성 (= 잭슨의 권력관계)\n3) 목적성 (교육실제 목적과 공식적 목적 사이에 괴리가 있음)\n4) 강요성 (학교 규칙/지시에 따라 행동)"},
+    {"front": "[교육과정 유형] 잠재적 교육과정 — 시사점 4 (교육목표·내용·방법·평가 측면)", "importance": "very_high", "back": "1) (교육목표 측면) 인지적 영역뿐 아니라 정의적 영역까지 고려해야 함\n2) (교육내용 측면) 교과서 위주 수업 X, 수업 영향을 다각도로 분석해 교육내용을 선정/조직해야 함\n3) (교육방법 측면) 교사는 솔선수범해야 함\n4) (교육평가 측면) 스크리븐의 탈목표 평가(의도치 않은 결과도 중시) 관점을 수용해야 함"},
+    {"front": "[교육과정 유형] 영 교육과정 — 기본 개념 2", "importance": "very_high", "back": "1) 공식적 교육과정에 포함되지 않아, 학생들이 학습하지 못한 교육과정\n2) 공식적 교육과정에 포함되었으나 학교에서 의도적으로 안 가르친 교육과정"},
+    {"front": "[교육과정 유형] 영 교육과정 — 발생 원인 3", "importance": "very_high", "back": "1) 교육과정 개발자의 타성\n2) 교사나 학생의 무능\n3) 정치적·사회적 요인 (교육정책, 사회관심사에 따라 갑자기 교육과정이 바뀌는 경우)"},
+    {"front": "[교육과정 유형] 영 교육과정 — 특징 3", "importance": "very_high", "back": "1) 공식적 교육과정의 필연적 부산물임\n2) 학생의 학습기회를 박탈함\n3) 특정 계급의 이데올로기적 산물임"},
+    {"front": "[교육과정 유형] 영 교육과정 — 의의 3", "importance": "very_high", "back": "1) (과목 선택의 중요성을 환기) 교육과정 개발에서의 실질적 문제를 제기함\n2) 공식적 교육과정 속 교육 목적과 교육내용의 가치를 되묻게 함 (더 중요한 게 빠진 건 아닐까 되돌아봄)\n3) 교육과정뿐 아니라 교재/수업의 측면에서도 교육 목적과 교육내용의 가치를 되묻게 함"},
+    {"front": "[교육과정 유형] 잠재적 교육과정 vs 영 교육과정 비교", "importance": "very_high", "back": "잠재적 교육과정과 영 교육과정은 둘 다 명시되어 있지 않으나, 의도 여부와 초점(잠재 기능 vs 학습기회 박탈)에서 다르다.", "table": "<table><tr><th>구분</th><th>잠재적 교육과정</th><th>영 교육과정</th></tr>\n<tr><td>공통점</td><td colspan=\"2\">교육과정에 명시되어 있지 않음</td></tr>\n<tr><td>차이점①</td><td>학교에서 의도 X</td><td>학교에서 의도적으로 배제함</td></tr>\n<tr><td>차이점②</td><td>교육환경의 잠재 기능에 초점</td><td>학습기회 박탈에 초점</td></tr></table>"},
+    {"front": "[발달과정] 교과중심 교육과정(1920년대 이전) — 기본 개념", "importance": "high", "back": "- 학생들이 배우고 익혀야 하는 모든 교과와 교재를 중시하는 교육과정"},
+    {"front": "[발달과정] 교과중심 교육과정 — 특징 5 (목표·내용·방법·평가·이론근거)", "importance": "high", "back": "1) (교육목표) 문화유산을 다음 세대에 체계적으로 전달\n2) (교육내용) 문화유산을 논리적으로 조직한 내용 (= 교과)\n3) (교육방법) 교사 중심의 수업, 반복적인 학습, 암기, 훈련\n4) (교육평가) 지필시험\n5) (이론근거) 형식도야설 (운동하듯 단련)"},
+    {"front": "[발달과정] 교과중심 교육과정 — 장점 4", "importance": "high", "back": "1) 지식 전달이 쉬움 (교과로 체계적으로 조직되어)\n2) 학습활동 통제가 쉬움 (교사가 교육활동을 주도하니)\n3) 평가 및 측정이 쉬움 (객관적 기준으로 평가하면 됨)\n4) 교사와 학생에게 안정감을 줌 (사전에 계획되어 있음)"},
+    {"front": "[발달과정] 교과중심 교육과정 — 단점 4", "importance": "high", "back": "1) 학생들의 흥미와 필요가 무시됨\n2) 학생들에게 수동적인 학습 태도를 형성시킴\n3) 고등정신능력이 저하될 수 있음 (암기에 치중)\n4) 비실용적인 지식을 학습함 (실제 생활 문제와 거리)"},
+    {"front": "[발달과정] 교과중심 교육과정 — 조직 유형 4", "importance": "high", "back": "1) 분과형 교육과정\n2) 상관형 교육과정 (두 개 이상의 교과를 관련시켜 조직)\n3) 융합형 교육과정 (교과 간 공통 개념을 추출해 새로운 교과로 구성)\n4) 광역형 교육과정 (유사 교과를 묶어 하나의 교과로 통합)"},
+    {"front": "[발달과정] 경험중심 교육과정(1920년~1950년) — 기본 개념", "importance": "high", "back": "- 학교 지도하에 학생들이 겪는 모든 경험과 활동으로 구성된 교육과정"},
+    {"front": "[발달과정] 경험중심 교육과정 — 특징 4 (목표·내용·방법·평가)", "importance": "high", "back": "1) (교육목표) 전인교육 + 문제해결능력 함양\n2) (교육내용) 학생의 필요/흥미를 토대로 조직한 실제 생활 경험\n3) (교육방법) 학습자 중심 교육\n4) (교육평가) 실제 과제처리 능력을 확인하는 평가"},
+    {"front": "[발달과정] 경험중심 교육과정 — 장점 3", "importance": "high", "back": "1) 학생의 자발적 활동 촉진\n2) 실제적인 문제해결력 향상\n3) 민주적 태도와 생활양식 함양 (다양한 경험 속에서 타인과 협력 & 이해 증진)"},
+    {"front": "[발달과정] 경험중심 교육과정 — 단점 3", "importance": "high", "back": "1) 기초학력 저하 우려\n2) 교육 시간의 경제성 저하 (직접 경험에 근거한 수업은 시간이 많이 소요됨)\n3) 행정적 통제의 어려움 (사전에 계획되지 않은 상황이 많아 통제 어려움)"},
+    {"front": "[발달과정] 경험중심 교육과정 — 조직 유형 4", "importance": "high", "back": "1) 활동 중심 교육과정\n2) 생성(현성) 중심 교육과정 (학습 주제를 미리 계획 X)\n3) 생활영역 교육과정\n4) 중핵 교육과정 (학습자 흥미/요구/사회문제를 중심으로, 관련 내용을 주변 영역으로 교육과정을 통합)"},
+    {"front": "[발달과정] 학문중심 교육과정(1960년~1970년) — 기본 개념", "importance": "high", "back": "- 학문의 핵심적 지식과 원리를 체계적으로 조직 → 지식의 구조를 이해/탐구하는 능력을 기르는 교육과정"},
+    {"front": "[발달과정] 학문중심 교육과정 — 특징 4 (목표·내용·조직원리·방법)", "importance": "high", "back": "1) (교육목표) 교과 내 핵심 지식 & 원리 습득, 탐구능력 향상\n2) (교육내용) 지식의 구조\n3) (교육내용 조직원리) 나선형 교육과정\n4) (교육방법) 발견학습"},
+    {"front": "[발달과정] 학문중심 교육과정 — 지식의 구조란", "importance": "high", "back": "- 각 학문의 가장 중요한 개념과 원리, 아이디어를 구조적으로 조직한 것"},
+    {"front": "[발달과정] 학문중심 교육과정 — 나선형 교육과정이란", "importance": "high", "back": "- 학습자 발달단계에 따라 기본개념/원리를 반복하며 폭과 깊이를 점진적으로 확대하도록 조직한 교육과정"},
+    {"front": "[발달과정] 학문중심 교육과정 — 장점 3", "importance": "high", "back": "1) 높은 학습 전이가 가능 (기본 원리와 핵심 아이디어를 학습한 것은 전이가 잘 됨)\n2) 내재적 동기 유발\n3) 고등정신능력 향상 (탐구 & 발견 과정에서 적용력/분석력 등 향상)"},
+    {"front": "[발달과정] 학문중심 교육과정 — 단점 3", "importance": "high", "back": "1) 정의적 교육엔 소홀\n2) 실생활과 유리된 비실용성 (지식의 구조는 순수 지식만 강조)\n3) 상위권 학습자에게 유리한 교육 (하위권 학습자는 지식의 구조 발견이 어려움)"},
+    {"front": "[발달과정] 인간중심 교육과정(1970년대 이후) — 기본 개념", "importance": "normal", "back": "- 자아실현과 전인교육을 위해, 학교에서 의도하거나 의도하지 않은 모든 경험으로 이루어진 교육과정"},
+    {"front": "[발달과정] 인간중심 교육과정 — 특징 5 (목표·내용·방법·평가·통합)", "importance": "normal", "back": "1) (교육목표) 전인교육 (자아실현에 도움되는 교육)\n2) (교육내용) 학생이 학교생활을 하는 동안 갖게 되는 모든 경험\n3) (교육방법) 학생의 주체성을 존중 (학생 잠재력을 최대한 발휘할 수 있게 도움)\n4) (교육평가) 자율적 자기평가 지향\n5) 잠재적 교육과정과 통합 교육과정(교과+경험+학문 중심 교육과정) 중시"},
+    {"front": "[발달과정] 인간중심 교육과정 — 장점 3", "importance": "normal", "back": "1) 인간의 성장 가능성을 조화롭게 발달시킬 수 있음\n2) 학습자의 긍정적 자아개념 형성\n3) 교육/교육환경의 인간화에 기여 (학생을 능동적/적극적 학습자로 봄)"},
+    {"front": "[발달과정] 인간중심 교육과정 — 단점 2", "importance": "normal", "back": "1) 현실 적용의 어려움 (현실적 교육 환경에 적용 어려움)\n2) 개인주의 우려 (개인 성장만 중시함, 사회적 관계 경시함)"},
+    {"front": "[발달과정] 통합 교육과정 — 기본 개념", "importance": "very_high", "back": "- 학생의 관심/흥미/주제 등을 중심으로 교육내용을 통합하여 조직하는 교육과정"},
+    {"front": "[발달과정] 통합 교육과정 — 특징 4", "importance": "very_high", "back": "1) 학생의 흥미를 고려하여 교사와 함께 학습 주제를 계획함\n2) 학생·활동 중심 수업을 함 (교과중심 수업보다는 프로젝트 학습 등)\n3) 지식의 기본 원리를 강조 & 지식의 분절화를 방지함\n4) 교사는 안내자/조력자/학생 상담자의 역할을 수행함 (교사는 지식 전달자가 아님)"},
+    {"front": "[발달과정] 통합 교육과정 — 장점 3", "importance": "very_high", "back": "1) 지식의 팽창에 대비 가능 (통합 내용으로 학습하므로 폭발적 지식 증가에 대응)\n2) 교육과정의 효율적 운영 (통합 과정에서 중복 내용이 줄어듦)\n3) 문제해결력 향상 (학교 밖 실제 문제를 다룸)"},
+    {"front": "[발달과정] 통합 교육과정 — 단점 3", "importance": "very_high", "back": "1) 통합 교육과정 구성의 어려움 (교과목의 논리적 통합은 너무 어려움)\n2) 교사의 업무적 부담 가중 (교과 통합에 시간과 노력이 많이 들어감)\n3) 학생의 혼란 우려 (지식 체계보다 특정 주제/쟁점 중점의 교육과정을 구성하다 보니)"},
+    {"front": "[발달과정] 통합 교육과정 — 교과 통합의 일반적 원칙 3", "importance": "very_high", "back": "1) 중요성의 원칙\n2) 일관성의 원칙 (단원 내용과 활동이 단원 목표에 맞아야 함)\n3) 적합성의 원칙 (학습자 수준에/전인격적 성장 목표에 맞춤)"},
+    {"front": "[발달과정] 통합 교육과정 — 유형 (드레이크) 3", "importance": "very_high", "back": "1) 다학문적 통합\n2) 간학문적 통합\n3) 탈학문적 통합 (학문 간 경계를 초월, 실생활 주제로 문제 중심 교육과정 조직)"},
+    {"front": "[발달과정] 역량중심 교육과정 — 등장 배경", "importance": "high", "back": "- 미래의 불확실성으로 지식 중심 교육과정 설계가 중요하지 않아짐 → 미래 사회에 필요한 역량을 반영한 교육과정이 등장"},
+    {"front": "[발달과정] 역량중심 교육과정 — 기본 개념", "importance": "high", "back": "- 사회적 삶에서 필요한 역량을 중심으로 구성된 교육과정"},
+    {"front": "[발달과정] 역량중심 교육과정 — 특징 4 (목표·내용·방법·평가)", "importance": "high", "back": "1) (교육목표) 사회적 삶에서 필요한 역량의 발달\n2) (교육내용) 역량의 발달을 촉진할 수 있도록 지식이나 내용을 조직함\n3) (교육방법) (학생 참여가 많으므로) 학생 주도적 배움 중심의 수업 강조\n4) (교육평가) 수행평가 중시함"},
+    {"front": "[발달과정] 역량중심 교육과정 — 장점 1", "importance": "high", "back": "1) 융통성 있는 교육과정"},
+    {"front": "[발달과정] 역량중심 교육과정 — 단점 2", "importance": "high", "back": "1) 구체적인 대안 제시 부족\n2) 선정된 역량에 대한 정당성 부족 (다른 역량도 중요한데..)"},
+    {"front": "[교육과정 개발] 교육목표의 설정 — 교육목표의 기능 3", "importance": "high", "back": "1) 교육활동의 방향 제시\n2) 교육내용의 선정/조직의 기준 제시\n3) 교육평가의 기준 제시"},
+    {"front": "[교육과정 개발] 교육목표의 설정 — 교육목표 진술의 기준 2", "importance": "high", "back": "1) 구체적이고\n2) 명료한 행동 용어로 진술해야 함"},
+    {"front": "[교육과정 개발] 교육목표 분류 (블룸) 3", "importance": "high", "back": "1) 인지적 영역 (복잡성 원리의 6단계)\n2) 정의적 영역 (내면화 원리의 5단계)\n3) 심동적 영역"},
+    {"front": "[교육과정 개발] 블룸 — 인지적 영역 6 & 복잡성의 원리란", "importance": "high", "back": "### 인지적 영역 6\n1) 지식\n2) 이해 (번역/해석/추론)\n3) 적용\n4) 분석\n5) 종합\n6) 평가\n### 복잡성의 원리란\n- 교육목표가 단순한 수준 → 점차 복잡한 수준이 되는 것 (하위수준 능력이 상위수준 능력의 토대가 되는 원리)"},
+    {"front": "[교육과정 개발] 블룸 — 정의적 영역 5 & 내면화의 원리란", "importance": "high", "back": "### 정의적 영역 5\n1) 감수(수용)\n2) 반응\n3) 가치화\n4) 조직화\n5) 인격화\n### 내면화의 원리란\n- 태도/흥미/가치와 같은 정의적 특성을 개인이 내면화한 수준"},
+    {"front": "[교육과정 개발] 블룸 — 심동적 영역 7", "importance": "high", "back": "1) 지각\n2) 태세\n3) 유도반응\n4) 기계화\n5) 복합외현반응\n6) 적응\n7) 독창성"},
+    {"front": "[교육과정 개발] 블룸의 교육목표 분류의 개정 차원 2 (인지적 영역)", "importance": "high", "back": "1) 지식 차원 (학습자가 어떤 지식을 가지고 있는가)\n2) 인지과정 차원 (학습자가 지식을 어떻게 활용하는가)"},
+    {"front": "[교육과정 개발] 블룸 개정 — 지식 차원 4", "importance": "high", "back": "1) 사실적 지식\n2) 개념적 지식\n3) 절차적 지식\n4) 메타인지"},
+    {"front": "[교육과정 개발] 블룸 개정 — 인지과정 차원 6", "importance": "high", "back": "1) 기억\n2) 이해\n3) 적용\n4) 분석\n5) 평가\n6) 창안"},
+    {"front": "[교육과정 개발] 교육목표(행동목표) 진술방법 3 (타·메·그)", "importance": "high", "back": "1) 타일러의 진술 방법: 내용영역 + 행동영역\n2) 메이거의 진술 방법: 조건 + 준거 + 행동(도착점 행동)\n3) 그론룬드의 진술 방법: 일반적 수업목표 서술 후 → 명세적 수업목표 서술"},
+    {"front": "[교육과정 개발] 교육내용 선정의 원리 5", "importance": "very_high", "back": "1) 기회의 원리\n2) 만족의 원리\n3) 학습 가능성의 원리\n4) 일목표 다경험의 원리(동목표 다경험의 원리) (하나의 목표를 위해 여러 경험이 가능해야 함)\n5) 일경험 다성과의 원리(동경험 다성과의 원리) (하나의 경험으로 여러 목표 달성)"},
+    {"front": "[교육과정 개발] 교육내용 조직의 원리 2", "importance": "very_high", "back": "1) 수평적(횡적) 조직 원리 (비슷한 시기에 연관 교육내용을 배치 → 학습효과 올림)\n2) 수직적(종적) 조직 원리 (시간 순서에 따라 교육내용을 차례대로 배치 → 학습효과 올림)"},
+    {"front": "[교육과정 개발] 수평적(횡적) 조직 원리 3", "importance": "very_high", "back": "1) 범위 (폭과 깊이)\n2) 통합성 (내용을 서로 연결)\n3) 수평적 연계성 (동일 학년의 같은 수준)"},
+    {"front": "[교육과정 개발] 수직적(종적) 조직 원리 3", "importance": "very_high", "back": "1) 계속성 (같은 내용을 학년에 따라 반복)\n2) 계열성 (수준을 점차 높임)\n3) 수직적 연계성 (학습 종결점이 다음 학습 출발점과 잘 맞물리게)"},
+    {"front": "[개발모형] 교육과정 개발모형이란", "importance": "very_high", "back": "- 교육과정을 설계/구성/실행/평가하는 데에 필요한 절차(지침)을 제공하는 도구"},
+    {"front": "[개발모형] 타일러 합리적 교육과정 개발모형 — 개발절차 4", "importance": "very_high", "back": "1) 교육목표 설정\n2) 학습경험 선정\n3) 학습경험 조직\n4) 평가"},
+    {"front": "[개발모형] 타일러 — 단계① 교육목표의 설정 & 목표 거름체란", "importance": "very_high", "back": "### 단계① 교육목표의 설정\n1) 학습자 심리적 요구 + 사회적 요구(가치) + 교과 전문가의 견해에 따라 잠정적 목표를 설정한 후\n2) 교육철학과 교육심리학의 거름체를 통해 최종 교육목표를 설정함\n### 목표 거름체란\n1) 교육적으로 추구할 가치가 있나? (교육철학)\n2) 잠정적 목표를 달성할 수 있나? (교육심리학)"},
+    {"front": "[개발모형] 타일러 — 단계② 학습경험의 선정 원리 5", "importance": "very_high", "back": "1) 기회의 원리\n2) 만족의 원리\n3) 학습 가능성의 원리\n4) 일목표 다경험의 원리(동목표 다경험의 원리) (하나의 목표를 위해 여러 경험 가능해야 함)\n5) 일경험 다성과의 원리(동경험 다성과의 원리) (하나의 경험으로 여러 목표 달성)"},
+    {"front": "[개발모형] 타일러 — 단계③ 학습경험의 조직 원리 3", "importance": "very_high", "back": "1) 계속성 (같은 내용을 학년에 따라 반복)\n2) 계열성 (수준을 점차 높임)\n3) 통합성 (내용을 서로 연결)"},
+    {"front": "[개발모형] 타일러 — 단계④ 평가", "importance": "very_high", "back": "- 교육목표 도달 여부를 확인하기 위해 평가도구를 제작해야 함"},
+    {"front": "[개발모형] 타일러 합리적 교육과정 — 장점 3", "importance": "very_high", "back": "1) 체계적인 모형 (각 단계를 명확히 제시함)\n2) 실용성 (어떤 교과나 수업의 수준에서도 활용 및 적용이 가능함)\n3) 평가의 유용성 (교육목표를 명시적으로 제시하여 평가 결과 해석이 용이)"},
+    {"front": "[개발모형] 타일러 합리적 교육과정 — 단점 3", "importance": "very_high", "back": "1) 내용을 단순히 목표 달성의 수단으로 간주함\n2) 부수적 목표를 간과함 (수업 진행 중 생겨나는 목표를 간과)\n3) 실질적인 내용이 부족함 (실제 무엇을 가르쳐야 하는지 지침이 없음)"},
+    {"front": "[개발모형] 타바 귀납적 교육과정 개발모형 — 기본 주장 2", "importance": "very_high", "back": "1) 교육과정이 교사에 의해 개발되어야 함을 강조함\n2) 수업 수준에서 어떻게 교수학습활동을 할 것인지 (내용과 학습경험을 구별하여) 개발단계를 세분화함"},
+    {"front": "[개발모형] 타바 — 개발절차 5", "importance": "very_high", "back": "1) 시험 단원 개발\n2) 시험 단원 검증\n3) 시험 단원의 수정 및 보완\n4) 단원 구조화 (범위와 계열에 따라 배열)\n5) 새 단원 정착 및 보급"},
+    {"front": "[개발모형] 타바 — 시험 단원 개발 8가지 하위단계", "importance": "very_high", "back": "1) 요구진단\n2) 목표설정\n3) 내용선정\n4) 내용조직\n5) 학습경험선정\n6) 학습경험조직\n7) 평가내용·방법·수단 결정\n8) 균형과 계열성 검증"},
+    {"front": "[개발모형] 타바 — 특징 4", "importance": "very_high", "back": "1) 교사 중심 모형 (교사가 현장을 고려해 직접)\n2) 귀납적 모형\n3) 처방적 모형\n4) 역동적 모형 (요구진단을 계속하며 상황에 맞게 수정)"},
+    {"front": "[개발모형] 타바 — 장점 4", "importance": "very_high", "back": "1) 실제 수업 수준에 적합한 교육과정 개발 가능 (교사가 수업을 염두에 두고 교육과정을 짬)\n2) 단계적으로 교육과정 개발에 좋음 (귀납적 방식으로 교육과정을 개발해 나감)\n3) 교육과정 개발 절차가 자세히 제시돼 수업을 염두한 교사가 이용하기 용이\n4) 학생의 요구/필요에 부합하는 교육과정 개발 가능"},
+    {"front": "[개발모형] 타바 — 단점 2", "importance": "very_high", "back": "1) 국가나 지역수준의 교육과정을 교사에게 맡기는 것은 부적절할 수 있음\n2) 개별 교과의 시야에 매몰돼, 전체 교육과정을 보는 시야가 부족할 수 있음"},
+    {"front": "[개발모형] 스킬벡 학교중심 교육과정 개발모형(SBCD) — 기본 주장 2", "importance": "very_high", "back": "1) 전통적인 교육과정(교사를 배제한 교육과정) 개발모형의 경직성/비현실성을 비판\n2) 학교 현장의 교사들이 융통성 있게 교육과정 개발에 참여할 수 있도록 허용함"},
+    {"front": "[개발모형] 스킬벡 — 개발절차 5", "importance": "very_high", "back": "1) 상황분석 (내적, 외적 요인 분석)\n2) 목표 설정\n3) 프로그램 구성\n4) 판단과 실행\n5) 모니터링, 피드백, 평가, 재구성"},
+    {"front": "[개발모형] 스킬벡 — 내적요인/외적요인이란", "importance": "very_high", "back": "1) 내적요인 – 학생의 적성/능력, 교사의 가치관/태도, 학교 환경 등\n2) 외적요인 – 학부모 기대, 지역사회 가치, 이데올로기 등"},
+    {"front": "[개발모형] 스킬벡 — 특징 2", "importance": "very_high", "back": "1) 상황분석을 통해 학교 현실이 가장 잘 반영된 교육과정을 개발 가능\n2) 교육과정 개발절차의 어느 단계에서든지 개발을 시작할 수 있음 (서로 다른 단계를 동시에 고려 가능한 역동적 모형)"},
+    {"front": "[개발모형] 스킬벡 — 장점 3", "importance": "very_high", "back": "1) 교사의 자율성 및 전문성 향상 (교사가 직접 편성)\n2) 학습자 중심 교육 (상황분석할 때 학습자 수준/요구를 파악해 맞춤 편성)\n3) 학교에서 활용하기 적합함 (학교 현실 반영이 편리)"},
+    {"front": "[개발모형] 스킬벡 — 단점 2", "importance": "very_high", "back": "1) 통합성 부족함 (학교마다 교육과정이 다 달라질 수 있음)\n2) 객관적인 평가 기준 설정의 어려움 (요구에 맞춰 교육할수록 개방적 수업이 됨)"},
+    {"front": "[개발모형] 위긴스와 맥타이 백워드 설계 모형 — 기본 개념 2", "importance": "very_high", "back": "1) 학습경험 및 수업 계획보다 평가 계획을 먼저 세움\n2) 학생의 이해력 신장을 강조 (교육과정 설계는 학생이 배운 내용을 이해하는 데 초점을 두어야 한다!)"},
+    {"front": "[개발모형] 백워드 설계 모형 — 개발절차 3", "importance": "very_high", "back": "1) 교육목표 설정 (바라는 결과 확인하기)\n2) 교육평가 계획 (수용할 수 있는 증거 결정하기)\n3) 학습경험 및 수업 계획 (교육목표 도달을 위한 수업 계획)"},
+    {"front": "[개발모형] 백워드 설계 모형 — 특징 3", "importance": "very_high", "back": "1) 성취기준 강조 (국가 성취기준을 교육목표 설정 시 반영하자)\n2) 영속적 이해 강조 (전이 가능성이 높은 핵심 아이디어를 학습시키자)\n3) 구체적인 평가계획을 강조"},
+    {"front": "[개발모형] 백워드 설계 모형 — 장점 3", "importance": "very_high", "back": "1) 목표, 내용, 평가의 일치 (목표/평가를 먼저 짜고 그에 맞춰 내용을 짬)\n2) 교사의 교육에 대한 책무성이 강조 (목표/평가를 먼저 짜고, 그에 맞춰 수업을 설계함)\n3) 국가 교육과정 기준과 현장 수업이 일치 (국가 성취기준을 반영해 짜니까)"},
+    {"front": "[개발모형] 백워드 설계 모형 — 단점 3", "importance": "very_high", "back": "1) 교육내용이 그저 목표 달성의 수단이 될 수 있음\n2) 평가 의존적인 수업활동을 하게 될 가능성이 있음\n3) 학생의 관심/흥미가 배제될 가능성이 있음"},
+    {"front": "[개발모형] 슈왑 실제적 교육과정 개발모형 — 기본 개념 2", "importance": "very_high", "back": "1) 교육과정 연구가 실제적/절충적인 방향으로 진행될 때 교육의 질 향상이 이루어진다고 주장 (단순히 막 이론 연구만 하지 말고)\n2) 교육과정 이론의 좋고 나쁨의 판단은 '숙의'를 통해 가능하다고 봄"},
+    {"front": "[개발모형] 슈왑 — 실제적 교육과정 목적", "importance": "very_high", "back": "- (학습자가 지식만 추구하기보다는) 어떤 결정을 할 수 있는 능력을 기르는 것"},
+    {"front": "[개발모형] 슈왑 — 실제적 교육과정 의의 2", "importance": "very_high", "back": "1) (이론을 중시할 게 아니라) 구체적/일상적 교육과정 문제에 관심을 가져야 함을 주장함\n2) 교육과정은 (단순히 목표를 달성하는 것이 아니라) 지속적으로 수정되고 개선돼야 함을 주장함"},
+    {"front": "[개발모형] 워커 자연주의적 개발모형(숙의 모형) — 기본 개념", "importance": "high", "back": "- 교육과정이 현장의 실제 상황에서 어떻게 자연스레 개발되는지 그 과정을 설명하고자 함"},
+    {"front": "[개발모형] 워커 — 개발절차 3", "importance": "high", "back": "1) 강령(토대): (교육과정 개발자들끼리 논의해) 공감대 형성 → [자료]\n2) 숙의: 검토, 토의, 합의 → [정책]\n3) 설계"},
+    {"front": "[개발모형] 워커 — 특징 3", "importance": "high", "back": "1) 서술적 모형 (실제 따르는 절차를 서술한 모형)\n2) 과정 지향적 모형 (개발자들의 의견 타협 과정 '숙의'를 강조함)\n3) 비선형적·역동적 모형 (순서에 구애 없이 타협 조정 강조)"},
+    {"front": "[개발모형] 워커 — 장점 3", "importance": "high", "back": "1) 학생들의 개별적 흥미/능력/적성 반영 가능 (개발자들이 충분히 토의하니까)\n2) 구성원들의 합의 도출이 가능 (개발자들이 충분히 토의하니까)\n3) 현실적인 모형 (학교 현장을 잘 아는 교육과정 개발자들이 참여)"},
+    {"front": "[개발모형] 워커 — 단점 2", "importance": "high", "back": "1) 참여자가 강령 설정/숙의하는 데 상당한 시간이 소요\n2) 교육과정 설계가 완성된 뒤의 문제에 대해서는 언급이 없음"},
+    {"front": "[개발모형] 아이즈너 예술적 개발모형(예술적 접근 모형) — 기본 개념 2", "importance": "very_high", "back": "1) 교육과정 개발이란 교육적 상상력을 발휘하는 과정이라고 봄\n2) (학생들의 의미 형성을 위해) 학습자의 특성에 맞게 창의적으로 교육과정을 운영하자는 모형"},
+    {"front": "[개발모형] 아이즈너 — 개발절차(예술적 접근법) 7", "importance": "very_high", "back": "1) 목표설정: 행동적 목표 / 문제해결 목표 / 표현적 결과 모두 함께 고려\n2) 내용 선정\n3) 학습기회의 결정: 교육적 상상력 발휘\n4) 학습기회의 조직\n5) 내용영역의 조직\n6) 제시방법\n7) 평가: 참 평가 / 교육적 감식안 / 교육비평"},
+    {"front": "[개발모형] 아이즈너 — 교육적 상상력이란", "importance": "very_high", "back": "- (만족스런 학습 기회 제공을 위해) 교육목표/교육내용을 학생들에게 적합한 형태로 변형하는 능력"},
+    {"front": "[개발모형] 아이즈너 — 참 평가·교육적 감식안·교육비평이란", "importance": "very_high", "back": "### 참 평가란\n- 실생활 문제해결 능력을 기르는 데 도움되는 평가\n### 교육적 감식안이란\n- 학생들의 성취물 사이의 미묘한 질적 차이를 감식하는 능력\n### 교육비평이란\n- 미묘한 질적 차이를 학생과 학부모가 이해하기 쉽게 표현하는 것"},
+    {"front": "[개발모형] 아이즈너 — 특징 3", "importance": "very_high", "back": "1) 교육적 상상력을 중시함\n2) 교육적 감식안과 교육비평을 중시함\n3) 교육과정 관련 중요 의사결정들은 교사에 의해서 이루어져야 한다고 봄 (교사가 교육과정에 대해서는 예술가니까!)"},
+    {"front": "[개발모형] 아이즈너 — 장점 2", "importance": "very_high", "back": "1) 교사의 전문성이 강조됨 (교육적 상상력/감식안/교육비평을 다 잘해야 함)\n2) 타일러의 합리적 모형보다 융통성 있음 (교육과정 개발에서 교사 역할/현장경험 강조)"},
+    {"front": "[개발모형] 아이즈너 — 단점 2", "importance": "very_high", "back": "1) (공교육은 체계성/통일성이 필요한데) 공교육 현실에 적용하기 어려움\n2) 합리적 모형의 문제점은 제시했지만, 구체적인 대안 제시가 부족함"},
+    {"front": "[개발모형] 파이너 실존적 재개념화 모형 — 기본 개념 2", "importance": "normal", "back": "1) 교육과정이 (사회적 맥락 속에서) 개인의 고유한 경험이 되도록 재개념화되어야 한다고 주장함\n2) 쿠레레 방법론과 자서전적 방법론을 제시함"},
+    {"front": "[개발모형] 파이너 — 쿠레레 방법론 단계 4", "importance": "normal", "back": "1) 회귀: 과거로 돌아가 교육적 경험을 기억/묘사\n2) 전진: 미래 모습을 상상/묘사\n3) 분석: 현재 자신의 삶을 비판적으로 분석\n4) 종합: (과거 교육경험으로부터 현재 어떤 영향을 받았는지 생각해) 현재 의미를 창출"},
+    {"front": "[개발모형] 파이너 — 자서전적 방법 3", "importance": "normal", "back": "1) 자신의 교육경험을 자서전 방식으로 표현하기\n2) 자신의 교육경험을 비판적으로 성찰하기\n3) 타인의 교육경험 분석하기"},
+    {"front": "[개발모형] 파이너 — 시사점 2", "importance": "normal", "back": "1) 교사는 지식만 전달해선 안 됨. 학생과 함께 의미를 재구성해 나가야 함\n2) 자신을 이해하는 데 도움이 됨"},
+    {"front": "[개발모형] 애플 구조적 재개념화 모형 — 기본 개념", "importance": "normal", "back": "- 억압된 사회구조에 구속된 인간을 해방해야 한다고 주장함 (학생의 학습 실패는 사회체제/제도 때문이야)"},
+    {"front": "[개발모형] 애플 — 핵심내용 3", "importance": "normal", "back": "1) 학교교육과 교육과정 비판\n ① 학교는 문화재생산 기능을 함 (학교는 기성세대의 권력관계를 다음 세대에 전달함)\n2) 타일러의 기술공학적 논리 비판\n ① 학업성취도로만 판단함. 교육의 가치 무시\n3) 컴퓨터 교육에 대한 비판\n ① 교사들이 수업 중 컴퓨터를 많이 사용할수록 단순 노동자로 전락함"},
+    {"front": "[교육과정 실제] 교육과정의 결정 형태 3", "importance": "normal", "back": "1) 중앙집권형\n2) 지방분권형\n3) 절충형"},
+    {"front": "[교육과정 실제] 중앙집권형 — 개념 & 장점 3", "importance": "normal", "back": "### 개념\n- 국가(교육부)에서 소수 전문가가 교육과정을 결정 (교사 참여 배제)\n### 장점 3\n1) 전국적으로 통일된 교육과정을 가질 수 있음\n2) 전문 인력 투입 → 질 높은 수준의 교육과정 개발 가능\n3) 학교급, 학교 간 교육과정의 연계성 충족 가능"},
+    {"front": "[교육과정 실제] 중앙집권형 — 단점 4", "importance": "normal", "back": "1) 교육과정 운영의 획일화 및 경직화 가능\n2) 권위주의적 교육풍토 조성 가능성이 큼\n3) 교육과정 사소화가 발생할 수 있음 (교사들이 교육과정을 중요하게 생각하지 않음)\n4) (지역, 학교, 학생의 특성을 고려한) 다양한 교육과정의 운영 어려움"},
+    {"front": "[교육과정 실제] 지방분권형 — 개념 & 장점 3", "importance": "normal", "back": "### 개념\n- 시도교육청 단위에서 교사 및 인사의 참여로 교육과정을 결정\n### 장점 3\n1) 교육과정을 신속하고 유연하게 수정하고 운영 가능\n2) 교사들이 교육과정에 대해 주인의식을 가짐\n3) (지역, 학교, 학생의 특성을 고려한) 다양한 교육과정 개발 가능"},
+    {"front": "[교육과정 실제] 지방분권형 — 단점 3", "importance": "normal", "back": "1) 전국적으로 통일된 교육과정을 갖기 어려움\n2) 지역, 학교 간 격차가 심화될 가능성이 있음\n3) 학교급, 학교 간 교육과정 연계가 힘듦"},
+    {"front": "[교육과정 실제] 절충형 — 개념 & 특징", "importance": "normal", "back": "### 개념\n- 중앙집권형 + 지방분권형 절충\n### 특징\n- 우리나라 제6차 교육과정에서 절충 형태의 교육과정 체제를 채택하고 있음"},
+    {"front": "[교육과정 실제] 스나이더 교육과정 실행관점 — 실행 관점이란 & 기본 주장", "importance": "normal", "back": "### 교육과정 실행 관점이란\n- 교육과정 전개과정을 어떤 시각으로 보는가의 문제를 의미함\n### 기본 주장\n- 충실도 관점, 상호적응 관점, 형성(생성) 관점을 제시함"},
+    {"front": "[교육과정 실제] 스나이더 — 교육과정 운영(실행) 관점 3", "importance": "normal", "back": "1) 충실도 관점 (교육과정이 개발자 의도대로 충실히 실행되는가)\n2) 상호적응 관점 (교육과정은 개발자-실행자 간 상호작용으로 조정될 수 있다)\n3) 형성(생성) 관점 (교육과정은 교사와 학생이 함께 만들어가는 교육경험이다)"},
+    {"front": "[교육과정 실제] 홀의 교사 관심에 기초한 교육과정 적용모형(CBAM) — 기본 개념", "importance": "normal", "back": "- 교육과정의 실행 양태는 교사의 관심 수준에 따라 달라진다고 봄"},
+    {"front": "[교육과정 실제] 홀 CBAM — 관심 단계 6", "importance": "normal", "back": "1) 교사 자신과 관련된 관심\n 0. 지각단계\n 1. 정보단계\n 2. 개인단계\n2) 업무와 관련된 관심\n 3. 운영단계\n3) 결과에 관련된 관심\n 4. 결과단계\n 5. 협동단계\n 6. 개선단계"},
+    {"front": "[교육과정 실제] 학교 교육과정의 재구성 — 기본 개념", "importance": "high", "back": "- 국가 수준의 교육과정을 교사(또는 학교)가 학생 특성 및 교육 상황에 맞게 재구성하는 것"},
+    {"front": "[교육과정 실제] 교육과정 재구성 방법 3", "importance": "high", "back": "1) 교과 내 재구성\n2) 교과 간 재구성\n3) 교과와 창체활동의 연계를 통한 재구성"},
+    {"front": "[교육과정 실제] 교육과정 재구성의 장점 3", "importance": "high", "back": "1) 학교 실정에 맞춤 가능 & 교과 간 중복 피함 → 교육 효율성 증진 가능\n2) 학생의 적성을 고려한 교육 → 교육 다양성 증진 가능\n3) 교사의 전문성이 향상됨 (재구성 과정에서)"},
+    {"front": "[교육과정 실제] 교육과정 재구성을 위한 교사의 역할 3", "importance": "high", "back": "1) 국가 교육과정 기준을 자세히 분석해야 함\n2) 학교의 교육 여건을 파악해야 함\n3) 전문성 신장을 위한 지속적인 노력이 필요함"},
+    {"front": "[교육과정 실제] 렌줄리 교육과정 압축 — 기본 개념 2", "importance": "normal", "back": "1) 상위 학생들을 위해, 이미 숙달한 학습자료의 반복을 피하고 보다 도전적인 학습기회를 마련해 주기 위한 전략\n2) 일종의 교육과정 '재구성' 혹은 '핵심화' 과정"},
+    {"front": "[교육과정 실제] 렌줄리 교육과정 압축 — 방법 3", "importance": "normal", "back": "1) 좀 더 도전적으로 활동할 수 있는 추가 활동을 제공함\n2) 이미 알고 있는 내용과 반복되는 내용을 제거해 학습 속도를 올림\n3) 심화학습 제공함"},
+    {"front": "[2022 개정] 2022 개정 교육과정 — 기본 개념", "importance": "normal", "back": "- 7차 교육과정을 개정한 교육과정으로, 2025년부터 모든 중·고등학교에 적용됨"},
+    {"front": "[2022 개정] 2022 개정 교육과정 — 궁극의 목표 & 추구하는 인간상 4", "importance": "normal", "back": "### 교육과정의 궁극의 목표\n- 포용성과 창의성을 갖춘 주도적인 사람 배출\n### 추구하는 인간상 4\n1) 자기주도적인 사람\n2) 창의적인 사람\n3) 교양 있는 사람\n4) 더불어 사는 사람"},
+    {"front": "[2022 개정] 2022 개정 교육과정 — 핵심역량 6", "importance": "normal", "back": "1) 자기관리 역량\n2) 지식·정보처리 역량\n3) 창의적 사고 역량\n4) 심미적 감성 역량\n5) 협력적 소통 역량\n6) 공동체 역량"},
+    {"front": "[2022 개정] 2022 개정 교육과정 — 주요 변화내용 (중학교) 4", "importance": "normal", "back": "1) 자유학기제로 변경\n2) 진로연계 학기 (3-2학기) 도입\n3) 창의적 체험활동이 3영역(자율자치, 동아리, 진로)으로 변경\n4) 학교스포츠클럽 활동 개선 (매 학기 운영 폐지, 총 136시간으로 운영)"},
+    {"front": "[2022 개정] 2022 개정 교육과정 — 주요 변화내용 (고등학교) 2", "importance": "normal", "back": "1) 고교학점제 도입\n2) 과목 선택권 확대"},
+    {"front": "[2022 개정] 2022 개정 교육과정 — 이해를 위한 용어 5", "importance": "normal", "back": "1) 창의적 체험활동\n2) 학년군\n3) 교과군\n4) 집중이수\n5) 블록타임"}
+  ],
+
+// ===================== 교육방법 및 교육공학 (186장) =====================
+  "교육방법 및 교육공학": [
+    {"front": "[교육공학] 교육공학의 기초 — 교육공학이란", "importance": "normal", "back": "1) 공학적 자원을 활용해 학습 촉진 방법을 연구하는 학문\n2) 공학 = (매체, 테크놀로지, 교수법 등)을 통칭"},
+    {"front": "[교육공학] 교육공학의 기초 — 교육공학 연구에서 연구하는 영역 5", "importance": "normal", "back": "1) 설계 (수업설계 연구)\n2) 개발 (수업자료(매체) 개발 연구)\n3) 활용 (수업자료(매체) 활용법 연구)\n4) 관리 (수업 자료/자원 관리법 연구)\n5) 평가 (수업평가 연구)"},
+    {"front": "[교육공학] 벌로의 SMCR 모형 — 수업과정 구성요소 4", "importance": "normal", "back": "1) S 송신자\n2) M 전달내용\n3) C 통신수단\n4) R 수신자"},
+    {"front": "[교육공학] 벌로 SMCR — ① 송신자(=교사) 하위요소 5", "importance": "normal", "back": "1) 통신 기술 (말솜씨)\n2) 태도 (열정)\n3) 지식수준 (교사 지식수준)\n4) 사회체제 (교사 속한 사회의 체제)\n5) 문화양식 (교사 속한 문화양식)"},
+    {"front": "[교육공학] 벌로 SMCR — ② 전달내용(=수업 내용) 하위요소 5", "importance": "normal", "back": "1) 내용\n2) 요소 (어떤 것 선택)\n3) 구조 (어떤 순서로)\n4) 코드 (언어적 & 비언어적)\n5) 처리 (어떤 형식으로)"},
+    {"front": "[교육공학] 벌로 SMCR — ③ 통신수단(=오감) 하위요소 5", "importance": "normal", "back": "1) 시각\n2) 청각\n3) 촉각\n4) 후각\n5) 미각"},
+    {"front": "[교육공학] 벌로 SMCR — ④ 수신자(=학생) 하위요소 5", "importance": "normal", "back": "1) 통신 기술 (학생의 언어이해력)\n2) 태도 (학생의 열정)\n3) 지식수준 (학생 지식수준)\n4) 사회체제 (학생 속한 사회의 체제)\n5) 문화양식 (학생 속한 문화양식)"},
+    {"front": "[교육공학] 벌로 SMCR — 의의 (학습효과 극대화 방법) 3", "importance": "normal", "back": "1) (S송신자-R수신자 측면) S와 R이 통신 기술/태도/지식수준/사회체제/문화양식이 일치하면 효과 굿\n2) (C통신수단 측면) 다양한 오감을 활용하면 효과 굿\n3) (M전달내용 측면) 내용/요소/구조/코드/처리를 구체화해 전달하면 효과 굿"},
+    {"front": "[교육공학] 쉐논과 슈람 통신과정모형 — 통신과정의 요소 6", "importance": "normal", "back": "1) 경험의 장 ★ (교사-학생 경험 일치 시 소통 원활)\n2) 기호화 (교사의 단어로 수업됨)\n3) 신호 (오감 사용됨)\n4) 해독 (학생은 교사 언어를 본인이 이해되게 변환)\n5) 잡음 ★ (교사-학생 통신 방해 요소)\n6) 피드백 ★ (내용 전달 후 학생 반응이 교사에게 전달)"},
+    {"front": "[교육공학] 쉐논과 슈람 통신과정모형 — 의의 3", "importance": "normal", "back": "1) 서로의 경험을 공유/이해해서 → 경험의 장을 확대해야 함\n2) 학습 환경의 잡음을 최소화하도록 노력해야 함\n3) (잡음 최소화 위해) 교사와 학생 간의 피드백이 중요함"},
+    {"front": "[교육매체] 교수매체의 특성과 연구 — 교수매체란 & 종류 3", "importance": "normal", "back": "### 교수매체란\n- (교수목표 달성 위해) 학습자 간 의사소통을 돕는 매개수단\n### 교수매체 종류 3\n1) 교과서\n2) 영상자료\n3) 컴퓨터"},
+    {"front": "[교육매체] 교수매체 — 교육적 효과 4", "importance": "normal", "back": "1) 주의집중, 동기유발\n2) 이해에 도움\n3) 새로운 교수학습 전략 구현\n4) 수업의 효율적 운영"},
+    {"front": "[교육매체] 교수매체 — 특성 4", "importance": "normal", "back": "1) 고정성 (보존 & 재생)\n2) 조작성 (여러 방식으로)\n3) 확충성 (동일 경험을 많은 사람에게)\n4) 반복성 (반복 사용 가능)"},
+    {"front": "[교육매체] 교수매체 — 선정 시 고려사항 4", "importance": "normal", "back": "1) 학습자 특성\n2) 수업 상황\n3) 학습 목표와 내용\n4) 실용성"},
+    {"front": "[교육매체] 교수매체 — 연구 4", "importance": "normal", "back": "1) 매체 비교 연구\n2) 매체 속성 연구 (어떤 속성이 학업 성취에 도움을 줄까)\n3) 매체 선호 연구\n4) 매체 경제성 연구"},
+    {"front": "[교육매체] 하이니히 ASSURE 모형 — 모형 목적 & 단계 6", "importance": "very_high", "back": "### 모형 목적\n- '교수매체를 효과적으로 활용하는 수업' 설계를 돕고자 개발된 모형\n### 모형 단계 6\n1) A 학습자 분석\n2) S 목표 진술\n3) S 매체와 자료의 선정\n4) U 매체와 자료의 활용\n5) R 학습자 참여 요구\n6) E 평가와 수정"},
+    {"front": "[교육매체] ASSURE — ① 학습자 분석(A) 내용 3", "importance": "very_high", "back": "1) 일반적 특성\n2) 출발점 능력\n3) 학습 양식"},
+    {"front": "[교육매체] ASSURE — ② 목표 진술(S) 방법", "importance": "very_high", "back": "1) 메이거의 ABCD 진술 기법 (A학습자 / B행동 / C조건 / D준거)"},
+    {"front": "[교육매체] ASSURE — ③ 매체와 자료의 선정(S) 단계 3", "importance": "very_high", "back": "1) 교수 방법 선정\n2) 교수 매체 선정\n3) 교수 자료 선정"},
+    {"front": "[교육매체] ASSURE — ④ 매체와 자료의 활용(U) 단계 5", "importance": "very_high", "back": "1) 자료의 사전 검토\n2) 자료의 준비\n3) 환경의 준비\n4) 학습자의 준비 (기대감/동기 등 마음의 준비 시킴)\n5) 학습경험의 제공"},
+    {"front": "[교육매체] ASSURE — ⑤ 학습자 참여 요구(R) 단계 3", "importance": "very_high", "back": "1) 호기심 가질 만한 질문\n2) 연습 기회 제공\n3) 피드백 제공"},
+    {"front": "[교육매체] ASSURE — ⑥ 평가와 수정(E) 단계 3", "importance": "very_high", "back": "1) 성취도 평가\n2) 매체 평가\n3) 수정"},
+    {"front": "[교수설계] 교수설계의 이해 — 교수설계란 & 체제적 교수설계 개념", "importance": "normal", "back": "### 교수설계란\n- 교육 요구를 분석해 → 효율적인 교육 프로그램(수업)을 개발하는 것\n### 체제적 교수설계 개념\n- 교수설계 각 단계에서 상호작용 가능한 비선형적 교수설계 방법"},
+    {"front": "[교수설계] 체제적 교수설계 — 장점 2", "importance": "normal", "back": "1) 효과적인 교수 전략 고안 가능 (각 단계를 연관시켜 설계)\n2) 오류를 지속적으로 수정/보완 가능 (교수설계 과정에서)"},
+    {"front": "[교수설계] 교수설계 시 고려할 3대 변인", "importance": "normal", "back": "1) 교수 조건\n2) 교수 방법\n3) 교수 성과"},
+    {"front": "[교수설계] 3대 변인 — ① 교수 조건 하위 변인 4", "importance": "normal", "back": "1) 교과 내용의 특성\n2) 교과의 목적\n3) 학습자 특성\n4) 제약조건"},
+    {"front": "[교수설계] 3대 변인 — ② 교수 방법 하위 변인 3", "importance": "normal", "back": "1) 조직 전략 (거시/미시 전략)\n2) 전달 전략\n3) 관리 전략 (조직/전달 전략 관리)"},
+    {"front": "[교수설계] 3대 변인 — ③ 교수 성과 하위 변인 4", "importance": "normal", "back": "1) 효과성\n2) 효율성\n3) 매력성\n4) 안정성"},
+    {"front": "[교수설계] 교수설계 초반의 주요 단계 4", "importance": "normal", "back": "1) 요구 분석 (실제 수행과 바라는 수행 수준의 차이)\n2) 학습자 분석\n3) 교수목표 설정/진술\n4) 학습과제 분석"},
+    {"front": "[교수설계] ① 요구 분석이 필요한 이유 2 & 기법 5", "importance": "normal", "back": "### 필요한 이유 2\n1) 요구 우선순위 결정 → 한정된 자원의 합리적 배분 가능\n2) (요구분석 결과 토대로) 교수 프로그램 목적 도출 가능\n### 요구 분석 기법 5\n1) 설문조사 2) 관찰 3) 면담 4) 자원명세서 조사 5) 사용분석"},
+    {"front": "[교수설계] ② 학습자 분석 요소 5", "importance": "normal", "back": "1) 일반적 특성\n2) 출발점 능력\n3) 학습유형\n4) 특정 과제에 대한 태도\n5) 테크놀로지 사용 능력"},
+    {"front": "[교수설계] ③ 교수목표 설정/진술 방식 2", "importance": "normal", "back": "1) 타일러: 내용(학습 내용) + 행동(도착점 행동)\n2) 메이거: ABCD 진술 기법 (A학습자 / B행동 / C조건 / D준거)"},
+    {"front": "[교수설계] ④ 학습과제분석 — 구성 2 & 학습 목표별 과제분석 기법(가네) 5", "importance": "normal", "back": "### 학습과제분석 구성 2\n1) 학습 목표(유형) 분석\n2) 하위 기능 분석\n### 학습 목표별 과제분석 기법(가네) 5 [목표-기법]\n1) 언어정보 - 군집분석\n2) 지적기능 - 위계분석\n3) 인지전략 - X\n4) 운동기능 - 절차분석\n5) 태도 - 통합분석"},
+    {"front": "[교수설계] 학습과제분석이 필요한 이유 3", "importance": "normal", "back": "1) 목표 달성에 필요한 학습 내용 확인 가능\n2) 내용의 계열화/조직화 가능\n3) 선수학습요소 확인 가능"},
+    {"front": "[교수설계] ADDIE 모형 — 기본 개념 & 단계 5", "importance": "very_high", "back": "### 기본 개념\n- ADDIE 단계에 맞춰 교수설계를 진행하기 위한 모형\n### 단계 5\n1) A 분석\n2) D 설계\n3) D 개발\n4) I 실행\n5) E 평가"},
+    {"front": "[교수설계] ADDIE — ① 분석(A) 하위 단계 4", "importance": "very_high", "back": "1) 요구분석 (실제 수행과 바라는 수행 수준의 차이 분석해 목표 도출)\n2) 과제분석 (최종 교수 목적 달성에 필요한 것들 분석)\n3) 학습자분석\n4) 환경분석"},
+    {"front": "[교수설계] ADDIE — ② 설계(D) 하위 단계 4", "importance": "very_high", "back": "1) 구체적 목표 진술\n2) 평가 도구 개발 (성취 수준 파악 위한 절대평가 문항 설계)\n3) 계열화 (내용 설명 순서 / 활동 순서 설계)\n4) 교수전략 및 매체 선정"},
+    {"front": "[교수설계] ADDIE — ③ 개발(D) 하위 단계 2", "importance": "very_high", "back": "1) 교수 자료 개발\n2) 형성평가 실시 (일대일 / 소집단 / 현장 평가)"},
+    {"front": "[교수설계] ADDIE — ⑤ 평가(E) 평가요소 2", "importance": "very_high", "back": "1) 프로그램 효과성\n2) 교수설계 과정의 효율성"},
+    {"front": "[교수설계] 딕과 캐리 체제적 교수설계모형 — 기본 개념 2", "importance": "very_high", "back": "1) ADDIE 단계를 세분화한 체제적 교수설계 모형\n2) (설계자 입장에서 구안한 모형이라) ADDIE 중 실행 단계는 생략됨"},
+    {"front": "[교수설계] 딕과 캐리 — 모형의 단계 10", "importance": "very_high", "back": "[분석]\n1) 교수목적설정\n2) 교수분석\n3) 학습자 및 환경분석\n[설계]\n4) 수행 목표 진술\n5) 평가 도구 개발\n6) 교수전략 개발\n[개발]\n7) 교수자료 개발 및 선정\n8) 형성평가\n9) 프로그램 수정\n[평가]\n10) 총괄평가"},
+    {"front": "[교수설계] 딕과 캐리 — ① 교수목적설정 주요내용 2", "importance": "very_high", "back": "1) 요구분석\n2) 교수 목적 설정"},
+    {"front": "[교수설계] 딕과 캐리 — ② 교수분석 주요내용 2", "importance": "very_high", "back": "1) (교수 목적 달성 위해 배워야 할) 학습 유형 결정\n2) 하위 기능 분석"},
+    {"front": "[교수설계] 딕과 캐리 — ③ 학습자 및 환경분석", "importance": "very_high", "back": "### 학습자 분석 3\n1) 일반적 특성 2) 출발점 능력 3) 학습 양식\n### 환경 분석 3\n1) 교수 학습 공간 2) 매체 3) 시설"},
+    {"front": "[교수설계] 딕과 캐리 — ⑥ 교수전략 개발 내용 5", "importance": "very_high", "back": "1) 동기유발 전략\n2) 교수법\n3) 연습 및 피드백 방식\n4) 학습할 내용의 설명 순서\n5) 활동 순서"},
+    {"front": "[교수설계] 딕과 캐리 — ⑧ 형성평가 (내용 3 & 방법 3)", "importance": "very_high", "back": "### 평가 내용 3\n1) 교수 자료 평가 2) 수정 3) 보완\n### 평가 방법 3\n1) 일대일 평가 2) 소집단 평가 3) 현장 평가"},
+    {"front": "[교수설계] 딕과 캐리 — ⑨ 프로그램 수정 & ⑩ 총괄평가 특징", "importance": "very_high", "back": "### ⑨ 프로그램 수정\n- 전체 단계 중 어디라도 수정 가능 (형성평가 결과 바탕)\n### ⑩ 총괄평가\n- 외부 평가자에게 평가 의뢰"},
+    {"front": "[교수설계] 조나센 구성주의 학습환경 설계모형(CLEs) — 기본 개념 2", "importance": "very_high", "back": "1) 구성주의 학습(학습자의 능동적 학습)을 위한 환경 설계를 위한 설계모형\n2) 6가지 설계요소 + 3가지 교수활동"},
+    {"front": "[교수설계] 조나센 CLEs — 설계요소 6", "importance": "very_high", "back": "1) 문제/프로젝트\n2) 관련 사례\n3) 정보 자원\n4) 인지 도구\n5) 대화/협력도구\n6) 사회적/맥락적 지원"},
+    {"front": "[교수설계] 조나센 CLEs — 교수활동 3 (학습자 활동-교수자 활동)", "importance": "very_high", "back": "1) 탐색 - 모델링(시범)\n2) 명료화 - 코칭\n3) 성찰 - 비계 설정(스캐폴딩)"},
+    {"front": "[교수설계] 4C/ID 모형(총체적 교수설계모형) — 기본 개념 2", "importance": "high", "back": "1) 복잡한 인지 기능 습득을 위한 구성주의 교수설계 모형\n2) 4가지 요소(4C)를 포함한 교수설계(ID)를 강조"},
+    {"front": "[교수설계] 4C/ID — 모형의 요소 4", "importance": "high", "back": "1) 학습 과제\n2) 지원적 정보\n3) 절차적 정보\n4) 부분 과제 연습"},
+    {"front": "[교수설계] 4C/ID — ① 학습 과제가 가져야 할 특징 4", "importance": "high", "back": "1) 복잡한 문제나 프로젝트\n2) 실제적 형태\n3) 간단한 것에서 복잡한 것으로 계열화해 조직\n4) 스캐폴딩 제공해야 함 (점차 소멸)"},
+    {"front": "[교수설계] 4C/ID — ② 지원적 정보 / ③ 절차적 정보 / ④ 부분 과제 연습", "importance": "high", "back": "### ② 지원적 정보란\n- 선언적 지식 학습을 지원하는 정보 (특징: 풍부하고 구체적으로 제공)\n### ③ 절차적 정보란\n- 절차적 지식 학습을 지원하는 정보 (특징: 학습 과제별로 구체화, 적시에 제시)\n### ④ 부분 과제 연습이란\n- 높은 자동화 수준으로 숙달이 필요한 부분 과제의 반복연습 (특징: 매우 많은 반복 연습 설계)"},
+    {"front": "[교수설계] 쾌속원형 모형(RP 모형) — 기본 개념", "importance": "high", "back": "1) 설계단계에서 RP(빠르게 프로토타입)를 개발해 테스트해보고, 이를 바탕으로 설계 내용을 수정\n → 학습자의 요구/사용성을 반영한 설계 버전으로 수업 개발하는 모형 (구성주의 교수설계 모형)"},
+    {"front": "[교수설계] 쾌속원형 모형 — 전체 단계 7", "importance": "high", "back": "1) 분석 (학습 목표 설정 관련 요인 분석)\n2) 설계 (교수 프로그램 초기버전 설계)\n[쾌속원형설계과정 RPD]\n 3) 프로토타입 개발\n 4) 사용성 평가 (교사 & 학습자 의견 수집)\n 5) 설계 전략 수정 및 보완\n6) 개발\n7) 적용 및 평가"},
+    {"front": "[교수설계] 쾌속원형 모형 — 쾌속원형설계(RPD)과정 3 & 장점 2", "importance": "high", "back": "### RPD 과정 3\n1) 프로토타입 개발\n2) 사용성 평가\n3) 설계 전략 수정 및 보완\n### 장점 2\n1) (프로토타입 사전 실험으로) 학습자의 요구와 사용성이 반영된 수업 설계\n2) (설계 초기 단계에 수정 빠르게 이뤄짐) 시간과 비용 절감"},
+    {"front": "[교수이론] 가네 교수설계 이론(목표별 수업이론) — 기본 개념 3", "importance": "very_high", "back": "1) 학습의 조건을 내적 조건(학생)과 외적 조건(교수자)으로 나눔\n2) 목표별 수업 이론 (학습 목표 유형에 따라 수업 방법이 달라져야 함)\n3) 9가지 수업사태 (학습자 내부 인지과정 이해 + 외부적 수업사태 제공 → 학습 촉진)"},
+    {"front": "[교수이론] 가네 — ① 학습의 조건 (내적 조건 4 & 외적 조건 3)", "importance": "very_high", "back": "### 내적 조건 4\n1) 선행학습능력 2) 학습 동기 3) 자아개념 4) 주의집중\n### 외적 조건 3\n1) 강화의 원리\n2) 접근의 원리 (자극/반응 시간 근접이 굿)\n3) 연습의 원리"},
+    {"front": "[교수이론] 가네 — ② 목표별 수업 이론 (목표-교수전략-과제분석 기법) 5", "importance": "very_high", "back": "1) 언어정보 – 묶어서, 맥락과 함께 – 군집분석\n2) 지적기능 – 위계적, 연습기회 – 위계분석\n3) 인지전략 – 시범, 연습, 피드백 – X\n4) 운동기능 – 시범, 연습, 피드백 – 절차분석\n5) 태도 – 대리강화, 모델링 – 통합분석"},
+    {"front": "[교수이론] 가네 — ③ 9가지 수업사태 (학습사태-수업사태) 9", "importance": "very_high", "back": "1) 주의집중 - 주의집중 시키기\n2) 기대(동기화) - 수업목표 제시\n3) 장기기억으로부터의 재생 - 선수학습 확인\n4) 선택적 지각 - 자극(학습내용) 제시\n5) 의미론적 부호화 - 학습안내 제시\n6) 재생과 반응 - 수행(연습) 유도\n7) 피드백(강화) - 피드백 제공\n8) 자극에 의한 재생 - 수행평가\n9) 일반화 - 파지와 전이 높이기"},
+    {"front": "[교수이론] 메릴 내용요소제시이론(구인전시이론, CDT) — 기본 개념 & 핵심 내용", "importance": "very_high", "back": "### 기본 개념 2\n1) 인지적 영역 한 차시 수업 설계를 위한 미시적 교수설계 이론\n2) (해당 차시에 다룰) 내용 분류 방법을 이차원적으로 제안\n### 핵심 내용 2\n1) 수행X내용 행렬표\n2) 자료 제시 형태"},
+    {"front": "[교수이론] 메릴 CDT — ① 수행X내용 행렬표 (수행 차원 3 & 내용 차원 4)", "importance": "very_high", "back": "### 수행 차원 3 (학생이 수행하길 기대하는 것)\n1) 기억 2) 활용 3) 발견\n### 내용 차원 4 (수업에서 다룰 내용의 성격)\n1) 사실 2) 개념 3) 절차 4) 원리"},
+    {"front": "[교수이론] 메릴 CDT — ② 1차 제시형 (개념 & 분류 4)", "importance": "very_high", "back": "### 개념\n- 학습 목표 도달을 위해 제시되어야 하는 가장 최소한의 자료/수업 형태\n### 분류 4\n1) 일반성 설명식 (법칙)\n2) 사례 설명식 (예)\n3) 일반성 질문식 (회상)\n4) 사례 질문식 (연습)"},
+    {"front": "[교수이론] 메릴 CDT — ③ 2차 제시형 (개념 & 예시 2)", "importance": "very_high", "back": "### 개념\n- (필수요소는 X) 학습을 지원해주는 부가적 자료\n### 예시 2\n1) 기억술 제공\n2) 맥락 제공"},
+    {"front": "[교수이론] 메릴 CDT — 시사점 3", "importance": "very_high", "back": "1) 학습활동 구조화 시, (일반성제시-사례제공-연습활동제공) 순서 진행을 시사\n2) 내용마다 맞는 교수전략 선택 가능케 함 (1차 제시, 2차 제시)\n3) 목표에 따른 교수 전략 처방에 활용 가능"},
+    {"front": "[교수이론] 라이겔루스 정교화이론 — 기본 개념 2", "importance": "very_high", "back": "1) 거시적 조직 전략 (여러 아이디어들을 어떤 순서로 가르칠 것인가)\n2) 수업 윤곽 제시 ~> 점차 구체화/정교화 방식으로 수업 전개하자는 이론"},
+    {"front": "[교수이론] 라이겔루스 정교화이론 — 수업 단계 5 (줌렌즈의 비유)", "importance": "very_high", "back": "1) 전체 개요 제시 (ZOOM OUT)\n2) 상세한 내용 설정 (ZOOM IN)\n3) 줌인, 줌아웃 반복\n4) 요약\n5) 종합"},
+    {"front": "[교수이론] 라이겔루스 정교화이론 — 교수전략 7", "importance": "very_high", "back": "1) 정교화된 계열화 (단순-복잡 계열화)\n ① 개념적 정교화 ② 절차적 정교화 ③ 이론적 정교화\n2) 선수학습요소의 계열화\n3) 요약자 사용 (망각 안 하게 복습 도움)\n4) 종합자 사용 (개별 내용 연결 & 통합)\n5) 비유 활용\n6) 인지전략 촉진자 준비\n7) 학습자 통제 (학습자 스스로 자신 학습 통제하도록 도움)"},
+    {"front": "[교수이론] 켈러 ARCS 이론(학습동기설계이론) — 기본 개념 & 동기유발 요소 4", "importance": "very_high", "back": "### 기본 개념\n- 학습 동기를 유발하고 유지시키기 위한 전략을 제시하는 이론\n### 동기유발 요소 4\n1) 주의집중 A\n2) 관련성 R\n3) 자신감 C\n4) 만족감 S"},
+    {"front": "[교수이론] 켈러 ARCS — ① 주의집중(A) 하위전략 3", "importance": "very_high", "back": "1) 지각적 주의 환기 전략 - 시청각 효과 활용 / 일상적이지 않은 내용 제시\n2) 탐구적 주의 환기 전략 - 질문, 활동 / 내용의 부분적 제시 → 신비감 제공\n3) 다양성 전략 - 다양한 수업 방식 혼합 사용 / 교수자료 적절히 변화"},
+    {"front": "[교수이론] 켈러 ARCS — ② 관련성(R) 하위전략 3", "importance": "very_high", "back": "1) 친밀성 전략 - 친밀한 이름, 예시, 그림 사용\n2) 목적 지향성 전략 - 실용성 중심의 학습목표 제시\n3) 필요나 동기와의 부합 전략 - 소속감 욕구 중시 / 성취 욕구 중시"},
+    {"front": "[교수이론] 켈러 ARCS — ③ 자신감(C) 하위전략 3", "importance": "very_high", "back": "1) 학습의 필요조건 제시 전략 - 목표 도달 기준, 시험 조건 등 제시\n2) 성공 기회 제시 전략 - 쉬운~>어려운 순으로 조직, 다양한 난이도 제공\n3) 개인적 조절감 증대 전략 - 속도, 난이도 스스로 조절케 함"},
+    {"front": "[교수이론] 켈러 ARCS — ④ 만족감(S) 하위전략 3", "importance": "very_high", "back": "1) 자연적 결과 강조 전략 - 배운 내용 적용 기회 제공 → 내재적 동기 유발\n2) 긍정적 결과 강조 전략 - 피드백/보상 제공 → 외재적 동기 유발\n3) 공정성 강조 전략 - 내용/목표/시험내용을 일관성 있게 유지"},
+    {"front": "[교수이론] 완전학습 모형 — 완전학습이란 & 캐롤 학교학습 모형 기본개념", "importance": "high", "back": "### 완전학습이란\n- 모든 학생이 높은 학업성취를 이루는 것\n### 캐롤의 학교학습 모형 기본개념\n- 학업 성취도 = 학습에 사용한 시간 ÷ 학습에 필요한 시간"},
+    {"front": "[교수이론] 캐롤 학교학습 모형 — 교사 변인 2 & 학생 변인 3", "importance": "high", "back": "### 교사 변인 2\n① 학습 기회 – 학습에 사용한 시간에 비례\n② 교수의 질 – 학습에 필요한 시간에 반비례\n### 학생 변인 3\n③ 학습 지속력 – 학습에 사용한 시간에 비례\n④ 적성 – 학습에 필요한 시간에 반비례\n⑤ 교수 이해력 – 학습에 필요한 시간에 반비례"},
+    {"front": "[교수이론] 캐롤 학교학습 모형 — 시간에 영향주는 변인", "importance": "high", "back": "### 학습에 사용한 시간에 영향주는 변인 2\n① 학습 기회 ③ 학습 지속력\n### 학습에 필요한 시간에 영향주는 변인 3\n② 교수의 질 ④ 적성 ⑤ 교수 이해력"},
+    {"front": "[교수이론] 캐롤 학교학습 모형 — 시사점 3", "importance": "high", "back": "1) 높은 교수의 질 → 높은 교수 이해력/높은 학습 지속력 → 높은 학업 성취\n2) 학습 기회를 충분히 허용 → 적성 낮아도 높은 학업 성취 가능\n3) 학습에 필요한 시간↓, 학습에 사용한 시간↑ → 학업 성취 최대치"},
+    {"front": "[교수이론] 블룸의 완전학습 모형 — 기본개념 & 절차(수업 전/본 수업/수업 후)", "importance": "high", "back": "### 기본개념\n- 학습 기회가 충분히 제공되면 완전학습이 가능함을 주장\n### 절차(수업 전) 2\n① 진단평가 ② 학습 결손 보충지도 (스키너 프로그램 학습 사용)\n### 절차(본 수업) 6\n③ 수업 목표 명시 ④ 수업 진행 ⑤ 수업 보조 활동 ⑥ 형성평가로 부진학생 파악\n⑦-1) 부진 학생→보충학습 / ⑦-2) 일반 학생→심화학습 ⑧ 제2차 학습 기회 제공\n### 절차(수업 후) 1\n⑨ 총괄평가"},
+    {"front": "[교수이론] 블룸의 완전학습 모형 — 특징 3", "importance": "high", "back": "1) 형성평가 & 보충학습/심화학습 강조\n2) 개별화 수업을 통한 학습 교정 강조\n3) 충분한 학습기회 강조"},
+    {"front": "[교수이론] 브루너 발견학습(탐구학습) — 기본 개념 & 수업 절차 4", "importance": "very_high", "back": "### 기본 개념 2\n1) 학생 주도적으로 지식의 구조를 발견해가는 교수학습 방법\n2) 교사는 안내자 역할\n### 수업 절차 4\n1) 문제 인식 → 2) 가설 설정 → 3) 가설 검증 → 4) 결론 도출"},
+    {"front": "[교수이론] 브루너 발견학습 — 요소 4", "importance": "very_high", "back": "1) 지식의 구조\n2) 계열화\n3) 학습경향성\n4) 강화"},
+    {"front": "[교수이론] 브루너 발견학습 — 촉진 조건 4", "importance": "very_high", "back": "1) 학습 태세 (탐구 지향적 태도 굿)\n2) 요구 상태 (보통 수준의 동기 수준이 굿)\n3) 관련 정보의 학습 (학습자에게 학습 관련 구체적 정보 많아야 굿)\n4) 연습의 다양성 (다양한 각도에서 접촉 굿)"},
+    {"front": "[교수이론] 브루너 발견학습 — 교사의 역할 3", "importance": "very_high", "back": "1) 다양한 자료 제시\n2) 내재적 보상 제공\n3) 스캐폴딩 제공"},
+    {"front": "[교수이론] 브루너 발견학습 — 장점 2 & 단점 2", "importance": "very_high", "back": "### 장점 2\n1) 고등정신능력 향상\n2) (발견학습으로 획득한 지식은) 더 오래 파지 & 전이됨\n### 단점 2\n1) 학습에 시간이 오래 걸림\n2) 수동적 학습자에겐 비효율적"},
+    {"front": "[교수이론] 오수벨 유의미 수용학습이론 — 기본개념 & 유의미 학습이란", "importance": "very_high", "back": "### 기본개념\n- 설명식 수업에서 유의미한 학습을 유발하는 수업 설계를 위한 이론\n### 유의미 학습이란\n- 새로운 지식과 기존 지식의 연결이 이뤄지는 학습"},
+    {"front": "[교수이론] 오수벨 — 유의미 학습 조건 3", "importance": "very_high", "back": "1) 논리적 유의미성 (학습과제가 ①실사성 / ②구속성을 가져야 함)\n2) 잠재적 유의미성 (학습자가 관련정착의미를 가져야 함)\n3) 심리적 유의미성 (학습자가 유의미 학습 태세를 가져야 함)"},
+    {"front": "[교수이론] 오수벨 — 선행조직자란 & 기능 & 종류 2", "importance": "very_high", "back": "### 선행조직자란\n- 새로운 과제 학습 전, 유의미학습 촉진을 위해 교사가 수업 도입부에 제시하는 도입 자료\n### 기능\n- 새로운 학습 과제를 기존 인지구조로 더 쉽게 포섭하게 도움\n### 종류 2\n1) 설명 조직자 (친숙하지 않은 과제에 → 이해 위해 개념적 근거 제시)\n2) 비교 조직자 (친숙한 과제에 → 유사점, 차이점 제시)"},
+    {"front": "[교수이론] 오수벨 — 포섭이란 & 포섭 종류 3", "importance": "very_high", "back": "### 포섭이란\n- 학습자의 인지구조에 새로운 내용이 정착(흡수)되는 것\n### 포섭 종류 3\n1) 하위적 포섭 (새로운 내용이 기존의 하위 개념) (①상관적 포섭, ②파생적 포섭)\n2) 상위적 포섭 (새로운 내용이 기존의 상위 개념)\n3) 병렬적 포섭 (대등한 개념끼리 포섭)"},
+    {"front": "[교수이론] 오수벨 — 유의미 수용학습의 원리 6", "importance": "very_high", "back": "1) 선행조직자의 원리\n2) 점진적 분화의 원리 (포괄 → 구체 순서로 제시)\n3) 통합적 조정의 원리 (새로운 내용이 기존 내용에 포섭되게)\n4) 선행학습의 요약 정리의 원리\n5) 내용의 체계적 조직의 원리\n6) 학습자 준비도의 원리 (학습자 기존 인지구조 고려하라)"},
+    {"front": "[교수이론] 오수벨 — 장점 2 & 단점 2", "importance": "very_high", "back": "### 장점 2\n1) (강의식 수업 → 지식 효율적 전달) 학습자의 학습 시간 절약\n2) 안정된 파지와 높은 학습전이\n### 단점 2\n1) (학생이 비판적 능력 없을 경우) 학습자의 수동적 태도 양산\n2) 교수자의 능력/준비에 따라 수업의 질이 크게 달라짐"},
+    {"front": "[교수이론] 구성주의 교수이론 — 기본개념", "importance": "normal", "back": "1) 학습자가 경험을 통해 스스로 지식을 구성한다 (지식이 객관적으로 존재 X)"},
+    {"front": "[교수이론] 객관주의 vs 구성주의 비교", "importance": "normal", "back": "객관주의와 구성주의는 교수 설계·학습 결과·수업 중심·수업 방법·교사 역할에서 대비된다.", "table": "<table><tr><th>구분</th><th>객관주의</th><th>구성주의</th></tr>\n<tr><td>교수 설계</td><td>내용 효과적 전달되게 수업 설계</td><td>자발적 학습 일어날 환경 설계</td></tr>\n<tr><td>학습 결과</td><td>모든 사람이 같은 이해에 도달</td><td>개인마다 구성한 지식 다름</td></tr>\n<tr><td>수업 중심</td><td>교사</td><td>학습자</td></tr>\n<tr><td>수업 방법</td><td>강의/암기/반복/대집단 학습</td><td>협동학습/소집단활동/문제해결학습</td></tr>\n<tr><td>교사 역할</td><td>지식의 전달자</td><td>지식 구성 위한 안내자</td></tr></table>"},
+    {"front": "[교수이론] 구성주의 — 교육적 적용 4", "importance": "normal", "back": "1) 학습자 중심으로 학습 환경 설계\n2) 교사는 안내자, 조력자 역할 수행\n3) 협동학습 활용\n4) 과정중심평가 사용"},
+    {"front": "[교수이론] 구성주의 — 장점 2 & 단점 3", "importance": "normal", "back": "### 장점 2\n1) 자기주도적 학습능력 + 수업 동기 향상\n2) 문제해결능력 + 협동력 향상\n### 단점 3\n1) (비구조화된 수업 설계에 있어) 교수자의 전문성 + 많은 시간/노력 필요\n2) 교과 지식의 체계적 습득 어려움\n3) (스스로 지식 재구성하니) 오개념 형성 위험"},
+    {"front": "[교수이론] 목표기반 시나리오 모형(GBS, 생크) — 기본개념", "importance": "very_high", "back": "1) 실제적 맥락 시나리오에 따라 역할놀이를 수행하며 → 나도 모르게 학습함"},
+    {"front": "[교수이론] GBS — 구성 요소 7", "importance": "very_high", "back": "1) 목표 (학습자들이 획득을 원하는 지식/기능)\n2) 임무\n3) 표지 이야기 (미션 관련 상황을 이야기 방식으로 구체화한 것)\n4) 역할 (표지 이야기 속 맡게 되는 인물)\n5) 시나리오 운영\n6) 자원 (미션 수행 시 정보/도구)\n7) 피드백 (미션 수행에 대한 도움/평가/조언)"},
+    {"front": "[교수이론] GBS — 특징 2", "importance": "very_high", "back": "1) 시나리오 수행을 통해 자연스레 학습\n2) 기대실패(현재 지식부족)를 극복하며 학습이 이루어짐"},
+    {"front": "[교수이론] GBS — 설계 시 유의사항 3", "importance": "very_high", "back": "1) 학습 목표 정의 시, 내용지식/과정지식의 목표를 구분해 제시\n2) (내용지식 & 과정지식 모두 들어간) 실제적 사례를 바탕으로 시나리오 만들기\n3) (공개적 X, 양적 평가 X) 개별적, 주관적, 질적 평가 진행"},
+    {"front": "[교수이론] 배로우스 문제중심 학습(PBL) — 기본개념 & 습득 기능 2", "importance": "very_high", "back": "### 기본개념\n- 실제적이고 비구조화된 문제의 해결 과정에서 학습하도록 하는 방법\n### PBL로 습득할 수 있는 기능 2\n1) 추론 기능 (가설 설정부터 문제 해결까지 해보면서)\n2) 자기주도적 학습 기능"},
+    {"front": "[교수이론] PBL — 특징 4", "importance": "very_high", "back": "1) 학습자 중심의 학습 환경 (을 통해 학습 이뤄짐)\n2) 비구조화된 실질적 문제 사용함\n3) 교사는 수업의 설계자, 조력자 역할\n4) 과정 중심 평가 (결과 평가 & 성찰적 평가도 중시)"},
+    {"front": "[교수이론] PBL — 절차 6", "importance": "very_high", "back": "1) 문제제시\n2) 문제확인 (소집단 활동, 가설 설정)\n3) 자료수집 (개별활동)\n4) 문제 재확인 & 해결안 도출 (소집단 활동) (해결 안 됐으면 다시 3번으로)\n5) 해결안 발표\n6) 정리 및 평가"},
+    {"front": "[교수이론] PBL — 교육적 가치 3", "importance": "very_high", "back": "1) 자기주도적 학습 능력 신장\n2) 협동심 함양\n3) 학습자의 흥미 유발"},
+    {"front": "[교수이론] 상황학습이론 — 기본개념 & 과제 설계 원리 3", "importance": "very_high", "back": "### 기본개념\n- 구체적 상황, 실질적 맥락 속에서의 학습을 강조하는 이론\n### 설계 원리 – 과제 설계 3\n1) 실제적 과제 사용\n2) 맥락과 함께 제시\n3) 실제적인 지식과 기능 평가"},
+    {"front": "[교수이론] 상황학습이론 — 교수방법 설계 원리 3", "importance": "very_high", "back": "1) 모델링\n2) 코칭/스캐폴딩\n3) 협동 → 반성, 명료화 기회 제공해야 함"},
+    {"front": "[교수이론] 상황학습 — 학습이란 & 실행공동체 & 합법적 주변적 참여", "importance": "very_high", "back": "### 상황학습에서 학습이란\n- 실행공동체의 합법적 주변적 참여 ~> 핵심구성원이 되어가는 과정에서 이뤄지는 것\n### 실행공동체란\n- 공동 목적을 가진 (상호작용하며 함께 배우는) 공동체\n### 합법적 주변적 참여란\n- (초보자일 때) 주변인 위치에서 공동체의 수행을 관찰하는 것"},
+    {"front": "[교수이론] 상황학습이론 — 시사점 2 & 종류 3", "importance": "very_high", "back": "### 시사점 2\n1) 학습은 상호작용으로 발생함\n2) 교사는 학생들이 공동체에 참여하도록 학생들의 관심/흥미를 높여야 함\n### 종류 3\n1) 인지적 도제 이론\n2) 인지적 유연성 이론\n3) 정착교수"},
+    {"front": "[교수이론] 상황학습 — ① 인지적 도제 이론 (개념 & 과정 MCSARE 6)", "importance": "very_high", "back": "### 개념\n- 전문가의 문제해결 과정을 학생이 관찰하여 학습\n### 과정 MCSARE 6\n1) M 모델링\n2) C 코칭\n3) S 스캐폴딩\n4) A 명료화\n5) R 반성\n6) E 탐색"},
+    {"front": "[교수이론] 상황학습 — ② 인지적 유연성 이론 (개념 & 교수설계 원리 4)", "importance": "very_high", "back": "### 개념\n- 지식을 상황에 맞게 재구성하는 능력을 형성시켜야 한다\n### 교수설계 원리 및 방법 4\n1) 소사례 제시\n2) 다양한 지식 표상 방식 제공 (다양한 자료 형태로 내용 제시)\n3) 반복학습 기회 제공 (다른 관점 해석 기회 제공)\n4) 하이퍼텍스트, 하이퍼미디어 활용 (학습순서 비순차적 배치 → 유연 사고 증진)"},
+    {"front": "[교수이론] 인지적 유연성 이론 — 장점 2 & 단점 2", "importance": "very_high", "back": "### 장점 2\n1) 복잡하고 다차원적인 지식체계 형성 가능\n2) 유연하고 다양한 사고 형성 가능\n### 단점 2\n1) 지식의 사회적 측면 소홀 (상호작용/협동학습 등)\n2) 구조화된 지식 전달에는 부적합"},
+    {"front": "[교수이론] 상황학습 — ③ 정착교수 (개념 & 과제의 특징 5)", "importance": "very_high", "back": "### 개념\n- 실제 문제 상황을 영상매체로 제공 → 해결하면서 지식을 학습시키는 방법\n### 과제의 특징 5\n1) 이야기 형태 (몰입 촉진)\n2) 모든 단서 포함됨\n3) (주로) 시각적 자료의 형태\n4) 정해진 답 없음 (& 다양한 문제해결방법 허용)\n5) 협동학습으로 문제 해결하도록 설계"},
+    {"front": "[교수이론] 상보적 교수(상호적 교수) — 기본개념 & 학습 원리", "importance": "normal", "back": "### 기본개념\n- (동료학습자, 교사와의) 언어적 상호작용을 통한 독해력 증진 유발\n### 학습 원리\n- 사회적 상호작용"},
+    {"front": "[교수이론] 상보적 교수 — 수업 단계 4", "importance": "normal", "back": "1) 요약하기 (주어진 글을 자신의 언어로 요약)\n2) 질문하기\n3) 명료화하기\n4) 예측하기 (요약한 글 다음 내용 예측)"},
+    {"front": "[교수이론] 자원기반학습(Big6 Skills 모형) — 기본개념 & 필요성 3", "importance": "high", "back": "### 기본개념\n- 학습자 스스로 자원과 상호작용하며 자료 수집/분석 → 최종 결과물 만들어냄\n### 필요성 3\n1) (정보사회에 맞게) 정보수집능력 함양 가능\n2) 비판적 사고력 함양 가능\n3) 다양한 학습자의 요구 만족 가능 (교사 제공 자료만으로는 모든 요구 만족 어려움)"},
+    {"front": "[교수이론] 자원기반학습 — 환경 설계 방법 4", "importance": "high", "back": "1) 상황맥락적 문제 상황 제시 (다양한 관점에서 조사할 수 있게)\n2) 다양한 학습 도구 제시 (탐색/처리/조작/커뮤니케이션 도구)\n3) 다양한 정보 자원 지원\n4) 적절한 비계자원(도움) 제시"},
+    {"front": "[교수이론] 자원기반학습 — 비계자원 종류 4", "importance": "high", "back": "1) 개념적 비계 (개념 이해 도움)\n2) 메타인지적 비계 (학습 과정 스스로 점검 도움)\n3) 절차적 비계 (학습도구 사용법/절차 이해 도움)\n4) 전략적 비계 (해결 전략 도움)"},
+    {"front": "[교수이론] 자원기반학습 — 한계/주의점 2 & Big6 Skills 모형 절차 6", "importance": "high", "back": "### 한계/주의점 2\n1) 적절한 평가나 피드백 필요 (그냥 자원 제시만 하면 학습 안 됨)\n2) 수동적 학생은 학습이 어려움\n### Big6 Skills 모형 절차 6 (정보리터러시 증진 모형)\n1) 과제정의 2) 정보탐색전략 3) 소재파악과 접근 4) 정보 활용 5) 종합 정리 6) 평가"},
+    {"front": "[전통적 교수법] 강의법 — 기본 개념 & 적합한 경우 3", "importance": "normal", "back": "### 기본 개념\n- 교사중심 설명식 수업\n### 적합한 경우 3\n1) 지식 전수\n2) 내용의 체계적 전달\n3) 내성적 학습자 대상"},
+    {"front": "[전통적 교수법] 강의법 — 부적합한 경우 3", "importance": "normal", "back": "1) 고차원적 학습 과제\n2) 개인차를 고려한 수업\n3) 학생의 참여가 필수적인 수업"},
+    {"front": "[전통적 교수법] 강의법 — 장점 3 & 단점 4", "importance": "normal", "back": "### 장점 3\n1) 학습자의 학습 시간 절약\n2) 지식의 체계적 전달 가능\n3) 많은 학생 대상 수업 가능\n### 단점 4\n1) 수동적 태도 양산\n2) 교수자에 따라 수업의 질 차이\n3) 고등정신기능 함양 어려움\n4) 개인차 고려 어려움"},
+    {"front": "[전통적 교수법] 문답법 — 기본개념 & 좋은 발문 3", "importance": "normal", "back": "### 기본개념\n- 교사와 학생 간의 질문과 대답으로 수업 진행\n### 좋은 발문 3\n1) (학습자 사고를 자극시키는) 개방적 질문\n2) 학습자 스스로 답을 찾아가는 질문\n3) 발문 후 학생의 이름 호명 (모든 학생에게 생각 기회 제공)"},
+    {"front": "[전통적 교수법] 문답법 — 장점 2 & 단점 3", "importance": "normal", "back": "### 장점 2\n1) 비판적 태도 (+ 사고력) 증진\n2) 의사소통 원활\n### 단점 3\n1) 소수의 학습자에 적합 (다수 학습자엔 어려움)\n2) 많은 시간 소요\n3) (내성적) 대인 공포증 학생에게 부적합"},
+    {"front": "[전통적 교수법] 팀티칭(협동교수) — 기본개념 & 성공을 위한 고려사항 3", "importance": "normal", "back": "### 기본개념\n- 두 명 이상의 교사가 협력하여 수업\n### 성공을 위한 고려사항 3\n1) 교사 간 열린 의사소통\n2) 자신의 대인관계 단점 보완 노력 필요\n3) (타 교사 수업에 대한) 건설적 피드백 필요"},
+    {"front": "[전통적 교수법] 팀티칭(협동교수) — 장점 2 & 단점 3", "importance": "normal", "back": "### 장점 2\n1) 교사 전문성 최대 활용 가능\n2) 학생 능력 따라 집단 편성 & 맞춤형 다양한 교수법 제공 가능\n### 단점 3\n1) 충분한 협의 시간 필요\n2) 학습자 혼란 야기 가능 (교사 간 기준/가치관 차이)\n3) 교사 간 충돌 발생 가능"},
+    {"front": "[전통적 교수법] 역할놀이 — 기본개념 & 장점 2 & 단점 1", "importance": "normal", "back": "### 기본개념\n- 가상의 역할 수행 (→ 태도/행동 변화) 하는 수업\n### 장점 2\n1) 타인 이해에 도움\n2) 의사소통능력, 문제해결능력 함양\n### 단점 1\n1) 학습자 흥미 따라 수업 효과 차이 발생 (흥미 없으면 효과 낮음)"},
+    {"front": "[전통적 교수법] 토의법 — 기본 개념 & 효과적 토의를 위한 고려사항 3", "importance": "high", "back": "### 기본 개념\n- 교사-학습자, 학습자-학습자 간의 언어적 상호작용으로 결론을 이끄는 수업\n### 고려사항 3\n1) 명확한 토의 목적 필요\n2) 토의 시작 전 절차, 방법, 목적 안내 필요\n3) 마무리 공유 및 정리 시간 필요"},
+    {"front": "[전통적 교수법] 토의법 — ① 원탁토의 (개념 & 장점 2 & 단점 2)", "importance": "high", "back": "### 개념\n- 상호 대등 관계 속 토의\n### 장점 2\n1) 민주적 태도 학습 가능\n2) 모두가 만족하는 결과 도출 가능\n### 단점 2\n1) 갈등의 여지\n2) 결론 없는 탁상공론 발생 가능"},
+    {"front": "[전통적 교수법] 토의법 — ② 배심토의(패널토의) (개념 & 장점 2 & 단점 2)", "importance": "high", "back": "### 개념\n- 상반된 견해를 가지는 소수 패널이 다수 청중 앞에서 토의\n### 장점 2\n1) 상반된 견해를 수렴하는 데 효과적\n2) 청중에게 최적의 학습 효과\n### 단점 2\n1) 패널 선정이 학습 효과에 결정적 영향\n2) 소수의 학생만이 패널로 참여"},
+    {"front": "[전통적 교수법] 토의법 — ③ 공개토의(포럼) (개념 & 장점 2 & 단점 2)", "importance": "high", "back": "### 개념\n- 전문가 연설 후 청중과 질의응답\n### 장점 2\n1) 모든 청중 참여\n2) 깊이 있는 학습 가능\n### 단점 2\n1) 연설 주제의 흥미에 따라 학습효과 저하\n2) 토의가 산만해질 수 있음 (질의응답)"},
+    {"front": "[전통적 교수법] 토의법 — ④ 대담토의 (개념 & 장점 2 & 단점 1)", "importance": "high", "back": "### 개념\n- 전문가 대표와 청중 대표가 다수 청중 앞에서 토의\n### 장점 2\n1) 전문가와 청중 간 자유로운 의사소통 가능\n2) 학습자(청중 대표)의 적극적, 능동적 참여 가능\n### 단점 1\n1) 청중 대표가 적극적이지 않으면 학습 효과 저하"},
+    {"front": "[전통적 교수법] 토의법 — ⑤ 단상토의(심포지움) (개념 & 장점 1 & 단점 2)", "importance": "high", "back": "### 개념\n- 몇 명의 전문가가 각자의 의견을 단상에서 순차 발표\n### 장점 1\n1) 다양한 전문적 견해 이해 가능\n### 단점 2\n1) (연속된 발표) 집중력 저하\n2) 학습자 수동적 참여 발생 가능"},
+    {"front": "[전통적 교수법] 토의법 — ⑥ 세미나 (개념 & 장점 1 & 단점 1)", "importance": "high", "back": "### 개념\n- 참가자 전원이 전문가\n### 장점 1\n1) 구성원의 능동적 참여 가능\n### 단점 1\n1) 일반 대중 이해 어려움"},
+    {"front": "[전통적 교수법] 토의법 — ⑦ 버즈토의 (개념 & 장점 2 & 단점 1)", "importance": "high", "back": "### 개념\n- 전체를 소집단으로 나누어 자유롭게 토의\n### 장점 2\n1) 전체 학습자가 토의에 참여\n2) 학급 내 사회적 협동심 증진\n### 단점 1\n1) 수많은 소집단 통제 어려움"},
+    {"front": "[전통적 교수법] 토의법 — ⑧ 하브루타 (개념 & 장점 2 & 단점 1)", "importance": "high", "back": "### 개념\n- 유대인의 전통 토론 방식 (2명씩 짝지어 논쟁)\n### 장점 2\n1) 비판적 사고력, 논리적 사고력 증진\n2) (논쟁 통해) 새로운 아이디어 공유 가능\n### 단점 1\n1) 이기기 위한 논쟁 시, 학습 효과 저하"},
+    {"front": "[전통적 교수법] 문제해결학습 — 학자 & 기본개념 & 반성적 사고란", "importance": "normal", "back": "### 학자\n- 존 듀이\n### 기본개념\n- 반성적 사고를 통해 생활 속 문제를 스스로 해결하며 학습\n### 반성적 사고란\n- 문제를 수동적으로 받아들임 X, 능동적으로 문제 분석 & 해결책 찾는 사고 과정"},
+    {"front": "[전통적 교수법] 문제해결학습 — 장점 2 & 단점 2", "importance": "normal", "back": "### 장점 2\n1) 문제해결력 증진\n2) 능동적 학습 가능\n### 단점 2\n1) 교과 지식의 체계적 학습 어려움\n2) 학습에 많은 시간 소요"},
+    {"front": "[전통적 교수법] 프로젝트 학습(구안법) — 학자 & 기본개념 & 절차 4", "importance": "normal", "back": "### 학자\n- 킬패트릭\n### 기본개념\n- 실생활 주제를 스스로 선정 & 해결을 위한 구체적 산출물을 만들어가는 교수방법\n### 절차 4\n1) 목적 설정 2) 계획 3) 실행 4) 평가"},
+    {"front": "[전통적 교수법] 프로젝트 학습 — 특징 4", "importance": "normal", "back": "1) 주제/문제는 – 실제적 문제로, 학습자가 직접 선정\n2) 자율적 계획과 실행\n3) 학습에 대한 학습자 책임 강조\n4) 구체적 산출물 형성됨"},
+    {"front": "[전통적 교수법] 프로젝트 학습 — 장점 4 & 단점 2", "importance": "normal", "back": "### 장점 4\n1) 학교 생활과 실생활 연계 가능\n2) 학습 동기 유발 가능\n3) 자발적, 능동적 학습 촉진 가능\n4) 사회성, 민주적 생활 태도 함양 가능\n### 단점 2\n1) 수업 무질서 발생 가능\n2) 교과 지식의 체계적 학습 어려움"},
+    {"front": "[전통적 교수법] 자기주도학습 — 학자 & 기본개념 & 필요성 3", "importance": "high", "back": "### 학자\n- 노울즈\n### 기본개념\n- 학습의 전 과정(목표/수준/내용 방법 등)을 학습자 스스로 결정하는 학습 방법\n### 필요성 3\n1) 교육 본연의 임무가 자기주도 학습 능력 증진임\n2) 인간 본성의 존중\n3) 교육 구조의 변화에 따라 더 중요해짐"},
+    {"front": "[전통적 교수법] 자기주도학습 — 능력 증진 방안 4", "importance": "high", "back": "1) 학생 참여형 수업 활성화\n2) 수업 중 자기주도적 학습 시간 제공\n3) 평가 개별화 (학습자마다 목표/속도 다르게 설정)\n4) 평가 자율화 (학습자마다 본인 목표/속도 따라 자발적 평가)"},
+    {"front": "[전통적 교수법] 개별화학습 — 기본개념 & 종류 7", "importance": "high", "back": "### 기본개념\n- 학습자의 개인차를 고려한 학습 방법\n### 종류 7\n1) 무학년제\n2) 팀티칭\n3) 달톤플랜(자율계약학습법)\n4) 프로그램 학습\n5) 개별 처방식 수업\n6) 적성처치 상호작용모형\n7) 켈러의 개별화 교수체제"},
+    {"front": "[전통적 교수법] 개별화학습 — ①~③ (무학년제/팀티칭/달톤플랜)", "importance": "high", "back": "### ① 무학년제\n- 학년 구분 없이 개별 학생 능력에 맞춰 수업\n### ② 팀티칭\n- 2인 이상의 교사가 협동하여 수업\n### ③ 달톤플랜(자율계약학습법)\n- 교사와 학습자 간의 학습 계약을 기반으로 수업"},
+    {"front": "[전통적 교수법] 개별화학습 — ④ 프로그램 학습(스키너) & 교수기계 원리 4", "importance": "high", "back": "### 기본개념\n- 학습 부진아의 완전 학습을 위한 개별화 수업\n### 개별화 교수기계(프로그램) 원리 4\n1) 단계적 학습의 원리\n2) 자기 속도의 원리\n3) 능동적(적극적) 반응의 원리 (너무 어렵지 않은 것 제시하여 참여 유도)\n4) 즉각적 강화의 원리 (문제 풀고 바로 결과 알려주면 쉽게 교정)"},
+    {"front": "[전통적 교수법] 개별화학습 — ⑤ 개별 처방식 수업 & ⑥ 적성처치 상호작용모형", "importance": "high", "back": "### ⑤ 개별 처방식 수업\n- 학습 전 진단 검사를 통해 개별 출발점을 달리하는 교수법\n### ⑥ 적성처치 상호작용모형\n- (적성 따라 효과적 교수방법이 존재한다 주장하나) 적성에 따른 적합한 처치란 존재 X, 다양한 교수 변인을 사용해 개인차를 줄이는 것이 더 중요함을 시사"},
+    {"front": "[전통적 교수법] 개별화학습 — ⑦ 켈러의 개별화 교수체제(켈러플랜) & 원리 5", "importance": "high", "back": "### 기본내용\n- 스키너의 프로그램 학습법을 다인수 학급에 적용한 교수법\n### 원리 5\n1) 스스로 공부 가능하도록 ①프로그램 학습 자료 + ②학습 안내서 배부\n2) 단계적 학습의 원리\n3) 자기 속도의 원리\n4) 학습 보조원의 활용 (다 끝낸 학생을 튜터로 활용)\n5) 교수자의 직접 강의 (개별학습 보조를 위해 가끔)"},
+    {"front": "[전통적 교수법] 협동학습 — 기본개념 & 효과 극대화 요인 5 (존슨 앤 존슨)", "importance": "very_high", "back": "### 기본개념\n- 이질적 소집단 구성 → 소집단 내 상호작용을 통한 학습\n### 효과 극대화 요인 5\n1) 긍정적 상호 의존성\n2) 대면적 상호작용 (서로 직접 격려)\n3) 개별 책무성\n4) 사회적 기술 (사회적 기술 사전에 교육하기)\n5) 집단 과정 (각자 노력/협력 정도(과정)을 토론 & 평가해보는 시간)"},
+    {"front": "[전통적 교수법] 협동학습 — 효과 3", "importance": "very_high", "back": "1) 대부분 학생 모두 학업 성취도 향상 (못하면 도움 받고, 잘하면 도움 주며)\n2) 사회적 기술 향상\n3) 학습 동기 증진"},
+    {"front": "[전통적 교수법] 협동학습 — 발생 가능 문제점-해결방안 4", "importance": "very_high", "back": "1) 부익부 현상 – STAD 도입 (개인 향상 점수 반영한 팀 점수 산출)\n2) 무임승객 효과 – STAD 도입\n3) 봉 효과 – STAD 도입\n4) 집단 간 편파 심화 – 소집단 재편성"},
+    {"front": "[협동학습 종류] ① 직소Ⅰ — 절차 4", "importance": "very_high", "back": "1) 모집단 활동\n2) 전문가 활동\n3) 모집단 복귀, 학습내용 공유\n4) 개별 점수 산출, 개별 보상 (→ 서로 경쟁자로 여겨 설명 잘 안 해주는 현상 발생)"},
+    {"front": "[협동학습 종류] ② 직소Ⅱ — 직소Ⅰ과의 차별점 2", "importance": "very_high", "back": "(직소Ⅰ과 1~4단계 동일, 그 뒤에 아래 두 단계 추가)\n1) 팀 점수 산출 (STAD 보상방식)\n2) 집단 보상 제공 (→ 서로 팀으로 여겨 상호의존성 높아짐)"},
+    {"front": "[협동학습 종류] ③ 직소Ⅲ & ④ 직소Ⅳ — 차별점", "importance": "very_high", "back": "### 직소Ⅲ (직소Ⅱ와 동일, 퀴즈 전 추가)\n1) 퀴즈 대비 공부시간 제공\n### 직소Ⅳ (직소Ⅲ와 동일, 추가)\n1) 전체 수업 내용 소개\n2) 전문가 활동에 대한 퀴즈\n3) 재교수 활동"},
+    {"front": "[협동학습 종류] 직소 수업에서 교사의 역할 2", "importance": "very_high", "back": "1) 학습자에게 효율적 교수방법 안내 (서로 잘 가르쳐주도록)\n2) 예시자료, 보조자료 제공 (기초학력 부진학생들도 전문가 활동에 부담 없게)"},
+    {"front": "[협동학습 종류] ⑤ 성취과제분담모형(STAD) — 점수 산출 및 보상 방법 4", "importance": "very_high", "back": "1) 개별평가를 통한 개인 향상점수 산출\n2) 개인 향상 점수를 합산해 팀 점수 산출\n3) 개인 향상 점수와 팀 점수 게시\n4) 개인보상 + 집단 보상"},
+    {"front": "[협동학습 종류] STAD — 협동 전략 3", "importance": "very_high", "back": "1) 집단 보상 → 긍정적 상호의존성 부여\n2) 팀 점수 → 개별 책무성 부여\n3) 향상 점수 → 성공기회 균등 부여"},
+    {"front": "[협동학습 종류] ⑥ 팀경쟁학습(TGT) & ⑦ 팀보조개별학습(TAI) & ⑧ 함께 학습하기(LT)", "importance": "very_high", "back": "### ⑥ 팀경쟁학습(TGT)\n- 팀 간 수준이 비슷한 학생끼리의 토너먼트 경쟁\n### ⑦ 팀보조개별학습(TAI)\n- 개별 학습 + 협동학습 (모르는 내용 있을 때만 집단 내 동료 도움) 결합 모형\n### ⑧ 함께 학습하기(LT)\n- 과제 공동 수행 → 집단 보상 / 문제점: 무임승차 효과, 봉효과 발생"},
+    {"front": "[협동학습 종류] ⑨ 집단조사(GI) & ⑩ 자율적 협동학습(Co-op Co-op)", "importance": "very_high", "back": "### ⑨ 집단조사(GI)\n1) (전체 과제 → 하위 주제로 나눔) 소집단 별 하위 주제 조사학습 & 평가\n2) (과제 선정~발표까지 스스로 진행) 민주적 협동학습 모형\n### ⑩ 자율적 협동학습(Co-op Co-op)\n1) (과제 선정~발표까지 스스로 진행) 민주적 협동학습 모형\n2) 학급 전체가 협동해서 하나의 문제 해결"},
+    {"front": "[협동학습 종류] 자율적 협동학습 — 집단조사(GI)와의 차이점/특징 4 & 장점 3", "importance": "very_high", "back": "### 차이점/특징 4\n1) 대주제 선정도 학생들이 직접\n2) 대주제 → 하위주제 → 소주제로 세분화\n3) 2번의 협동 (소집단 내 협동 + 소집단 간 협동)\n4) 다면적 평가 (교사/조원/자기평가/팀간/팀내 평가)\n### 장점 3\n1) 자율성 증대\n2) (협동 많음) 관계성 증대\n3) 성취감과 유능감 증진"},
+    {"front": "[전통적 교수법] 웹기반 협동학습 — 기본개념 & 장점 3", "importance": "normal", "back": "### 기본개념\n- 웹 (웹게시판/채팅/이메일/화상 등)을 통한 협동학습\n### 장점 3\n1) 시공간 제약 극복 (→ 학습자 학습 기회 확대)\n2) 소극적인 학생도 비교적 쉽게 의견 제시\n3) 편의성, 접근성 (→ 학습 효과 극대화)"},
+    {"front": "[전통적 교수법] 웹기반 협동학습 — 단점 3", "importance": "normal", "back": "1) 의견 조율에 많은 시간 소요 (온라인 공간이라 제약)\n2) 정보의 과부하 발생 가능\n3) 학습 동기가 낮은 학생에게 부적합 (시공간 제약 없이 자율적임)"},
+    {"front": "[전통적 교수법] 웹퀘스트 수업 — 기본개념 2 & 특징 3", "importance": "normal", "back": "### 기본개념 2\n1) 웹 기반 탐구학습\n2) 인터넷 탐색 + 리포트 작성\n### 특징 3\n1) 교사의 지시와 안내에 기초 (학습과제/활동과정/정보자원 안내)\n2) 실생활 문제 해결\n3) 협동학습으로 진행"},
+    {"front": "[교수방법의 혁신] 컴퓨터 보조 수업(CAI) — 기본 개념 & 코스웨어란", "importance": "normal", "back": "### 기본 개념\n- 컴퓨터를 활용해 교과 내용을 교수하는 방법\n### 코스웨어란\n- 교육과정용 소프트웨어 (교육과정 Course + 컴퓨터 프로그램 Software)"},
+    {"front": "[교수방법의 혁신] CAI — 코스웨어 종류 6", "importance": "normal", "back": "1) 개인교수형 (코스웨어가 교사 역할)\n2) 반복연습형\n3) 시뮬레이션형 (모의 실습)\n4) 게임형\n5) 발견학습형 (문제 해결 과정에서 학습자 스스로 필요 정보 찾아감)\n6) 시험형"},
+    {"front": "[교수방법의 혁신] CAI — 장점 3 & 단점 2", "importance": "normal", "back": "### 장점 3\n1) 개별화 수업 가능\n2) 흥미와 동기유발 가능\n3) 실시간 피드백 가능\n### 단점 2\n1) 컴퓨터 활용 능력이 낮은 학습자에게 부적합\n2) 큰 비용 소모"},
+    {"front": "[교수방법의 혁신] 컴퓨터 관리 수업(CMI) — 기본 개념", "importance": "normal", "back": "- 컴퓨터를 활용하여 개별 학습자를 관리 (진도/성취도 등 저장/관리/평가)"},
+    {"front": "[교수방법의 혁신] 멀티미디어 — 기본 개념 & 인지부하이론 개념", "importance": "normal", "back": "### 기본 개념\n- 두 가지 이상의 매체가 결합되어 정보를 제공하는 것\n### 인지부하이론 개념\n- 작업기억은 한계 용량이 있으니, 인지부하 최소화 방향으로 수업해야 함을 주장"},
+    {"front": "[교수방법의 혁신] 멀티미디어 — 인지부하 종류 3", "importance": "normal", "back": "1) 외생적 인지부하 - 불필요하게 투입된 인지적 노력\n2) 본질적 인지부하 - 이해 노력 과정에서 발생한 인지부하 (좋은 거임)\n3) 내재적 인지부하 - 과제 자체의 복잡도로 인한 부하 (조절 어려움)"},
+    {"front": "[교수방법의 혁신] 멀티미디어 설계 원리 — 외생적 인지부하 감소 4", "importance": "normal", "back": "1) 근접성 원리 - 공간적 근접 / 시간적 근접\n2) 양식 원리 - 시각 채널 + 청각 채널 모두 활용\n3) 중복 원리 - 동일 내용 시각 + 청각 중복 X\n4) 일관성 원리 - 학습에 불필요한 내용은 X"},
+    {"front": "[교수방법의 혁신] 멀티미디어 설계 원리 — 본질적 인지부하 촉진 2 & 내재적 인지부하 조절 2", "importance": "normal", "back": "### 본질적 인지부하 촉진 2\n1) 개인화 원리 – ①구어체 / ②학습자 이름 넣어 설명\n2) 자기설명 및 인지 리허설의 원리\n### 내재적 인지부하 조절 2\n1) 사전 훈련 – 학습 전 전체 구조 미리 제시\n2) 완성된 예제의 활용 - 과제의 단계적 제시"},
+    {"front": "[교수방법의 혁신] 원격 교육·온라인 수업 — 기본 개념 & 특징 3", "importance": "very_high", "back": "### 기본 개념\n- 교사와 학습자가 직접 대면 X, 매개를 통해 수업하는 형태\n### 특징 3\n1) 교사-학습자 시공간적 분리\n2) 학습자 자율성 가짐 → 책임감도 가짐\n3) 다양한 교수매체 활용"},
+    {"front": "[교수방법의 혁신] 원격 교육 — 매체 선정 시 고려 요소 7 (ACTIONS)", "importance": "very_high", "back": "1) A 접근성\n2) C 비용\n3) T 교수-학습 지원성 (교수학습에 도움되는 다양한 기능 제공하나)\n4) I 상호작용과 학습자 친화\n5) O 조직의 문제 (매체 적용 위해 조직에 필요한 변화는)\n6) N 참신성 (얼마나 새로운 매체인가)\n7) S 신속성 (얼마나 빨리 작동하는가)"},
+    {"front": "[교수방법의 혁신] 원격 교육 — 온라인 수업 형태 예시 3 & 장점 3 & 단점 3", "importance": "very_high", "back": "### 형태 예시 3\n1) 온라인 게시판 2) 온라인 화상회의 3) 온라인 교실\n### 장점 3\n1) 시공간 제약 없음\n2) 다수의 학습자에게 동시 교육 가능\n3) 원거리 교사나 전문가의 도움 가능\n### 단점 3\n1) 학습자 통제 어려움\n2) 초기 비용 부담\n3) 심리적 거리감 (교사-학생 직접 대면 X)"},
+    {"front": "[교수방법의 혁신] 원격 교육 — 상호작용 유형 3 & 상호작용 어려움 3", "importance": "very_high", "back": "### 상호작용 유형 3\n1) 교수자-학습자 2) 학습자-학습자 3) 학습자-내용 (게임, 퀴즈, 영상 등)\n### 상호작용 어려움 3\n1) 매체 사용에 익숙하지 않은 학생\n2) 비언어적 상호작용 제한\n3) (비실시간 온라인 수업에선) 즉각적 의사소통 피드백 불가"},
+    {"front": "[교수방법의 혁신] 원격 교육 — 고립감 해소 방법 2", "importance": "very_high", "back": "1) 온라인 게시판, 토론 활용 → 학습자 간 소통 촉진\n2) 채팅, 댓글 활용 → 교사와의 소통 촉진"},
+    {"front": "[교수방법의 혁신] 블렌디드 러닝(혼합학습) — 기본개념 & 유용성 3", "importance": "normal", "back": "### 기본개념\n- 온라인 + 오프라인 수업 결합 (해 장점만 취한 학습 방법)\n### 유용성 3\n1) 시공간적 제약에서 벗어남 (→ 학습 기회 확대)\n2) 학습효과 극대화\n3) 수업 결손 감소 (오프라인 수업 어려우면 온라인 수업 참여시킴)"},
+    {"front": "[교수방법의 혁신] 플립드 러닝(거꾸로 수업) — 기본개념 & 유용성 3", "importance": "normal", "back": "### 기본개념\n- 사전 온라인 수업(강의) → 오프라인 수업(교실에서 과제 활동)\n### 유용성 3\n1) 오프라인에서 학습자 중심의 수업 가능\n2) 학습 효율성 증진 (수업에서 교사가 학생 심화수업 도울 수 있음)\n3) 학습에 대한 자신감 고취 (미리 배운 거 다시 다루니까)"},
+    {"front": "[교수방법의 혁신] 플립드 러닝 — 설계 시 고려사항 4 (FLIP) & 어려운 점 3", "importance": "normal", "back": "### 설계 시 고려사항 4 (FLIP)\n1) F 유연한 환경\n2) L 학습 문화의 변화 (교사 중심 X → 학생 중심 학습 문화 O)\n3) I 의도된 내용 (수업 & 과제들 미리 계획)\n4) P 전문성을 갖춘 교사\n### 어려운 점 3\n1) 사전 강의 수강 관리 어려움 (학습자가 안 들으면 말짱 꽝)\n2) 사전 강의 수강이 안 된 경우 오프라인 수업 어려움\n3) 학습자 입장에선 학습량 부담"},
+    {"front": "[교수방법의 혁신] 디지털 리터러시 — 기본개념 & 향상시켜주는 방법 3", "importance": "normal", "back": "### 기본개념\n- 디지털 기기를 통해 얻은 정보의 활용 능력\n### 향상시켜주는 방법 3\n1) 수업 중 디지털 기기를 활용해 문제해결 자료 조사 진행\n2) 디지털 자료 비판적 해석 활동 진행\n3) 디지털 기기 창작물 제작 활동 진행"},
+    {"front": "[교수방법의 혁신] 모바일 러닝(M-learning) — 기본개념 & 장점 2", "importance": "normal", "back": "### 기본개념\n- 모바일 기기를 활용한 수업\n### 장점 2\n1) 학습자의 개별학습 가능\n2) 시공간 제약 없이 학습 가능"},
+    {"front": "[교수방법의 혁신] 게이미피케이션 — 기본개념 & 게임의 요소 6", "importance": "normal", "back": "### 기본개념\n- 게임의 요소를 적용하여 흥미/몰입도를 증진시킨 학습 방법\n### 게임의 요소 6\n1) 목표 2) 규칙 3) 피드백 4) 보상 5) 레벨 6) 이야기"},
+    {"front": "[교수방법의 혁신] 게이미피케이션 — 장점 2 & 단점 1", "importance": "normal", "back": "### 장점 2\n1) 학습자의 동기 증진 가능\n2) 자연스럽게 학습 유도\n### 단점 1\n1) 경쟁에만 초점을 둘 위험 (불필요한 에너지 소모)"},
+    {"front": "[교수방법의 혁신] 인공지능 활용 교육 — 교육적 활용 방법 2", "importance": "normal", "back": "1) 개인 맞춤형 학습 (맞춤형 피드백, 맞춤형 문제 제공)\n2) 챗봇 활용 수업"},
+    {"front": "[교수방법의 혁신] SNS 활용 수업 — 교육적 활용 방법 (유튜브 3 & 트위터 3)", "importance": "normal", "back": "### 유튜브 3\n1) 동기유발 영상 공유\n2) 과제를 영상으로 제작해 업로드\n3) 관점 다른 영상들 비교 활동\n### 트위터 3\n1) 공지사항 공유\n2) 전문가 팔로잉 (전문가로부터 정보 공유 가능)\n3) 질의응답"},
+    {"front": "[교수방법의 혁신] SNS 활용 수업 — 문제점 2 & 올바른 활용 방안 2", "importance": "normal", "back": "### 문제점 2\n1) 비교육적 자료에 노출될 위험\n2) 저작권 침해 발생 가능\n### 올바른 활용 방안 2\n1) SNS 이용 방법에 대한 사전 교육 실시\n2) 저작권 윤리 교육 실시"},
+    {"front": "[교수방법의 혁신] 메타버스 — 기본개념 & 교육적 활용 방법 2", "importance": "normal", "back": "### 기본개념\n- 온라인 공간에서의 가상 세계\n### 교육적 활용 방법 2\n1) (메타버스 공간에서의 활동으로) 학습자 동기 유발\n2) 학습자 중심 학습 환경으로 활용 가능"},
+    {"front": "[교수방법의 혁신] 메타버스 — 교육적 효과 2 & 문제점 3", "importance": "normal", "back": "### 교육적 효과 2\n1) 몰입감, 흥미 증진\n2) (메타버스 간접 체험 통해) 풍부하고 실제적인 교육 제공\n### 문제점 3\n1) 익명성, 윤리적 문제 발생 가능\n2) 스마트기기 활용 능력 미숙한 학생은 참여 어려움\n3) (가상 공간 속) 학생 통제 어려움"}
+  ],
+
+// ===================== 교육평가 (95장) =====================
+  "교육평가": [
+    {"front": "[교육평가 이해] 교육평가의 기본가정 4", "importance": "normal", "back": "1) 인간은 무한한 잠재 능력을 가짐 (인간은 발달하는 존재)\n2) 교육평가는 계속적이어야 함 (일회성 X)\n3) 교육평가는 종합적이어야 함 (한 가지 자료로 X)\n4) 평가는 교육활동에 도움을 주어야 함 (평가 자체가 목적 X)"},
+    {"front": "[교육평가 이해] 교육평가 목적과 기능 3", "importance": "normal", "back": "1) 학생의 교육적 성취 확인\n2) 학업 곤란점 진단 및 치료(에 활용)\n3) 교육적 개선 (학생 상태 파악 → 교육과정/교수과정에 반영 개선)"},
+    {"front": "[교육평가 이해] 교육평가의 어려움 2", "importance": "normal", "back": "1) 효과적인 평가 방법이 확실치 않음\n2) 피험자의 직접적 평가가 어려움 (피험자가 대충 평가에 임하면 정확도 ↓)"},
+    {"front": "[교육평가 이해] 검사관 (평가에 대한 관점) 3", "importance": "normal", "back": "1) 측정관\n2) 평가관\n3) 총평관"},
+    {"front": "[교육평가 이해] 검사관 — ① 측정관 특징 4", "importance": "normal", "back": "### 평가목적\n- 학습자에게 점수(수치) 부여하기 위함\n### 특징 4\n1) 인간의 행동 특성은 변하지 않음을 가정 (애초에 똑똑한 사람 찾기)\n2) 중시 양호도 - 신뢰도, 객관도\n3) 관련 교육관 - 선발적 교육관\n4) 연관된 평가유형 - 규준지향평가"},
+    {"front": "[교육평가 이해] 검사관 — ② 평가관 특징 4", "importance": "normal", "back": "### 평가목적\n- 학습자의 학습 목표 달성 정도 파악\n### 특징 4\n1) 인간의 행동 특성은 변할 수 있음을 가정\n2) 중시 양호도 - 내용 타당도\n3) 관련 교육관 - 발달적 교육관\n4) 연관된 평가유형 - 준거지향평가"},
+    {"front": "[교육평가 이해] 검사관 — ③ 총평관 특징 4", "importance": "normal", "back": "### 평가목적\n- 전인적 평가 (인간 특성을 다양한 방법 동원해 종합적 평가)\n### 특징 4\n1) 인간의 행동 특성은 환경과의 상호작용을 통해 변함을 가정\n2) 중시 양호도 - 구인 타당도, 예언 타당도\n3) 관련 교육관 - 인본주의적 교육관\n4) 연관된 평가유형 - 다양한 평가 방법의 종합적 활용"},
+    {"front": "[교육평가 이해] 교육관 (교육에 대한 관점) 종류 3", "importance": "normal", "back": "1) 선발적 교육관\n2) 발달적 교육관\n3) 인본주의적 교육관"},
+    {"front": "[교육평가 이해] 교육관 — ① 선발적 교육관", "importance": "normal", "back": "### 교육목적\n- 우수한 소수 학생을 선발하는 것\n### 평가목적\n- 개인차 변별\n### 특징 3\n1) 학업 실패의 책임은 학생에게 있음\n2) 관련 검사관 - 측정관\n3) 관련 평가 유형 - 규준지향평가"},
+    {"front": "[교육평가 이해] 교육관 — ② 발달적 교육관", "importance": "normal", "back": "### 교육목적\n- 학생의 개인차 극복 → 학습 목표 도달시키는 것\n### 평가목적\n- 수업 목표 달성 & 완전 학습\n### 특징 3\n1) 학업 실패의 책임은 교사에게 있음\n2) 관련 검사관 - 평가관\n3) 관련 평가 유형 - 준거지향평가"},
+    {"front": "[교육평가 이해] 교육관 — ③ 인본주의적 교육관", "importance": "normal", "back": "### 교육목적\n- (인간은 환경과 능동적 상호작용 하는 존재임) 교육 통한 자아실현 도움\n### 평가목적\n- 학생의 전체적 특성 이해\n### 특징 3\n1) 학업 실패의 책임은 학습자와 교사 모두에게 있음\n2) 관련 검사관 - 총평관\n3) 관련 평가 유형 - 수행평가"},
+    {"front": "[양호도] 타당도 — 기본개념 & 종류 5", "importance": "very_high", "back": "### 타당도란\n- 측정 도구가 본래 측정하려던 것을 얼마나 충실히 측정하는가\n### 종류 5\n1) 내용타당도\n2) 준거타당도\n3) 구인타당도\n4) 결과타당도\n5) 안면타당도"},
+    {"front": "[양호도] 타당도 — ① 내용타당도 (개념 & 증진방법 3 & 이원목적분류표)", "importance": "very_high", "back": "### 개념\n- 검사 도구가 측정하고자 하는 내용을 얼마나 잘 대표하고 있는가의 정도 (교육 목표(내용+행동)를 얼마나 잘 측정하는가)\n### 증진방법 3\n1) (검사 내용을) 전문가에게 묻고 수정\n2) 이원목적분류표에 근거하여 제작\n3) 전체 내용을 골고루 표집, 표집타당도 높이기\n### 이원목적분류표란\n- 학습할 내용을 내용 영역(무엇) + 행동 영역(어떻게)으로 도식화해 학습 목표를 분류한 표"},
+    {"front": "[양호도] 타당도 — ② 준거타당도 (개념 & 종류 2)", "importance": "very_high", "back": "### 개념\n- 특정 준거를 기준으로 검사 도구의 타당성 평가\n### 종류 2\n1) 공인타당도 - 이미 타당도를 입증받은 검사 도구와의 상관으로 판단\n2) 예언타당도 - (검사 도구 점수가) 미래 행동 특성을 잘 예측하는지 정도로 판단"},
+    {"front": "[양호도] 타당도 — ③ 구인타당도 (개념 & 구인이란)", "importance": "very_high", "back": "### 개념\n- 심리적 특성(구인)을 관찰 가능한 요소들로 정의하고, 검사 도구가 해당 요소들을 얼마나 잘 측정하는가로 판단\n### 구인이란\n- 직접 측정하거나 관찰하는 것이 불가능한 개인의 인지/심리적 특성"},
+    {"front": "[양호도] 타당도 — ④ 결과타당도 & ⑤ 안면타당도 (개념)", "importance": "very_high", "back": "### ④ 결과타당도\n- 평가 결과가 의도한 목적을 얼마나 충실히 달성했는지로 가치판단\n### ⑤ 안면타당도\n- 친숙하거나 타당하다고 느끼는 정도로 판단 (주관적 척도. 겉보기(안면상)로 봤을 때 그 평가도구가 타당해 보이느냐)"},
+    {"front": "[양호도] 신뢰도 — 기본개념 & 추정 방법(2회 검사방식) 2", "importance": "very_high", "back": "### 신뢰도란\n- 반복 측정 시, 결과가 일관성 있게 나오는 정도\n### 추정 방법 – 2회 검사방식 2\n1) 재검사 신뢰도\n2) 동형검사 신뢰도"},
+    {"front": "[양호도] 신뢰도 — ① 재검사 신뢰도 (개념 & 장점 2 & 단점 2)", "importance": "very_high", "back": "### 개념\n- 하나의 검사 도구로 (시간적 간격 두고) 두 번 측정\n### 장점 2\n1) 신뢰도 추정 방법 간단\n2) 문항의 차이로 인한 신뢰도 추정 오차 방지 (동일 문항이니까)\n### 단점 2\n1) 검사를 두 번 실시해야 함\n2) 실시 간격에 따라 신뢰도가 상이함 (기억효과/연습효과가 영향)"},
+    {"front": "[양호도] 신뢰도 — ② 동형검사 신뢰도 (개념 & 장점 2 & 단점 2)", "importance": "very_high", "back": "### 개념\n- (문항수/내용/난이도) 비슷한 두 개의 검사지로 검사를 실시해 일관성 측정\n### 장점 2\n1) (실시 간격 고려 없이) 신뢰도 빠르게 추정 가능\n2) 기억 효과, 연습 효과로 인한 신뢰도 추정 오차 방지 (다른 문항이니까)\n### 단점 2\n1) 검사를 두 번 실시해야 함\n2) 동형 검사 제작의 어려움"},
+    {"front": "[양호도] 신뢰도 — ③ 반분검사 신뢰도 (개념 & 반분방법 3 & 장점 1 & 단점 2)", "importance": "very_high", "back": "### 개념\n- 하나의 검사를 두 부분으로 나누어 두 결과의 상관 비교 (1회 검사방식)\n### 반분방법 3\n1) 기우 반분법: 홀수/짝수 문항으로\n2) 전후 반분법: 앞부분/뒷부분\n3) 문항 특성에 따른 반분법\n### 장점 1 / 단점 2\n장점) 검사를 한 번만 실시해도 됨\n단점) 반분 방법에 따라 신뢰도 상이 / 문항 수 적을수록 신뢰도 부정확"},
+    {"front": "[양호도] 신뢰도 — ④ 문항 내적 합치도 (개념 & 장점 2 & 단점 1)", "importance": "very_high", "back": "### 개념\n- 문항 하나하나를 하나의 검사로 생각 & 문항 간 유사성 추정 (1회 검사방식)\n### 장점 2\n1) 검사를 한 번만 실시해도 됨 (시간/비용 효율적)\n2) 반분 방법의 영향을 받지 않아 오차 적음\n### 단점 1\n1) 동일한 능력을 측정하는 문항 개발 어려움"},
+    {"front": "[양호도] 신뢰도 — 측정에 영향 주는 검사 요인 6 & 향상방법", "importance": "very_high", "back": "1) 문항 수 - 많을수록 신뢰도 ↑\n2) 난이도 - 적절할수록\n3) 변별도 - 높을수록\n4) 가능 점수 범위 - 나올 수 있는 점수 범위가 클수록\n5) 검사 내용의 범위 - 시험범위가 좁을수록\n6) 검사 시간 - 충분할수록"},
+    {"front": "[양호도] 신뢰도 — 영향 주는 집단 요인 3 & 상황 요인 1", "importance": "very_high", "back": "### 집단 요인 3\n1) 집단의 동질성 – 이질적 집단일수록 신뢰도 ↑\n2) 검사 요령 - 모든 학생이 검사 요령을 잘 알수록\n3) 동기 유발 - 모든 학생의 동기가 일정 수준 이상일수록\n### 상황 요인 1\n1) 시험 상황 - 부정행위가 없을수록 신뢰도 ↑"},
+    {"front": "[양호도] 신뢰도와 타당도의 관계", "importance": "very_high", "back": "- 신뢰도 ⊃ 타당도\n (신뢰도는 타당도의 선행 조건임)"},
+    {"front": "[양호도] 객관도 — 기본개념 & 종류 2 & 평정의 오류란", "importance": "high", "back": "### 기본개념\n- 채점자가 채점을 얼마나 일관성 있게 하였는가의 정도\n### 종류 2\n1) 채점자 내 신뢰도 (동일 채점자가 모든 대상에 꾸준히 일관성 있게 채점하는가)\n2) 채점자 간 신뢰도 (여러 채점자가 동일 대상에 유사하게 채점하는가)\n### 평정의 오류란\n- 평가 시 생기는 왜곡이나 편향 (평가자 주관 개입)"},
+    {"front": "[양호도] 객관도 — 평정의 오류 종류 10", "importance": "high", "back": "1) 집중경향의 오류 (채점 결과가 중간에 몰림)\n2) 인상의 오류 (배경 정보가 채점에 영향)\n3) 논리적 오류 (명확히 평정 속성을 규정 못한 경우)\n4) 표준의 오류 (채점자 간 평정 기준이 다른 경우)\n5) 근접의 오류 (이전 평정이 이후 평정에 영향)\n6) 관용의 오류 (전반적으로 높은 점수)\n7) 엄격의 오류 (전반적으로 낮은 점수)\n8) 대비의 오류 (채점자 스스로에게 없는 특성 높이 평가)\n9) 의도적 오류 (의도적 평가 조작)\n10) 무관심의 오류 (무관심/관찰부족)"},
+    {"front": "[양호도] 객관도 — 평정의 오류 원인 2 & 해결책 4", "importance": "high", "back": "### 원인 2\n1) 측정 도구 자체의 문제 (문제 자체가 객관적 채점 어려우면)\n2) 평가자의 소양 문제\n### 해결책 4\n[측정 도구 문제] 1) 루브릭 활용 2) 여러 명이 공동 채점 & 종합\n[평가자 소양 문제] 3) 채점자 사전 교육 실시 4) 최고/최저 점수 반영하지 않음"},
+    {"front": "[양호도] 실용도 — 기본개념 & 조건 2", "importance": "normal", "back": "### 기본개념\n- 평가 도구의 유용성과 경제성을 평가\n (*실용도 너무 강조 시 타당도 낮아질 수 있음)\n### 조건 2\n1) 비용, 시간, 노력이 절약되어야 함\n2) 한 번의 검사 결과를 다양하게 활용해야 함"},
+    {"front": "[평가모형] 타일러 목표중심 평가모형 — 기본개념 & 사전 목표 계획 방법", "importance": "very_high", "back": "### 기본개념\n- 사전 계획한 교육 목표가 수업 종료 후 얼마나 달성되었는지로 → 해당 프로그램을 평가하는 모형\n### 사전 목표 계획 및 평가 방법\n- 이원 목적 분류표 활용 (구체적으로 교육목표를 세워놔야 교육성과 평가가 됨)"},
+    {"front": "[평가모형] 타일러 목표중심 평가모형 — 평가 절차 7", "importance": "very_high", "back": "1) 교육목표 설정\n2) 교육목표 분류\n3) 교육목표 행동 용어로 진술\n4) 평가 장면 설정\n5) (평가 장면에서 사용할) 평가 방법 및 도구 선정\n6) 평가 시작 및 결과 수집\n7) 평가 결과 해석"},
+    {"front": "[평가모형] 타일러 목표중심 평가모형 — 장점 3 & 단점 3", "importance": "very_high", "back": "### 장점 3\n1) 목표-내용-평가 간 논리적 일관성 유지 가능\n2) 정확한 평가기준 적용 가능 (교육목표가 구체적임)\n3) 절차에 따라 적용이 쉽다 (절차가 명확)\n### 단점 3\n1) 행동 용어로 진술 힘든 목표는 평가 어려움\n2) 잠재적 효과는 평가 어려움 (목표로 진술한 것만 평가 가능)\n3) 교육과정 자체 소홀히 할 수 있음 (결과에만 초점)"},
+    {"front": "[평가모형] 프로버스 괴리모형(격차모형, 불일치모형) — 기본개념 & 특징 2 & 제한점 2", "importance": "normal", "back": "### 기본개념\n- 프로그램(수업) 목표와 실제 수행의 격차를 확인해 프로그램을 평가하는 모형 (→ 이후 프로그램 개선에 활용)\n### 특징 2\n1) 프로그램 목표와 실제 수행 사이의 격차 확인을 강조\n2) 프로그램 개선에 직접적으로 기여 가능\n### 제한점 2\n1) 시간과 비용 많이 소요 (괴리수준 파악 위해 전문가 필요)\n2) 잠재적 효과는 평가 어려움"},
+    {"front": "[평가모형] 스크리븐 탈목표평가모형 — 기본개념 & 평가 방법(특징) 5", "importance": "very_high", "back": "### 기본개념\n- (프로그램이 의도한 효과뿐 아니라) 수업의 부수적 효과까지 포함해 → 프로그램을 평가하는 모형\n### 평가 방법(특징) 5\n1) 탈목표 평가 - 의도 안 한 부수적 효과까지 평가\n2) 비교평가 - 여러 수업 비교 판단\n3) 외재적 준거에 의한 평가 - 수업의 결과, 이후 영향까지 평가\n4) 목표 자체(질과 가치)까지 평가\n5) 형성평가와 총괄평가 구별(해 둘 다 평가)"},
+    {"front": "[평가모형] 스크리븐 탈목표평가모형 — 장점 3 & 단점 2", "importance": "very_high", "back": "### 장점 3\n1) 교육의 실제적 효과 평가 가능 (부수적 효과까지 평가하니)\n2) 가치 있고 타당한 목표 설정에 기여 (목표 자체 가치판단 강조)\n3) 사전에 설정된 목표가 없어도 평가 가능\n### 단점 2\n1) 5가지 평가 방법의 결과를 다 같게 생각하는 문제 발생 가능\n2) 판단의 타당성 평가 불가 (타당성 판단 방법 제시 X)"},
+    {"front": "[평가모형] 아이즈너 예술적 비평모형 — 기본개념 & 평가 관점 2", "importance": "high", "back": "### 기본개념\n- 예술 분야의 전문가가 사용하는 방법과 절차를 적용해 → 프로그램을 평가하는 모형 (프로그램 효과를 수업 전문가가 직관적으로 평가)\n### 평가 관점 2\n1) 교육적 감식안 - (표면적으로 안 보이는) 평가 대상의 미묘한 차이를 주관적으로 판단하는 능력\n2) 교육 비평 - 주관적 평가를 이해하기 쉬운 글로 표현하는 능력"},
+    {"front": "[평가모형] 아이즈너 예술적 비평모형 — 장점 2 & 한계 2", "importance": "high", "back": "### 장점 2\n1) 전문가의 자질과 통찰력을 평가에 충분히 활용\n2) 일반인이 간과할 수 있는 교육의 효과를 인식 가능\n### 한계 2\n1) 평가자 자신이 오차 요인 될 수 있음 (주관적)\n2) 구체적 평가 지침 제시 X"},
+    {"front": "[평가모형] 스터플빔 CIPP 평가모형 — 기본개념 & 평가절차(유형) 4", "importance": "very_high", "back": "### 기본개념\n- 평가는 프로그램 개선 의사결정을 돕기 위한 정보를 제공하기 위함임\n### 평가절차(유형) 4\n1) C 상황 평가\n2) I 투입 평가\n3) P 과정 평가\n4) P 산출 평가"},
+    {"front": "[평가모형] CIPP — ① C 상황 평가 (의사결정 단계 & 활동 2)", "importance": "very_high", "back": "### 의사결정 단계\n- 계획 단계 (프로그램 목표 설정하는 의사결정)\n### 활동 2\n1) 프로그램 목표 설정에 도움되는 자료 (학생 요구, 수업 환경 등) 수집 제공\n2) 방법: 체계 분석, 문헌연구, 진단 검사"},
+    {"front": "[평가모형] CIPP — ② I 투입 평가 (의사결정 단계 & 활동 2)", "importance": "very_high", "back": "### 의사결정 단계\n- 구조화 단계 (프로그램 목표 달성 위한 전략/절차 설계하는 의사결정)\n### 활동 2\n1) 목표 달성을 위해 투입될 자원 자료 (전략/절차/예산/인적자원 등) 수집 제공\n2) 방법: 관련 문헌 및 기사 검토, 모범 프로그램 조사"},
+    {"front": "[평가모형] CIPP — ③ P 과정 평가 (의사결정 단계 & 활동 2)", "importance": "very_high", "back": "### 의사결정 단계\n- 실행 단계 (수립된 전략/절차를 실행하는 의사결정)\n### 활동 2\n1) 수업이 계획대로 실행되고 있는지 정보 수집 및 피드백 제공\n2) 방법: 수업 참관, 설문 조사"},
+    {"front": "[평가모형] CIPP — ④ P 산출 평가 (의사결정 단계 & 활동 2)", "importance": "very_high", "back": "### 의사결정 단계\n- 재순환 단계 (목표 달성 수준 판단 & 프로그램 존속/변경 의사결정)\n### 활동 2\n1) 프로그램 가치판단(재사용 여부)에 도움될 자료 제공\n2) 방법: 사전 목표와 성과 비교, 유사 프로그램과 성과 비교"},
+    {"front": "[평가모형] CIPP 평가모형 — 장점 2 & 단점 2", "importance": "very_high", "back": "### 장점 2\n1) 평가가 프로그램 개선에 직접 기여 가능\n2) 의사결정과 평가 간에 체계적 접근 가능 (각 단계별 의사결정-평가 짝지어둠)\n### 단점 2\n1) 평가자의 역할 경시될 수 있음 (평가자는 그저 자료 수집 & 제공 역할)\n2) 비용이 많이 듦"},
+    {"front": "[평가유형] 준거참조평가(절대평가) — 기본개념 & 준거 설정 방법 3", "importance": "very_high", "back": "### 기본개념\n- 절대적 기준인 '준거'에 비추어 목표 달성 정도를 평가하는 방법\n### 준거 설정 방법 3\n1) 앙고프 방법 (문항마다 기대정답률을 설정해 → 최종 준거 설정)\n2) 제이거 방법 (최소능력 보유 피험자가 맞힌 문항 수로 → 최종 준거 설정)\n3) 북마크 방법 (최소능력 보유 피험자가 맞힐 수 있는 난이도로 → 최종 준거 설정)"},
+    {"front": "[평가유형] 준거참조평가 — 특징 5", "importance": "very_high", "back": "1) 평가 목적 - (학생의 성취 수준 확인 →) 교수학습 개선\n2) 중시 양호도 - 검사의 타당도\n3) 교육관 - 발달적 교육관 (누구나 학습 목표 도달 가능을 전제)\n4) 평가 활용 방향 - 개인차를 줄이고자 노력\n5) 기대 분포 - 부적 편포 기대"},
+    {"front": "[평가유형] 준거참조평가 — 장점 3 & 단점 3 & 활용방안 3", "importance": "very_high", "back": "### 장점 3\n1) 교수학습 개선에 용이\n2) 협동 정신 (+ 내적 동기) 함양 가능\n3) 수업 목표 달성 정도 확인 가능\n### 단점 3\n1) 개인차 변별 어려움 2) 준거 설정 어려움 3) 외재적 동기유발 어려움\n### 활용방안 3\n1) 진단평가 2) 형성평가 3) 자격부여"},
+    {"front": "[평가유형] 규준참조평가(상대평가) — 기본개념 & 특징 5", "importance": "high", "back": "### 기본개념\n- '상대적 서열'에 따라 평가하는 방법\n### 특징 5\n1) 평가 목적 - 개인차 변별\n2) 중시 양호도 - 검사의 신뢰도\n3) 교육관 - 선발적 교육관 (우수한 학생 선발)\n4) 평가 활용 방향 - 개인차가 클수록 성공적인 평가\n5) 기대 분포 - 정규 분포 기대"},
+    {"front": "[평가유형] 규준참조평가 — 장점 3 & 단점 3 & 활용방안 2", "importance": "high", "back": "### 장점 3\n1) 개인차 변별에 용이\n2) 객관적 평가 가능 (교사 주관적으로 준거 설정 X)\n3) 외재적 동기유발에 효과적\n### 단점 3\n1) 협동심 상실, 내재적 동기 저하 2) 목표 달성 여부 확인 어려움 3) 낮은 성적 학생 반드시 존재\n### 활용방안 2\n1) 선발 2) 분류 (등급 분류)"},
+    {"front": "[평가유형] 자기참조평가 — 기본개념 & 종류 3", "importance": "very_high", "back": "### 기본개념\n- 평가의 기준을 '개인'에게 두는 평가 방법 (평가기준이 개인마다 다름)\n### 종류 3\n1) 성장지향평가\n2) 능력지향평가\n3) 노력지향평가"},
+    {"front": "[평가유형] 자기참조평가 — ① 성장지향평가 (개념 & 타당할 조건 2 & 한계 3)", "importance": "very_high", "back": "### 개념\n- 현재 성취도와 과거 성취도 간의 차이를 평가\n### 타당할 조건 2\n1) 사전/현재 측정 점수가 신뢰할 수 있어야 함\n2) 사전/현재 측정 점수 간의 본질적 상관이 낮아야 함\n### 한계 3\n1) 이미 높은 점수 받은 학생은 성장 평가 어려움\n2) 사전 검사에서 일부러 틀릴 가능성\n3) 공정성 문제"},
+    {"front": "[평가유형] 자기참조평가 — ② 능력지향평가 (개념 & 한계 3)", "importance": "very_high", "back": "### 개념\n- 능력에 비추어 얼마나 최선을 다하였는지 (능력 발휘했는지) 평가\n### 한계 3\n1) 능력 정확히 측정 어려움\n2) 능력에 대한 고정적 관점의 오류 (능력이 항상 고정된 건 아님)\n3) 공정성 문제 (시험 결과가 중요한 경우 사용 불가)"},
+    {"front": "[평가유형] 자기참조평가 — ③ 노력지향평가 (개념 & 한계 1 & 장점 3)", "importance": "very_high", "back": "### 개념\n- 학생이 기울인 노력의 정도를 기준으로 (열심히 노력했는지) 평가\n### 한계 1\n1) 성적의 의미 왜곡됨 (노력만으로 성취도를 나타낼 순 없음)\n### 장점 3\n1) 개별화 학습 촉진\n2) 평가의 교수적 기능 촉진 (학습 동기 유발 & 수행에 피드백 제공)\n3) 학습 동기 유발"},
+    {"front": "[평가유형] 진단평가 — 기본개념 & 평가 요소 3", "importance": "very_high", "back": "### 기본개념\n- 교수학습이 시작되기 전, 학습자의 능력 및 특성을 진단하기 위해 실시하는 평가\n### 평가 요소 3\n1) 지적 출발 행동 (선수학습 정도)\n2) 정의적 출발 행동 (동기/흥미/태도 등)\n3) 학습 외적 요인 (친구 관계/교수학습 방법 등)"},
+    {"front": "[평가유형] 진단평가 — 방법 5 & 목적 2 & 시행전략 2", "importance": "very_high", "back": "### 방법 5\n1) 이전 학년 성적표 2) 학생 생활 기록부 3) 시험 4) 설문조사 5) 관찰법\n### 목적 2\n1) 교수학습 효과 증진 위해 (선수학습 부족하면 미리 도와줌)\n2) 교수학습 효율 증진 위해 (학생 특성 맞춰 수업 전략)\n### 효과적 시행전략 2\n1) 준거지향평가 활용하기\n2) 다양한 평가도구로 학습 외적 요인도 파악하기"},
+    {"front": "[평가유형] 형성평가 — 기본개념 & 방법 3 & 목적 3", "importance": "very_high", "back": "### 기본개념\n- 수업 진행 도중 학습 내용에 대한 이해도를 점검하기 위해 실시하는 평가\n### 방법 3\n1) 관찰법 2) 퀴즈 3) 쪽지 시험\n### 목적 3\n1) 학습 곤란점 진단 위해\n2) 교수학습 개선에 활용 위해\n3) 피드백 제공해 학습 개선 위해"},
+    {"front": "[평가유형] 형성평가 — 효과적인 피드백 전략 3", "importance": "very_high", "back": "1) 수행한 과제에 대한 객관적 피드백 제공 (학생에 대한 개인적 의견 말고)\n2) 구체적 피드백 제공 (수정 용이하도록)\n3) 과제 수행 직후 제공"},
+    {"front": "[평가유형] 형성평가 — 문항 제작 시 고려사항 3", "importance": "very_high", "back": "1) 교사가 제작 (본인이 수업한 내용 관련 평가니까)\n2) 중요한 학습 요소 포함\n3) 최저 준거 난이도 문항 포함 (이해 확인용이니 너무 어려운 문항 필요 X)"},
+    {"front": "[평가유형] 총괄평가 — 기본개념 & 목적 3 & 특징 3", "importance": "normal", "back": "### 기본개념\n- 수업이 종료된 후, 목표 달성 여부를 종합적으로 판단하기 위해 실시하는 평가\n### 목적 3\n1) 서열 부여 2) 자격증 부여 3) 프로그램 재사용 여부 결정 (효과 분석)\n### 특징 3\n1) 평가 전문가가 제작한 평가 도구 사용해야 함\n2) 다음 교육을 위한 진단평가로 활용 가능\n3) 가르치고 배운 내용 모두 포함해야 함"},
+    {"front": "[평가유형] 양적 평가(정량평가) — 기본개념 & 장점 2 & 단점 2", "importance": "normal", "back": "### 기본개념\n- 수량화된 자료, 통계적 분석을 통한 평가\n### 장점 2\n1) 신뢰성 보장\n2) 객관성 확보\n### 단점 2\n1) 평가 대상의 전체적 측면 평가 불가\n2) 결과 중심의 평가 (학습 과정은 고려 안 함)"},
+    {"front": "[평가유형] 질적 평가(정성평가, 다면평가) — 기본개념 & 특징 2", "importance": "normal", "back": "### 기본개념\n- 수량화되지 않은 다양한 형태의 자료 분석 및 평가\n### 특징 2\n1) 전체적 관점으로 평가 (특정 요소만 보지 X)\n2) 귀납적 방법으로 평가 (개별 자료 종합해 결론냄)"},
+    {"front": "[평가유형] 질적 평가 — 장점 2 & 단점 2", "importance": "normal", "back": "### 장점 2\n1) 평가 대상을 전체적, 종합적으로 평가\n2) 학습의 과정도 중시\n### 단점 2\n1) 객관성 떨어짐 (평가자 주관 개입 가능)\n2) 평가 결과를 일반화하기 어려움"},
+    {"front": "[평가유형] 표준화 검사 — 기본개념 & 특징 2 & 기능 3", "importance": "normal", "back": "### 기본개념\n- 전문가가 제작한 도구로 평가 및 결과 해석\n### 특징 2\n1) 검사 도구가 전문가에 의해 제작됨\n2) 표준화된 조건 (제한된 시간/환경)에서 평가 실시\n### 기능 3\n1) 조사 기능 2) 예측 기능 3) 진단 기능"},
+    {"front": "[평가유형] 교사 제작 검사 — 기본개념 & 특징 2", "importance": "normal", "back": "### 기본개념\n- 교사가 (비공식/비표준으로) 제작한 도구로 평가\n### 특징 2\n1) 방식이 교사마다 다름\n2) (일반적 기준이 없으니) 검사의 질 판단이 어려움"},
+    {"front": "[수행평가] 수행평가 — 기본개념 & 특징 4", "importance": "very_high", "back": "### 기본개념\n- 실제 상황에서의 과제 수행 과정을 교사가 관찰하고 전문적으로 평가\n### 특징 4\n1) 주관적, 전문적 평가\n2) 실제 상황에서의 수행 능력을 평가\n3) 학습 결과뿐만 아니라 과정도 평가\n4) 종합적, 전인적 평가"},
+    {"front": "[수행평가] 수행평가 — 방법 7", "importance": "very_high", "back": "1) 서술형 및 논술형 평가\n2) 포트폴리오 평가\n3) 구술 평가\n4) 연구보고서법\n5) 실험·실습법\n6) 자기평가 및 동료평가 (평가보고서 작성)\n7) 관찰법"},
+    {"front": "[수행평가] 수행평가 — 조건 및 고려사항 3", "importance": "very_high", "back": "1) 실제적 과제 활용\n2) 다양한 학습성과를 평가해야 함 (수행평가 한 번에 시간/노력 많이 들어감)\n3) 채점 준거(루브릭)를 명시해야 함 (주관적 채점하므로 공정성/신뢰성 증진)"},
+    {"front": "[수행평가] 루브릭이란 & 장점 3", "importance": "very_high", "back": "### 루브릭이란\n- 평가 요소와 평가 기준이 제시된 채점 기준표\n### 장점 3\n1) 신뢰도와 객관도 향상\n2) 자기조절 학습 태도 증진 (채점 기준 맞춰 학습 방법 조절 가능)\n3) 학생의 현재 상태 진단에 용이 (채점 기준 세분화되어 부족 부분 파악 가능)"},
+    {"front": "[수행평가] 수행평가 — 장점 3 & 단점 3", "importance": "very_high", "back": "### 장점 3\n1) 전인적 평가 가능\n2) 결과뿐만 아니라 과정도 평가 가능\n3) 자기주도적 학습 능력 신장 (수행 과정과 결과 스스로 평가하며 학습 개선)\n### 단점 3\n1) 많은 시간과 노력 소요\n2) (결과 + 과정 함께 평가) 채점자 입장에서 평가 까다로움\n3) 평가 결과의 신뢰도 낮음"},
+    {"front": "[수행평가] 포트폴리오 평가 — 개념 & 평가 방법 2", "importance": "very_high", "back": "### 개념\n- 지속(체계)적으로 모아 둔 개인별 작품집을 통한 평가\n### 평가 방법 2\n1) 분석적 평가 방법 (작품집 속 여러 특성 나눠 점수 매겨 합산)\n2) 총체적 평가 방법 (포트폴리오를 전체로 이해 & 단일 점수 부과)"},
+    {"front": "[수행평가] 포트폴리오 평가 — 유의점 3 & 장점 3", "importance": "very_high", "back": "### 유의점 3\n1) 포트폴리오가 자신의 '작품'임을 확인시켜야 함 (의미 있게 제작하도록)\n2) 다양한 작품을 포함해야 함\n3) 학생이 본인 포트폴리오를 지속적으로 평가하도록 권장 (점차 보완해가게)\n### 장점 3\n1) 성장 과정 파악 가능\n2) 학생 스스로 장점과 약점 파악 가능\n3) 수업과 평가가 연계됨"},
+    {"front": "[기타 평가] 정적 평가 — 학자 & 개념 & 평가 방법 & 교수학습과의 관계", "importance": "normal", "back": "### 학자\n- 피아제\n### 개념\n- 피드백 없이 학생 혼자서 검사 항목 풂 → 완성된 발달 정도를 평가 받음\n### 평가 방법\n- 획일적/표준화된 상황에서 평가 수행\n### 교수학습 활동과 평가의 관계\n- 교수학습-평가를 분리해서 평가"},
+    {"front": "[기타 평가] 역동적 평가 — 학자 & 개념 & 평가 방법 2 & 교수학습과의 관계", "importance": "normal", "back": "### 학자\n- 비고츠키\n### 개념\n- 평가자와 학생 간의 역동적 상호작용을 통해 → 학생의 잠재능력 평가 & 학습 유발하는 평가\n### 평가 방법 2\n1) 표준적 접근 - (문제해결 못할 때) 계획된 힌트의 순차적 제시\n2) 임상적 접근 - (문제해결 못할 때) 계획하지 않고 상황에 맞춰 힌트 제공\n### 교수학습과의 관계\n- 교수학습-평가를 통합한 통합적 평가"},
+    {"front": "[기타 평가] 정의적 특성의 평가 — 기본개념 & 필요성 2 & 평가 방법 5", "importance": "high", "back": "### 기본개념\n- (태도/학습 동기/대인관계/자아개념/자기효능감/성격 등) 정의적 특성 평가\n### 필요성 2\n1) 교수학습 효과 극대화에 도움 (정의적 특성을 수업 계획에 반영)\n2) 전인교육 실현 (인지적 + 정의적 특성 함께 평가)\n### 평가 방법 5\n1) 관찰법 2) 질문지법 3) 투사법 4) 면접법 5) 사회성 측정법"},
+    {"front": "[기타 평가] 정의적 특성 — ① 관찰법 (유의점 2 & 유형 2 & 기록방법 3)", "importance": "high", "back": "### 유의점 2\n1) 객관적 태도로 관찰 (주관적 생각 배제)\n2) 상세히 기록\n### 유형 2\n1) 전기적 관찰 (오랜 시간 관찰한 내용으로 평가)\n2) 자연적 관찰 (계획 없이 우연히 관찰한 내용으로 평가)\n### 기록방법 3\n1) 일화기록법 2) 평정척도법 3) 체크리스트법"},
+    {"front": "[기타 평가] 정의적 특성 — ② 질문지법 (장점 1 & 단점 1 & 유형 4)", "importance": "high", "back": "### 장점 1\n1) 많은 사람 대상으로 단시간에 실시 가능\n### 단점 1\n1) 응답 내용의 진위 확인이 어려움\n### 유형 4\n1) 선택법 (선택지 제공)\n2) 자유반응법 (주관식)\n3) 평정척도법 (①리커트척도 / ②의미변별척도)\n4) 체크리스트법"},
+    {"front": "[기타 평가] 정의적 특성 — ③ 투사법 (장점 1 & 단점 1 & 유형 3)", "importance": "high", "back": "### 장점 1\n1) 반응이 다양해 → 개인을 이해하는 데 유용함\n### 단점 1\n1) 타 검사에 비해 객관적이지 못함 (신뢰도/타당도 낮음)\n### 유형 3\n1) 주제통각검사(TAT)\n2) 로르샤흐 잉크반점검사\n3) 문장완성검사"},
+    {"front": "[기타 평가] 정의적 특성 — ④ 면접법 & ⑤ 사회성 측정법", "importance": "high", "back": "### ④ 면접법\n장점) (응답이 애매할 땐) 추가질문으로 오류 줄일 수 있음\n단점) 검사 비용 (면접관, 면접 시간 등) 많이 발생\n### ⑤ 사회성 측정법 (교육적 가치 2)\n1) 집단 재조직에 도움 (자리배치/반편성 등)\n2) 집단 따돌림 문제 파악 & 해결 가능"},
+    {"front": "[기타 평가] 창의·인성 교육을 위한 평가 — 기본개념 & 평가 방안 2", "importance": "normal", "back": "### 기본개념\n- 평가 수행 과정에서 학생의 창의성과 인성이 개발되어야 함\n### 평가 방안 2\n1) 수행평가 내실화 (비구조적인 과제 제공으로 창의성 신장)\n2) 실생활과 연계한 평가 (실생활 문제 해결하며 창의성 & 사회적 능력 신장)"},
+    {"front": "[기타 평가] 메타 평가 — 기본개념 & 유형 3 & 기능/장점 2", "importance": "high", "back": "### 기본개념\n- 평가에 대한 평가 (평가의 질적 수준 향상 목적으로 실시)\n### 유형 3\n1) 진단적 메타평가 (평가 실시 전)\n2) 형성적 메타평가 (평가 실시 중)\n3) 총괄적 메타평가 (평가 종료 후)\n### 기능/장점 2\n1) 평가의 적합성 평가 (평가 과정 불평등/윤리문제 없는지 판단)\n2) 평가의 정확성 평가 (평가 문항 내 오류 없는지)"},
+    {"front": "[기타 평가] 컴퓨터화 평가 — 기본개념 & 종류 2", "importance": "normal", "back": "### 기본개념\n- 컴퓨터를 평가에 활용하는 것\n### 종류 2\n1) 컴퓨터 이용검사 CBT\n2) 컴퓨터 능력 적응 검사 CAT"},
+    {"front": "[기타 평가] 컴퓨터 이용검사(CBT) — 기본개념 & 장점 2 & 한계점 2", "importance": "normal", "back": "### 기본개념\n- 컴퓨터를 이용해 실시하는 지필검사\n### 장점 2\n1) (채점/분석 자동화) 인력과 시간 절약 가능\n2) 다양한 형태로 문항 제시 → 피험자 다양한 능력 평가 가능\n### 한계점 2\n1) 컴퓨터 조작 능력이 검사 결과에 영향\n2) 교과에 따라 적합하지 않을 수도 있음 (수학/국어 등)"},
+    {"front": "[기타 평가] 컴퓨터 능력 적응 검사(CAT) — 기본개념 & 장점 3 & 한계점 3", "importance": "normal", "back": "### 기본개념\n- 학생 개개인의 능력 수준에 따라 문항 구성을 달리해 평가 (응답 따라 문항 난이도 달라지며, 응시자마다 다 다른 문제 풂)\n### 장점 3\n1) 학생의 실력 정확히 측정 가능\n2) 부정행위 방지 (다 다른 문항)\n3) 개별화 교육에 기여\n### 한계점 3\n1) 컴퓨터 조작 능력이 영향\n2) CAT 시스템 구축 비용이 큼\n3) 비전공자가 활용하기 어려움 (수학/통계 원리 필요)"},
+    {"front": "[성취평가제] 성취평가제 — 기본개념 & 성취기준이란 & 성취수준이란", "importance": "very_high", "back": "### 기본개념\n- 교과목별 성취기준과 성취수준에 따라 학생 학업성취수준을 평가하는 준거지향평가\n### 성취기준이란\n- 교과별로 성취해야 할 지식/기능/태도를 명시한 것 (주로 국가 수준에서 제공한 것 기준)\n### 성취수준이란\n- 성취기준을 지식/기능/태도에 따라 몇 개의 수준으로 구분한 것 (주로 A-B-C-D-E)"},
+    {"front": "[성취평가제] 성취평가제 — 특징 2 & 도입으로 인한 변화 3", "importance": "very_high", "back": "### 특징 2\n1) 미리 선정된 성취기준에 따라 평가하고 해석\n2) 학생의 수준을 단계별로 파악 가능\n### 도입으로 인한 변화 3\n1) 성적 기재 방식의 변화 (원래 석차등급만 → 이제 ABCDE 함께 표기)\n2) 수업의 변화 (성취기준 도달하게끔 수업 내용 구성)\n3) 교과 협의회의 활성화 (학기별 평가 성취기준/성취수준 논의 필요)"},
+    {"front": "[평가문항] 평가문항의 제작 — 유형 구분기준 2 & 구분", "importance": "normal", "back": "### 유형 구분기준 2\n1) 채점 방식에 따른 구분 (채점 시 주관 개입 되는가)\n2) 학생 반응 양식에 따른 구분 (학생에게 무엇을 제시하는가)\n### 채점방식 따른 구분 2\n1) 주관식 문항 2) 객관식 문항\n### 학생반응양식 따른 구분 2\n1) 선택형 문항 2) 서답형 문항"},
+    {"front": "[평가문항] ① 주관식 문항 & ② 객관식 문항 (개념 & 종류)", "importance": "normal", "back": "### ① 주관식 문항\n- 채점 시 주관 개입 여지 있는 문항\n- 종류 2: 서술형, 논술형\n### ② 객관식 문항\n- 답이 정해져 있어 채점 시 주관 개입되지 않는 문항\n- 종류 5: 진위형(OX), 연결형, 선다형, 단답형, 완성형(빈칸채우기)"},
+    {"front": "[평가문항] ③ 선택형 문항 (개념 & 종류 3 & 장점 2 & 단점 2)", "importance": "normal", "back": "### 개념\n- 여러 답지 제공 → 그 중 가장 적합한 답지를 선택하는 문항\n### 종류 3\n1) 진위형 2) 연결형 3) 선다형\n### 장점 2\n1) 채점 쉽고, 객관성 & 신뢰성 높음\n2) 문항 난이도 조절 쉬움\n### 단점 2\n1) 문항 제작이 어려움 (선지까지 제작)\n2) 추측 요인을 배제할 수 없음 (찍어 맞히기)"},
+    {"front": "[평가문항] ④ 서답형 문항 (개념 & 종류 4 & 장점 1 & 단점 2)", "importance": "normal", "back": "### 개념\n- 답을 (선택지에서 고르지 않고) 수험자가 스스로 작성\n### 종류 4\n1) 단답형 2) 완성형 3) 서술형 4) 논술형\n### 장점 1\n1) (응답 제한하지 않아) 다양한 능력을 확인 가능\n### 단점 2\n1) 피험자의 문장력이 채점에 영향\n2) (선택형에 비해) 시간 많이 소요 → 넓은 범위 측정 어려움"},
+    {"front": "[평가문항] 주관식/서술형 문항 — 제작 시 유의점 2 & 채점 시 유의점", "importance": "normal", "back": "### 제작 시 유의점 2\n1) 문항 구조화 & 제한성을 줌 (구체적 목표를 평가할 수 있게)\n2) 모범 답안 및 채점 기준표 작성해둬야 함 (출제 과정에서 미리)\n### 채점 시 유의점 (채점자 주관 반영 유의)\n1) (미리 만들어 둔) 채점 기준표를 토대로 채점\n2) (가급적) 여러 채점자가 공동으로 채점\n3) 피험자 이름을 가리고 채점"},
+    {"front": "[평가문항] 객관식/선택형 문항 — 제작 시 유의점 3", "importance": "normal", "back": "1) 정답 선지는 분명하게, 오답 선지는 매력 있게 제작\n2) 정답 번호는 다양하게 배치 (패턴 추측 못하도록)\n3) 선지가 다른 문항에 힌트를 제공하지 않아야 함 (선지는 서로 독립적이게)"},
+    {"front": "[문항분석] 고전검사이론 — ① 문항난이도(문항곤란도) (개념 & 공식 & 활용 2)", "importance": "normal", "back": "### 개념\n- 문항이 어렵고 쉬운 정도 (지수 0% ~ 100%)\n### 공식\n- 문항난이도 = (정답자 ÷ 총 응시자) × 100\n### 활용 2\n1) 문항 난이도에 따라 문항 순서 결정 (난이도 높은 문항부터 배치)\n2) 학생 동기 유발/성취감을 위해 문항 선택\n (난이도 높은 문항 → 능력 낮은 학생 동기 유발 / 난이도 낮은 문항 → 상위권 학생 성취감)"},
+    {"front": "[문항분석] 고전검사이론 — ② 문항변별도 (개념 & 공식 & 활용 2)", "importance": "normal", "back": "### 개념\n- 피험자의 능력을 변별하는 정도 (지수 -1 ~ 1)\n### 공식\n- 문항변별도 = (상위집단 정답자 수 – 하위집단 정답자 수) ÷ 한 집단의 학생 수\n (*상위집단과 하위집단 정답자 수 차이 클수록 변별도 높은 문항)\n### 활용 2\n1) 상대평가에서 상위/하위 학생 변별\n2) 절대평가에서 학습 목표 달성 여부 파악 (달성/미달성 학생 변별)"},
+    {"front": "[문항분석] 고전검사이론 — ③ 문항추측도 & ④ 문항반응분포 (개념)", "importance": "normal", "back": "### ③ 문항추측도\n- 추측에 의해 답을 맞힐 수 있는 정도 (찍어서 맞출 확률)\n### ④ 문항반응분포\n- 선택형 문항에서 오답지의 매력도 (50%가 이상적)"},
+    {"front": "[문항분석] 문항반응이론 — 정의 & 문항특성곡선 (개념 & 활용)", "importance": "normal", "back": "### 문항반응이론이란\n- 평가 문항을 문항 자체에 근거해 분석하는 방법\n### ① 문항특성곡선 개념\n- 피험자의 능력 수준에 따라 문항을 맞힐 확률을 나타낸 곡선\n### 활용\n- (그래프를 근거해) 문항의 난이도, 변별도, 추측도를 규정"},
+    {"front": "[문항분석] 문항반응이론 — ② 문항난이도 측정 방법 & 활용 2", "importance": "normal", "back": "### 측정 방법\n- 문항특성곡선 상에서 문항의 정답을 맞힐 확률이 0.5에 해당하는 학생의 능력 수준\n### 활용 2\n1) 문항 난이도에 따라 문항 순서 결정 (난이도 낮은 문항부터 배치)\n2) 학생 동기 유발/성취감을 위해 문항 선택\n (난이도 낮은 문항 → 능력 낮은 학생 동기 유발 / 난이도 높은 문항 → 상위권 학생 성취감)"},
+    {"front": "[문항분석] 문항반응이론 — ③ 문항변별도 & ④ 문항추측도 측정 방법", "importance": "normal", "back": "### ③ 문항변별도 측정 방법\n- 문항특성곡선 상의 문항난이도를 산출하는 지점 (정답 맞힐 확률 0.5인 지점)에서의 기울기 (기울기 가파를수록 변별도 높음)\n### ④ 문항추측도 측정 방법\n- 문항특성곡선 상의 학생의 능력이 0인 지점에서 정답을 맞힐 확률"}
+  ],
+
+// ===================== 교육행정 (171장) =====================
+  "교육행정": [
+    {"front": "[교육행정의 이해] 교육행정의 정의 & 개념 5", "importance": "high", "back": "### 정의\n- 교육목표 달성에 필요한 인적·물적 조건을 정비(확립/감독)하는 것\n### 개념 5\n1) 국가공권설\n2) 조건정비설\n3) 행동행위설\n4) 교육지도성설\n5) 학습조장설"},
+    {"front": "[교육행정의 이해] ① 국가공권설 — 개념 & 특징 3", "importance": "high", "back": "### 개념\n- 법이 정하는 바에 따라, 교육정책을 구체적으로 실현하는 공권적 작용\n### 특징 3\n1) 교육에 관한 행정 (교육행정을 행정의 하위 영역으로 생각)\n2) 중앙집권적(권위주의적) 행정 중시\n3) 교육행정의 특수성·전문성 무시"},
+    {"front": "[교육행정의 이해] ② 조건정비설 — 개념 & 특징 3", "importance": "high", "back": "### 개념\n- 교육목표 달성에 필요한 조건을 정비(확립)하는 수단적·봉사적 활동\n### 특징 3\n1) 교육을 위한 행정 (교육과 행정 분리함)\n2) 지방분권적(민주적) 교육행정 중시\n3) 교육행정의 특수성·전문성 중시"},
+    {"front": "[교육행정의 이해] ③ 행동행위설 — 개념 & 특징 3", "importance": "high", "back": "### 개념\n- 교육목표를 효율적으로 달성하기 위한 구성원의 합리적 협동 행위\n### 특징 3\n1) 교육의 행정 (교육과 행정을 하나의 통합으로 봄)\n2) 행정행위(의사결정과정)에 초점\n3) 교육행정의 합리성·조직의 협동성 중시"},
+    {"front": "[교육행정의 이해] ④ 교육지도성설 & ⑤ 학습조장설 — 개념", "importance": "high", "back": "### ④ 교육지도성설\n- 교육목적을 효과적으로 달성하기 위해 교육지도성을 발휘하는 것\n### ⑤ 학습조장설\n- (학습자 동기 유발 및 활발한 학습활동의 조장을 통해) 교육적 성장을 달성할 수 있도록 제반 조건과 환경을 정비하는 활동"},
+    {"front": "[교육행정의 이해] 법규 측면의 교육행정 원리 4", "importance": "normal", "back": "1) 합법성의 원리 (법 범위 내에서 행정)\n2) 자주성의 원리 (일반 행정과 분리, 정치/종교 중립적)\n3) 기회균등의 원리 (모든 국민 교육기회 균등히)\n4) 지방분권의 원리 (지역 특수성 반영해야 함)"},
+    {"front": "[교육행정의 이해] 운영 측면의 교육행정 원리 5", "importance": "normal", "back": "1) 민주성의 원리 (국민 의사 반영해야 함)\n2) 효율성의 원리 (최소 노력 최대 성과 목표)\n3) 안정성의 원리 (교육정책은 계속성/일관성 필요)\n4) 적응성의 원리 (새로운 변화에 능동적 대처 필요)\n5) 전문성 보장의 원리 (교육행정은 전문가가 해야 함)"},
+    {"front": "[교육행정이론] 과학적 관리론 — 기본개념 & 과학적 관리의 원리 6", "importance": "high", "back": "### 기본개념\n- 노동자의 작업과정을 표준화 & 과학적으로 관리하면 조직 능률/생산성을 극대화할 수 있다는 이론\n### 원리 6\n1) 1일 최대 작업량 (딱 정해줘야 함)\n2) 표준화된 조건 (작업조건/도구 표준화)\n3) 차별적 성과급 제도 (과업 성공 시 높은 보상)\n4) 실패에 대한 책임 (과업 실패 시 책임)\n5) 과업의 전문화 (과업은 꽤나 어려운 것)\n6) 관리와 수행의 분리 (생산 설계 담당자와 생산 담당자 구분)"},
+    {"front": "[교육행정이론] 과학적 관리론 — 교육적 적용 4 (보비트)", "importance": "high", "back": "1) 가능한 모든 시간에 모든 교육시설 최대로 활용\n2) 교직원의 작업능률 최대로 유지 / 교직원 수 최소로 감축\n3) 교육활동 중 낭비 최대한 제거\n4) 교사는 가르치는 일에만 전념 / 행정은 별도의 행정가가 맡아야 함"},
+    {"front": "[교육행정이론] 과학적 관리론 — 장점 3 & 문제점 3", "importance": "high", "back": "### 장점 3\n1) 교육의 효율성 향상\n2) 구성원의 동기 유발 (업무 수행 정도 따라 성과급 차등 부여)\n3) 교사의 전문성 향상 (학교 업무가 분업화 됨)\n### 문제점 3\n1) 교육의 발전 저하 (효율성에만 집중 → 장기적으로 전인 형성 목적 어긋남)\n2) 교육 만족도 저하 (개인 자율성/창의성 제한)\n3) 교육의 비인간화 촉진 (인간보다 과업/생산을 중시)"},
+    {"front": "[교육행정이론] 행정관리론 — 기본개념", "importance": "normal", "back": "- 행정자의 작업과정을 표준화 & 과학적으로 관리하면 조직 능률/생산성을 극대화할 수 있다는 이론\n- 최소 인적·물적 자원으로 조직 목적을 달성하고자 하는 이론"},
+    {"front": "[교육행정이론] 관료제론 — 관료제 특징 5", "importance": "normal", "back": "1) 권위의 위계화\n2) 분업과 전문화\n3) 규칙과 규정 강조\n4) 경력 지향성 (구성원 직무경력 중요시)\n5) 몰인정성 (개인 감정 없이 업무함)"},
+    {"front": "[교육행정이론] 관료제 — 특징별 학교 관료제 순기능 5", "importance": "normal", "back": "1) (권위의 위계화) → 원활한 순응과 조정\n2) (분업과 전문화) → 숙련된 기술과 전문성 향상\n3) (규칙과 규정 강조) → 계속성과 통일성 확보\n4) (경력 지향성) → 동기유발, 유인가\n5) (몰인정성) → 합리성 증대"},
+    {"front": "[교육행정이론] 관료제 — 특징별 학교 관료제 역기능 5", "importance": "normal", "back": "1) (권위의 위계화) → 의사소통의 장애 (위계 지나치면 의사소통 단절)\n2) (분업과 전문화) → 피로 및 권태감 누적\n3) (규칙과 규정 강조) → 조직의 경직성, 목표전도 현상\n4) (경력 지향성) → 실적과 연공 간의 갈등, 무사안일\n5) (몰인정성) → 사기 저하, 비인간주의"},
+    {"front": "[교육행정이론] 인간관계론 — 등장배경 2 & 기본개념", "importance": "very_high", "back": "### 등장배경 2\n1) 과학적 관리론에 대한 비판 (능률/획일성만 강조해 비인간화)\n2) 호손실험 결과 (생산성에 영향 미치는 건 능력보다도 개인의 사회적 욕구임)\n### 기본개념\n- 인간의 사회·심리적 측면을 중시하면 조직 능률과 생산성을 극대화할 수 있다는 이론"},
+    {"front": "[교육행정이론] 인간관계론 — 교육적 적용 3", "importance": "very_high", "back": "1) 교육행정의 민주화 (학교 의사결정과정에 구성원 적극 참여 유도)\n2) 비공식조직 중시 (비공식조직 의견도 의사결정과정에 반영)\n3) 개인의 사회·심리적 욕구 중시 (구성원들을 배려 & 존중)"},
+    {"front": "[교육행정이론] 인간관계론 — 공헌점 2 & 문제점 2", "importance": "very_high", "back": "### 공헌점 2\n1) 교육행정의 민주적 발전에 기여\n2) 비공식 조직의 역할(기능)을 부각\n### 문제점 2\n1) 정의적 측면을 지나치게 강조함\n2) 공식조직의 중요성 및 인간의 경제적 동기를 과소평가함"},
+    {"front": "[교육행정이론] 행동과학론 — 기본개념 & 대표자 2", "importance": "normal", "back": "### 기본개념\n- 조직 내 인간 행동을 연구해 행정/경영의 효율성을 높이려는 이론\n### 대표자 2\n1) 바나드(Barnard)\n2) 사이먼(Simon)"},
+    {"front": "[교육행정이론] 행동과학론 — ① 바나드의 주장 2 & ② 사이먼의 주장", "importance": "normal", "back": "### ① 바나드(Barnard) 주장 2\n1) 조직은 사회적 협동체임 (행정적 요소 + 인간적 요소에 초점)\n2) 구성원 중심적 만족·사기 강조 (조직 중심적 목표보다)\n### ② 사이먼(Simon) 주장\n- 효과적 의사결정을 위해, 제한된 합리성 토대로 결정하는 행정적 인간형이 필요 (모든 의견 다 들어줄 순 없음)"},
+    {"front": "[교육행정이론] 체제이론 — 체제이론이란 & 기본가정 4", "importance": "high", "back": "### 체제이론이란\n- 학교사회를 하나의 체제로 보고, 학교체제가 어떻게 작동하는지 연구하는 이론\n### 기본가정 4\n1) 모든 조직체계는 하나의 체제로 파악 가능함\n2) 사회체제는 여러 하위체제로 구성 (& 늘 상호작용)\n3) 체제 구성 요소를 유기적으로 기능하게 하면 → 생산성 향상\n4) 사회체제는 사회 유지·발전 위한 기본 기능(목표달성, 적응 등)을 수행함"},
+    {"front": "[교육행정이론] 개방체제 — 개방체제란 & 학교 개방체제의 특징 5", "importance": "high", "back": "### 개방체제란\n- 주변 환경과 자유롭게 상호작용하는 체제\n### 학교 개방체제의 특징 5\n1) 외부 환경과 끊임없이 상호작용함\n2) 투입→과정→산출→피드백 과정을 거침\n3) 균형 상태(안정성)를 스스로 유지하려는 경향 있음\n4) 주요 목적은 학생들에게 성인 역할을 준비시키는 것\n5) 구성원의 적절한 행동은 공식적 규칙과 비공식적 규범에 의해 이뤄짐"},
+    {"front": "[교육행정이론] 카우프만의 체제접근 모형 — 모형이란 & 단계-도구 5", "importance": "normal", "back": "### 체제접근 모형이란\n- (여러 대안 중) 최적의 해결방안을 얻어내 실천/평가하는 모형\n### 단계 - 도구 5\n1) 문제 확인 - 요구분석\n2) 대안 결정 - 목표관리기법\n3) 해결전략 선정 - 기획예산제도, 투입산출분석\n4) 해결전략 시행 - 과업평가검토기법, 비판적 경로분석 기법\n5) 성취효과 결정 - 성취평가"},
+    {"front": "[교육행정이론] 브루코버의 사회체제접근 모형 — 기본개념 2 & 구성요소 3", "importance": "normal", "back": "### 기본개념 2\n1) (사회체제 분석 위해) 투입-과정-산출 모형 도입\n2) 학교의 사회·심리적 풍토 강조\n### 학교사회체제 구성요소 3\n1) 학교의 사회·심리적 규범 (학교교육에 갖는 기대 등)\n2) 학교의 조직구조 및 운영방식 (행정조직 형태)\n3) 학급 내 수업실천 행위 (의사소통 방식 등)"},
+    {"front": "[교육행정이론] 브루코버 모형 — 투입-과정-산출 모형 3", "importance": "normal", "back": "1) 투입변인 - 학생집단 특성, 교직원 배경\n2) 과정변인 ★ - 학교의 사회적 구조(참여도/개방성 등), 학교의 사회적 풍토(기대 등)\n3) 산출변인 - 학급 학습효과"},
+    {"front": "[교육행정이론] 브루코버 모형 — 효과적인 학교란 & 시사점 2", "importance": "normal", "back": "### 효과적인 학교란\n- (동등 조건 속에서) 투입변인 + 과정변인으로 높은 효과를 산출하는 학교\n### 시사점 2\n1) 학교 과정변인이 학업성취에 뚜렷한 영향이 있음을 보여줌\n2) 교사/교장/학생이 학업성적 향상 가능성을 믿을 때 학교풍토가 학습으로 이어짐 → 성적 좋아짐"},
+    {"front": "[교육행정이론] 겟젤스·구바의 역할과 인성의 상호작용모형 — 기본개념 3", "importance": "normal", "back": "1) 사회체제 내 인간의 행동은 역할과 인성의 상호작용임\n2) 학교조직은 역할과 인성에 모두 영향을 받음\n3) 학교조직은 위기 시 (인성보단) 역할을, 안정기엔 (역할보단) 인성을 강조함"},
+    {"front": "[교육행정이론] 겟젤스·구바의 사회과정 모형 — 기본개념 & 특징 2", "importance": "high", "back": "### 기본개념\n- (학교조직을 사회체제로 보고) 사회체제 속 인간의 사회적 행동에 관한 사회과정 모형 제시\n### 특징 2\n1) 인간의 사회적 행동은 조직차원(규범적 차원)과 개인차원(심리적 차원)의 상호작용 결과\n2) 사회체제 내 인간의 행동은 역할과 인성의 상호작용"},
+    {"front": "[교육행정이론] 겟젤스·구바의 사회과정 모형 — 시사점", "importance": "high", "back": "- 학교는 [조직의 목표달성]과 [개인의 욕구충족]이 적절히 조화를 이뤄야 함"},
+    {"front": "[교육행정이론] 겟젤스·셀렌의 사회과정 모형(수정모형) — 기본개념 & 차원 종류 5", "importance": "high", "back": "### 기본개념\n- 기존 사회과정 모형에 인류학적/조직풍토/생물학적 차원을 추가해 새로운 사회과정 모형 제시\n### 차원 종류 5\n1) 규범적 2) 개인적 3) 인류학적 4) 조직풍토 5) 생물학적 차원"},
+    {"front": "[교육행정이론] 겟젤스·셀렌의 사회과정 모형 — 특징 & 개인 행동이 목표 사회적 행동으로 나타나기 위한 3조건", "importance": "high", "back": "### 특징\n- 인간의 행위는 각 차원들과 관련된 사회적 상호작용에 의해 이루어짐\n### 사회적 행동 발현 3조건 (구성원의 사기 진작 요인)\n1) 합리성 (체제의 목표 ↔ 조직 요구 역할기대 일치)\n2) 일체감 (체제의 목표 ↔ 개인 욕구성향 일치)\n3) 소속감 (조직 요구 역할기대 ↔ 개인 욕구성향 일치)"},
+    {"front": "[교육행정이론] 호이·미스켈의 학교체계모형 — 기본개념 & 학교체계 4", "importance": "normal", "back": "### 기본개념\n- 체제의 본질적 기능을 '교수·학습 기제'로 두고 학교체계를 분석함\n### 학교체계 4\n1) 구조체제 (학교 조직의 공식적 구조)\n2) 개인체제 (학교 구성원들의 욕구 등)\n3) 문화체제 (교직원들이 공유하는 지향점)\n4) 정치체제 (학교 구조 속 권력관계)"},
+    {"front": "[동기이론] 매슬로우의 욕구위계 이론 — 기본개념 & 특징", "importance": "normal", "back": "### 기본개념\n- 인간 내적 욕구를 동기유발 요인으로 봄 (욕구엔 5단계 위계가 있다고 가정)\n### 특징\n- 하위욕구가 충족되어야 → 상위욕구가 등장해 충족을 요구함"},
+    {"front": "[동기이론] 매슬로우 — 5단계 욕구위계 & 시사점 2", "importance": "normal", "back": "### 5단계 욕구위계\n[결핍욕구] 1) 생리적 욕구 2) 안전의 욕구 3) 사회적 욕구(사랑과 소속) 4) 존경의 욕구\n[성장욕구] 5) 자아실현의 욕구\n### 시사점 2\n1) (교사 자아실현욕구 충족되게) 인간 중심 경영을 해야 함\n2) (교사 동기유발 위해) 단계적·복합적 접근 필요함"},
+    {"front": "[동기이론] 허즈버그의 동기-위생이론 — 기본개념 & ① 동기 요인 & ② 위생 요인", "importance": "very_high", "back": "### 기본개념\n- 인간의 욕구를 동기 요인과 위생 요인의 이원적 구조로 설명함\n### ① 동기 요인\n- 직무만족에 기여 / '직무 그 자체' 관련 (성취, 인정, 자아실현 등)\n### ② 위생 요인\n- 직무불만족에 기여 / '직무 환경' 관련 (인간관계, 보수, 근무조건 등)"},
+    {"front": "[동기이론] 허즈버그 — 특징 2", "importance": "very_high", "back": "1) 두 요인은 (반대개념이 아니라) 별개 차원으로 존재함\n  ex. 동기요인 충족O → 만족 증대 / 충족X → 불만족 발생은 아님\n  ex. 위생요인 충족X → 불만족 발생 / 충족O → 만족 증대는 아님\n2) 동기 요인 충족을 위해서는 위생 요인의 충족이 전제되어야 함"},
+    {"front": "[동기이론] 허즈버그 — 시사점 2 & 직무재설계 프로그램 3", "importance": "very_high", "back": "### 시사점 2\n1) 위생 요인 최소화 & 동기 요인 향상 필요\n2) (교사 동기요인 제고 위해) 직무재설계 프로그램 구안 및 실행 필요\n### 직무재설계 프로그램 3\n1) 직무 풍요화 (다양 작업내용·높은 지식·자율성과 책임·개인적 성장)\n2) 직무특성이론 (직무 내재 특성이 직무동기/만족도에 영향)\n3) 경력단계 프로그램 (교사 자격 세분화 → 다양성/책임감 부여 → 보람 제공)"},
+    {"front": "[동기이론] 허즈버그 — 비판점 2", "importance": "very_high", "back": "1) (공개 면담 통해 알아낸 결과라) 신뢰성 부족 (주관적)\n2) 만족 차원과 불만족 차원이 동시에 나타나기도 함이 (후속연구에서) 밝혀짐"},
+    {"front": "[동기이론] 알더퍼의 ERG 이론 — 기본개념 & 3단계 욕구", "importance": "normal", "back": "### 기본개념\n- 매슬로우의 욕구위계이론을 3단계로 단순화\n### 3단계 욕구\n1) E (생존욕구) - 생존에 필요한 욕구\n2) R (관계욕구) - 만족스런 인간관계 맺으려는 욕구\n3) G (성장욕구) - 자신 잠재 능력 실현 욕구"},
+    {"front": "[동기이론] 알더퍼 ERG — 매슬로우와의 공통점 1 & 차이점 3", "importance": "normal", "back": "### 공통점\n- 하위 수준 욕구가 충족되면 → 상위 수준 욕구가 동기유발 힘을 얻게 됨\n### 차이점 3\n1) 좌절 및 퇴행 요소가 있음 (상위 욕구 좌절 시 하위 욕구 중요성 커짐)\n2) 2~3가지 욕구가 한 번에 충족 가능\n3) 하위욕구가 충족되지 않아도 상위욕구 발생 가능"},
+    {"front": "[동기이론] 알더퍼 ERG — 시사점", "importance": "normal", "back": "- 생존욕구가 완전 충족되지 않아도 성장욕구를 자극하면 동기부여 될 수 있음\n  (교사에게 자율성 부여 & 도전감 제시 → 성장욕구 자극)"},
+    {"front": "[동기이론] 맥그리거의 X-Y 이론 — 기본개념 & 비교 관점 2", "importance": "normal", "back": "### 기본개념\n- 인간 본성을 부정적으로 보는 X이론과 긍정적으로 보는 Y이론으로 나누어 동기부여 하려는 전략\n### 비교 관점 2\n1) 인간관\n2) 경영전략"},
+    {"front": "[동기이론] 맥그리거 X-Y — ① 인간관 & ② 경영전략", "importance": "normal", "back": "### ① 인간관\n1) X이론 - 성악설\n2) Y이론 - 성선설\n### ② 경영전략\n1) X이론 - 과학적 관리론적 접근 (경제적 보상 or 처벌로 경영)\n2) Y이론 - 인간관계론적 접근 (사회심리적 욕구 충족 or 조직 정비로 경영)"},
+    {"front": "[동기이론] 아지리스의 미성숙-성숙 이론 — 기본개념 & 연구결과 2", "importance": "normal", "back": "### 기본개념\n- 개인 성격은 미성숙→성숙 상태로 발전한다는 가정 속, 개인 성숙도 변화를 조직이 어떻게 지원해 동기부여하는지 설명하는 이론\n### 연구결과 2\n1) (미성숙으로 간주해) 각종 통제 시 → 조직 문제해결력 저하\n2) (성숙으로 간주해) 격려와 신뢰 시 → 조직 효과성 증대"},
+    {"front": "[동기이론] 아지리스 미성숙-성숙 — 시사점 3", "importance": "normal", "back": "1) 개인의 성숙이 → 곧 조직의 성장을 촉진함\n2) 구성원들을 성숙한 인간으로 취급 & 지속적 격려/신뢰 제공\n3) 구성원에게 자율성/책임 & 신뢰를 주고 → 직장에서 성숙할 기회 부여"},
+    {"front": "[동기이론] 브룸의 기대이론(VIE) — 기본개념 3", "importance": "high", "back": "1) 성과기대(E) - 노력하면 성과를 이룰 것\n2) 보상기대(I) - 그 성과에 대해 보상을 받을 것\n3) 그 성과와 보상이 높은 유인가(V)를 지닐 때 동기가 촉진된다는 이론"},
+    {"front": "[동기이론] 브룸의 기대이론 — 시사점 3", "importance": "high", "back": "1) 높은 성과기대(E) - 구성원 노력 시 성과를 얻을 수 있다는 믿음 심어주기\n2) 높은 보상기대(I) - 보상기대를 분명히 하기\n3) 높은 유인가(V) - 보상 매력도 높이기"},
+    {"front": "[동기이론] 포터·로울러의 성과-만족이론 — 기본개념 & 각 요인별 특징 4", "importance": "normal", "back": "### 기본개념\n- 브룸의 기대이론을 발전시켜 성과 & 만족에 영향을 주는 요인을 제시함\n### 각 요인별 특징 4\n1) 노력 : 보상가치 / 지각된 노력-보상 가능성에 의해 결정\n2) 성과 : 노력 / 능력과 특성 / 역할지각에 의해 결정\n3) 성과 → 내적 보상과 외적 보상을 가져옴\n4) 만족 : 그 보상을 공정하다고 지각하는 정도에 따라 결정"},
+    {"front": "[동기이론] 포터·로울러 성과-만족 — 시사점 4", "importance": "normal", "back": "1) 높은 성과기대 (노력 시 성과 얻을 수 있다는 믿음 심어주기)\n2) 높은 보상기대 (보상기대 분명히)\n3) 높은 유인가 (보상 매력도 높이기)\n4) 높은 역할지각 (교사가 역할지각 분명히 하게 지원)"},
+    {"front": "[동기이론] 아담스의 공정성 이론 — 기본개념 & 특징 2", "importance": "very_high", "back": "### 기본개념\n- 한 개인이 다른 사람에 비해 얼마나 공정하게 대우받느냐에 초점을 둔 이론\n### 특징 2\n1) 개인은 자신과 타인의 성과/투입 비율을 비교함\n2) 비율 비슷 → 공정성 → 직무 만족 / 비율 불균등 → 불공정성 → 공정성 회복 위해 동기 유발"},
+    {"front": "[동기이론] 아담스 공정성 — 공정성 회복을 위한 행동유형 6", "importance": "very_high", "back": "1) 투입 조정 (보상 적으면 투입 줄이고, 크면 투입 늘림)\n2) 성과 조정 (보상 적다 느끼면 투입 증가 없이 임금인상 요구)\n3) 투입/성과의 인지적 왜곡 (자신·타인 투입/성과를 왜곡 이해)\n4) 비교 대상의 투입과 성과 변경 (타인 투입/성과 바뀌게 압력)\n5) 비교 대상의 변경\n6) 조직 이탈 (불공정 극심할 때)"},
+    {"front": "[동기이론] 아담스 공정성 — 시사점 3 & 한계점 2", "importance": "very_high", "back": "### 시사점 3\n1) 학교경영자는 교사들을 공정하게 대우해야 함\n2) 학교경영자는 공정한 조직문화풍토를 구축해야 함\n3) 교사 보수체계에 국가적 차원의 정책적 배려 필요\n### 한계점 2\n1) 공정성에 대한 판단이 주관적임\n2) (많이 받는 것보다 적게 받는 것에 민감해) 균형적 판단이 어려움"},
+    {"front": "[동기이론] 로크의 목표설정이론 — 기본개념 & 목표가 지녀야 할 속성 6", "importance": "high", "back": "### 기본개념\n- 인간의 동기는 목표에 의해 결정된다고 보는 이론 (가치 바탕 → 욕망 형성 → 목표 설정)\n### 속성 6\n1) 구체성\n2) 곤란성 (다소 어려운 목표가 성과 굿)\n3) 참여 (설정에 참여하면 성과 굿)\n4) 피드백 (피드백 주어지면 성과 굿)\n5) 동료 간 경쟁\n6) 수용성 (자발적 수용한 목표가 성과 굿)"},
+    {"front": "[동기이론] 로크 목표설정 — 시사점 & 영향 3", "importance": "high", "back": "### 시사점\n- 구체적/도전적/자발적/수용된 목표/노력 피드백이 있는 목표가 동기를 유발해야 함\n### 영향 3 (관련 기법)\n1) 목표관리기법(MBO) - 목표 명료화/체계화로 효율화\n2) 경영정보관리(MIS) - 의사결정에 필요한 정보 신속/정확 제공\n3) 기획예산제도(PPBS) - 합리적 목표 설정 & 자원/절차 계획 → 효과 향상"},
+    {"front": "[지도성 이론] 피들러의 상황적 지도성 이론 — 기본개념 & 리더십 유형 2", "importance": "very_high", "back": "### 기본개념\n- 리더십 유형과 상황의 호의성 변인을 고려해 가장 효과적인 리더십 유형을 제시\n### 리더십 유형 2\n1) 관계지향적 지도자 (사람 사이 관계 중시)\n2) 과업지향적 지도자 (업무 목표 달성 중시)"},
+    {"front": "[지도성 이론] 피들러 — 상황의 호의성 & 변인 3", "importance": "very_high", "back": "### 상황의 호의성\n- 지도자가 (집단에 대해) 얼마의 영향력을 발휘할 수 있는 상황인가\n### 변인 3\n1) 지도자와 구성원 간 관계\n2) 과업 구조 (과업이 명확히 규정·체계화되어 있는가)\n3) 지도자의 권력 (부하에게 부여할 수 있는 상과 벌 권한 정도)"},
+    {"front": "[지도성 이론] 피들러 — 상황별 효과적인 리더십 유형 2", "importance": "very_high", "back": "1) 상황이 호의적 or 비호의적일 때 → 과업지향적 지도자 굿\n2) 상황의 호의성이 중간 정도일 때 → 관계지향적 지도자 굿"},
+    {"front": "[지도성 이론] 허쉬·블랜차드의 상황적 지도성 이론 — 기본개념 & 과업행동 & 관계행동", "importance": "very_high", "back": "### 기본개념\n- 구성원의 성숙도를 주요 상황적 변인으로 간주해 효과적 지도성 유형을 제시\n### 과업행동\n- 부하에게 무슨 과업을 언제/어떻게 수행할지 지시 (일방적 의사소통)\n### 관계행동\n- 사회정서적 지원으로 심리적 위로 제공하며 일을 촉진 (쌍방적 의사소통)"},
+    {"front": "[지도성 이론] 허쉬·블랜차드 — 지도성 유형 4 & 구성원의 성숙도 2", "importance": "very_high", "back": "### 지도성 유형 4\n1) 지시형 (과업↑, 관계↓)\n2) 지도형 (과업↑, 관계↑)\n3) 지원형 (과업↓, 관계↑)\n4) 위임형 (과업↓, 관계↓)\n### 구성원의 성숙도 2\n1) 직무 성숙도 (수행 능력)\n2) 심리적 성숙도 (동기 수준)"},
+    {"front": "[지도성 이론] 허쉬·블랜차드 — 효과적인 리더십 유형 4 (성숙도별)", "importance": "very_high", "back": "1) 동기↓, 능력↓ → 지시형 굿\n2) 동기↑, 능력↓ → 지도형 굿\n3) 동기↓, 능력↑ → 지원형 굿\n4) 동기↑, 능력↑ → 위임형 굿"},
+    {"front": "[지도성 이론] 리더십 대용상황 이론(커&저미어) — 기본개념 & 상황 변인 3", "importance": "high", "back": "### 기본개념\n- 지도자 리더십이 상황에 따라 대용 or 억제될 수 있다는 이론\n### 상황 변인 3\n1) 구성원 특성 (능력/경험/리더 지지 여부 등)\n2) 업무 특성 (구조화 여부/만족도 여부 등)\n3) 조직 특성 (단결력/규칙 엄격성/지도자 권한 등)"},
+    {"front": "[지도성 이론] 리더십 대용상황 — 상황 유형 2 & 시사점 2", "importance": "high", "back": "### 상황 유형 2\n1) 대용 상황 (리더 지도가 불필요한 상황)\n2) 억제 상황 (리더 지도가 제한 or 무력화 되는 상황)\n### 시사점 2\n1) 지도자 행동이 상황 따라 왜 영향이 다른지 이해 가능\n2) 구성원 태도/행동/역할지각 이해 위해 지도자 행동 & 대용 상황을 이해할 필요 있음"},
+    {"front": "[지도성 이론] 거래적 지도성 — 기본개념 & 특징 2", "importance": "normal", "back": "### 기본개념\n- 지도자가 구성원에게 순종을 요구 → 과업 성과 대가로 외적 보상 제공 → 구성원 동기 유발하는 지도성\n### 특징 2\n1) 조직 효율성/안정성 유지에 도움 (역할&과업조건 명확히 제시)\n2) 구성원의 개인적 성장엔 관심 없음 (조직 단기 목표 달성에만 관심)"},
+    {"front": "[지도성 이론] 변혁적 지도성(바스) — 기본개념 & 핵심요소(4I) 4", "importance": "high", "back": "### 기본개념\n- 구성원 성장 욕구 자극 → 태도·신념 변화 & 비전/장기계획 수립 → 개인 & 조직 발전을 함께 추구하는 지도성\n### 핵심요소(4I) 4\n1) 이상적인 영향력 (도덕적 모범으로 존경 얻음)\n2) 감화력 (비전 공유로 기대 만들어 동기화)\n3) 지적 자극 (새로운 아이디어 격려)\n4) 개별적 배려 (개인적 성장 욕구에 관심)"},
+    {"front": "[지도성 이론] 변혁적 지도성 — 의의 2 & 한계 2", "importance": "high", "back": "### 의의 2\n1) 거래적 지도성(구성원 이익에만 호소)보다 효과적임\n2) 급격한 사회변화에 적극 대응해 교육의 질을 높여야 함을 강조\n### 한계 2\n1) 지도자와 구성원 간 관계에만 초점을 둠\n2) 상황 변인의 중요성을 간과함 (상황 따라 리더십 안 통할 수도)"},
+    {"front": "[지도성 이론] 카리스마적 지도성(하우스) — 기본개념 & 특징 2", "importance": "normal", "back": "### 기본개념\n- 지도자의 비범한 능력과 개인적 매력으로 → 구성원의 복종/충성을 이끌어내는 지도성\n### 특징 2\n1) 지도자가 높은 능력 갖춤 → 구성원 스스로 과업 수행 동기 증가\n2) 구성원의 욕구/가치를 개인 차원 → 집단 차원 관심으로 바꿔 수행성과를 높임"},
+    {"front": "[지도성 이론] 카리스마적 지도성 — 의의 2 & 한계 2", "importance": "normal", "back": "### 의의 2\n1) 일부 지도자의 특별한 영향력 설명 가능\n2) 위기/격동/변화 요구가 높은 조직 상황에서 큰 효과 발휘 가능\n### 한계 2 (변혁적 지도성과 동일)\n1) 지도자와 구성원 간 관계에만 초점\n2) 상황 변인의 중요성 간과"},
+    {"front": "[지도성 이론] 분산적 지도성(스필레인) — 기본개념 & 필수 조건 3", "importance": "very_high", "back": "### 기본개념\n- 지도자-구성원-상황 간 상호작용으로 지도성이 분산되어 실행되는 것\n### 필수 조건 3\n1) 지도자 (구성원/상황과 상호작용하며 지도성 실행)\n2) 구성원 (서로 영향력 행사 & 협력적 조직문화 형성)\n3) 상황 (제도/도구/구조 등)"},
+    {"front": "[지도성 이론] 분산적 지도성 — 특징(장점) 4", "importance": "very_high", "back": "1) 공동 지도성 강조 (학교장과 구성원 공동으로 실행)\n2) 공동 실행 촉진 (다수 지도자가 상호 협력)\n3) 공동 책임 지향 (구성원도 의사결정 참여 & 공동 책임)\n4) 전문성 극대화 (전문성 바탕 집단 구성 & 공동 과업 → 전문성 극대화)"},
+    {"front": "[지도성 이론] 분산적 지도성 — 의의 2 & 한계 2", "importance": "very_high", "back": "### 의의 2\n1) (새로운 방식 지도성 제시로) 지도성 개선에 강력한 도구 제시\n2) 학교 운영 / 교수·학습 / 학업성취도 향상에 기여\n### 한계 2\n1) 조직 내 갈등 유발 가능 (특정 개인/집단에만 분산하면 타 집단 불만)\n2) 새로운 접근을 제한할 가능성 (지도자가 편협하면)"},
+    {"front": "[지도성 이론] 초우량 지도성(슈퍼 리더십, 만즈&심즈) — 기본개념 & 특징 3", "importance": "high", "back": "### 기본개념\n- 지도자가 구성원 개개인을 지도자로 성장시켜 → 모든 구성원이 스스로를 자율적으로 지도할 수 있게 만드는 지도성\n### 특징 3\n1) 자율적 통제 강조 (외적 통제보다)\n2) 구성원 스스로 지도자로서의 능력 개발 중시\n3) 지도자는 '지도자들의 지도자' ('구성원의 지도자'가 아님)"},
+    {"front": "[지도성 이론] 학교 지도성(서지오바니) — 기본개념 & 유형(리더십 영향력 위계) 5", "importance": "normal", "back": "### 기본개념\n- 지도자가 구성원 개개인을 지도자로 성장시켜 모든 구성원이 자율적 지도자가 되게 함\n### 학교지도성 유형 5\n1) 기술적 지도성\n2) 인간적 지도성\n3) 교육적 지도성\n4) 상징적 지도성\n5) 문화적 지도성 ★"},
+    {"front": "[지도성 이론] 학교 지도성 — ① 기술적 & ② 인간적 지도성 특징", "importance": "normal", "back": "### ① 기술적 지도성 (전문 경영자)\n1) 경영관리기술 구비\n2) 계획, 조직, 조정, 시간관리 강조\n### ② 인간적 지도성 (인간공학 전문가)\n1) 유용한 사회적/인간적 자원 활용\n2) 인간관계·사교능력·동기화 능력으로 조직 성장 도모"},
+    {"front": "[지도성 이론] 학교 지도성 — ③ 교육적 & ④ 상징적 & ⑤ 문화적 지도성 특징", "importance": "normal", "back": "### ③ 교육적 지도성 (현장교육 전문가)\n- 효과적 교수학습·프로그램 개발·교육과정 개발·장학·평가 수행\n### ④ 상징적 지도성 (대장의 역할)\n- 학교 중대사(중요 가치)를 알려줌 / 상징적 행사·언사로 비전·목표에 주의 환기\n### ⑤ 문화적 지도성 (성직자의 역할)\n- 구성원 가치/의미 추구 욕구 만족 → 조직 제도적 통합 / 영속적 가치·신념 규정 & 독특한 학교문화 창출"},
+    {"front": "[지도성 이론] 도덕적 지도성(서지오바니·오웬스) — 기본개념 & 특징 2", "importance": "high", "back": "### 기본개념\n- 모든 구성원이 '자율적 지도자'가 되도록 자극해 → 학교가 '도덕적 & 효과적인 조직'이 될 수 있게 하는 지도성\n### 특징 2\n1) 관리자 측면의 성공보다 도덕적 측면의 '선의'를 중시\n2) '도덕적이고 효과적인 학교'를 지향"},
+    {"front": "[조직이론] ① 공식조직 — 개념 & 특징 3", "importance": "normal", "back": "### 개념\n- 공적인 목표 달성을 위해 인위적으로 구성한 조직\n### 특징 3\n1) 제도화된 공식규범을 통해 형성됨\n2) 권한의 계층 / 명료한 책임분담 / 표준화된 업무수행 / 냉담한 인간관계\n3) 과학적 관리론(효율 중시) 시대에 중요하게 여긴 조직"},
+    {"front": "[조직이론] ② 비공식조직 — 개념 & 특징 3", "importance": "normal", "back": "### 개념\n- 공식 조직 내에서 → 구성원 간 인간관계를 중심으로 구성된 조직\n### 특징 3\n1) 학연, 지연, 혈연, 취미, 종교 등을 통해 형성\n2) 자생조직(자연발생적 조직)이라고도 함\n3) 인간관계론(사회·심리적 요소 중시) 시대에 중요하게 여긴 조직"},
+    {"front": "[조직이론] 비공식조직 — 순기능 4 & 역기능 3", "importance": "normal", "back": "### 순기능 4\n1) 원활한 의사전달 (공식조직 의사전달 보충)\n2) 효율적 직무 수행 (협조·의사소통 잘됨)\n3) 공식 조직의 경직성 완화\n4) 귀속감과 안정감 부여\n### 역기능 3\n1) 구성원의 사기 저하 (왜곡된 소문 등)\n2) 갈등과 소외 초래 (파벌 조성)\n3) 공식조직의 기능 마비"},
+    {"front": "[조직이론] ① 계선조직 — 개념 & 특징 2", "importance": "normal", "back": "### 개념\n- (조직 목표 달성 위해) 상하 위계의 명령 계통을 갖는 수직적 조직\n### 특징 2\n1) 실제 집행하는 기능 (각자 역할 직접 수행)\n2) 현실적, 보수적 특성"},
+    {"front": "[조직이론] 계선조직 — 순기능 3 & 역기능 3", "importance": "normal", "back": "### 순기능 3\n1) 효율적 업무 수행 (권한/책임 명확)\n2) 신속한 의사결정 (단일 기관)\n3) 경비의 절약 (업무처리 간편)\n### 역기능 3\n1) 관리자의 업무량 과중 (대규모 조직에서 특히)\n2) 관리자의 독단 (전문가 지식 활용 어려움)\n3) 조직의 경직성 초래"},
+    {"front": "[조직이론] ② 참모조직 — 개념 & 특징 2", "importance": "normal", "back": "### 개념\n- (계선조직이 원활히 목적 달성하게) 기획/자문/협의/정보제공 등을 지원하는 수평적 조직\n### 특징 2\n1) 간접적으로 지원·보조하는 기능 (역할 직접 수행 X)\n2) 이상적, 개혁적 특성"},
+    {"front": "[조직이론] 참모조직 — 순기능 3 & 역기능 3 & 갈등해소 방안", "importance": "normal", "back": "### 순기능 3\n1) 합리적 의사결정 가능 (전문가 지식 활용)\n2) 조직의 신축성 부여\n3) 수평적 업무의 조정과 협조 가능\n### 역기능 3\n1) 계선·참모 간 책임 전가 우려\n2) 구성원/부서 간 갈등 우려\n3) 의사전달·명령계통 혼란 발생 가능\n### 갈등해소 방안\n- 상호 책임 한계를 분명히 해 충돌 방지 & 서로 간의 친밀한 관계 증진"},
+    {"front": "[조직이론] 파슨스의 조직분류 — 기본개념 & 분류 4", "importance": "normal", "back": "### 기본개념\n- 조직의 사회적 기능에 따라 → 조직 유형 4가지로 분류\n### 분류 4\n1) 생산조직 (사회 적응기능 - 경제체제)\n2) 정치적 목표지향 조직 (공동 목표달성기능 - 정치체제)\n3) 통합조직 (사회구성원 통합기능 - 사회체제)\n4) 유형유지조직 √ (문화유지기능 - 문화체제)"},
+    {"front": "[조직이론] 블라우·스캇의 조직분류 — 기본개념 & 분류 4", "importance": "normal", "back": "### 기본개념\n- 조직의 1차 수혜자에 따라 → 조직 유형 4가지로 분류\n### 분류 4\n1) 호혜조직 (조직구성원이 1차 수혜자)\n2) 사업조직 (조직소유자가 1차 수혜자)\n3) 공공조직 (일반대중전체가 1차 수혜자)\n4) 봉사조직 √ (조직의 이용고객이 1차 수혜자)"},
+    {"front": "[조직이론] 칼슨의 조직분류 — 기본개념 & 분류 4", "importance": "high", "back": "### 기본개념\n- 조직과 고객의 선택 여부를 기준으로 → '봉사조직'의 유형을 4가지로 분류\n### 분류 4\n1) 야생조직 (조직의 고객 선택권 O, 고객의 조직선택권 O)\n2) 적응조직 (조직의 고객 선택권 X, 고객의 조직선택권 O)\n3) 강압조직 (조직의 고객 선택권 O, 고객의 조직선택권 X)\n4) 온상조직 √ (조직의 고객 선택권 X, 고객의 조직선택권 X)"},
+    {"front": "[조직이론] 에치오니의 조직분류 — 기본개념 & 분류 3", "importance": "normal", "back": "### 기본개념\n- 권력 유형과 참여 유형에 따라 → 조직 유형 3가지로 분류\n### 분류 3\n1) 강제 조직 (강제적 권력 & 소외적 참여)\n2) 공리 조직 (보상적 권력 & 타산적 참여)\n3) 규범 조직 √ (규범적 권력 & 헌신적 참여)"},
+    {"front": "[조직이론] 홀의 조직분류 — 기본개념 & 분류 4", "importance": "normal", "back": "### 기본개념\n- 관료성과 전문성 정도에 따라 → 학교조직 4가지 유형으로 분류\n### 분류 4\n1) Weber형 (관료성↑, 전문성↑) - 전문화와 관료화가 상호 보완적\n2) 권위주의형 (관료성↑, 전문성↓)\n3) 전문형 (관료성↓, 전문성↑)\n4) 혼돈형 (관료성↓, 전문성↓)"},
+    {"front": "[조직이론] 민츠버그의 조직분류 — 기본개념 & 조직의 구성요소 5", "importance": "high", "back": "### 기본개념\n- 조직의 구성요소와 조정기제에 따라 → 조직 유형 5가지로 분류\n### 조직의 구성요소 5\n1) 최고관리층 2) 지원부서층 3) 중간관리층 4) 기술구조층 5) 핵심운영층"},
+    {"front": "[조직이론] 민츠버그 — 조직의 조정기제 5 & 분류 5", "importance": "high", "back": "### 조정기제 5\n1) 직접감독 2) 상호조절 3) 산출의 표준화 4) 작업과정의 표준화 5) 기술의 표준화\n### 분류 5\n1) 단순구조 (최고관리층 & 직접감독)\n2) 임시구조 (지원부서층 & 상호조절)\n3) 사업부제 (중간관리층 & 산출의 표준화)\n4) 기계적 관료제 (기술구조층 & 작업과정의 표준화)\n5) 전문적 관료제 (핵심운영층 & 기술의 표준화)"},
+    {"front": "[조직이론] 전문적 관료제(호이·미스켈) — 기본개념 & 학교의 관료적 특징 5", "importance": "very_high", "back": "### 기본개념\n- 학교는 관료적 특징 + 전문적 특징을 모두 갖춘 조직임!\n### 학교의 관료적 특징 5\n1) 권위의 위계화\n2) 분업과 전문화\n3) 규칙과 규정 강조\n4) 경력 지향성\n5) 몰인정성"},
+    {"front": "[조직이론] 전문적 관료제 — 학교의 전문적 특징 3", "importance": "very_high", "back": "1) 자유재량권 부여 (독립적 교실 내에서 자유재량권 가지고 지도)\n2) 의사결정의 참여 보장\n3) 직무수행의 통일된 표준과 엄격한 감독 없음"},
+    {"front": "[조직이론] 조직화된 무질서 조직(코헨·마치·올센) — 기본개념 & 특징 3", "importance": "very_high", "back": "### 기본개념\n- 학교는 조직화 O but 구조화 X → 합리적으로 파악될 수 없는 조직임\n### 특징 3\n1) 불분명한 목표 (목표 구체적 X & 자주 바뀜)\n2) 불분명한 기술 (목표 달성 방식 모두 다름)\n3) 구성원의 유동적 참여 (구성원 계속 바뀜)"},
+    {"front": "[조직이론] 이완조직(이완결합체제, 와익) — 기본개념 2 & 특징(장점) 4", "importance": "high", "back": "### 기본개념 2\n1) 부서들은 상호 관련성 O but 구조적으로 느슨하게 결합 → 각각 독립성 유지\n2) '신뢰의 논리'가 통제의 기제임\n### 특징(장점) 4\n1) 구성원에게 더 많은 자유재량권·자기결정권 부여\n2) 국지적 적응 인정\n3) 이질적 요소들 공존 허용\n4) 부분 간 조정에 비교적 소액 경비 요구"},
+    {"front": "[조직이론] 이완조직 — 장점 2 & 한계점 2", "importance": "high", "back": "### 장점 2\n1) 교사의 자율성과 전문성 존중\n2) 한 부분의 문제/결손은 국지화 → 위험부담 감소\n### 한계점 2\n1) 교수활동의 자율성·전문성을 지나치게 강조\n2) 비교수활동·교사 자격·채용·회계 등은 엄격한 법적·행정적 규제 필요"},
+    {"front": "[조직이론] 이중조직(오웬즈) — 기본개념 & 시사점", "importance": "normal", "back": "### 기본개념\n- 학교는 교수활동 측면에서는 느슨한 결합구조(이완조직), 행정관리 측면에서는 엄격한 결합구조(관료적 조직)임\n### 시사점\n- 지나친 독립성 → 생산성 저하 가능 / 엄격한 경직성 → 교사 사기 저하 가능\n- 교육행정가는 느슨한 결합 & 엄격한 결합의 순기능을 확보할 안목과 전략수립능력 필요"},
+    {"front": "[조직이론] 학습조직(센지) — 기본개념 & 학습조직의 원리 5", "importance": "high", "back": "### 기본개념\n- 일상적으로 학습을 계속 진행해나가며 → 환경 변화에 빠르게 적응할 수 있는 조직\n### 학습조직의 원리 5\n1) 개인적 숙련\n2) 정신모형 (주변 현상을 이해하는 인식체계)\n3) 팀 학습\n4) 시스템 사고 (조직 내 현상을 전체적으로 사고)\n5) 공유 비전 (조직 방향을 모든 구성원의 공감대로 형성)"},
+    {"front": "[조직이론] 전문적 학습공동체 — 기본개념 & 특징 3", "importance": "high", "back": "### 기본개념\n- 교사들이 함께 연구 & 함께 실천 & 함께 성장하는 학습 공동체 활동\n### 특징 3\n1) 가치와 비전 공유\n2) 협력적 학습 및 적용\n3) 개인적 경험의 공유 및 반성적 대화"},
+    {"front": "[조직이론] 전문적 학습공동체 — 성공 조건 2 & 장점 3", "importance": "high", "back": "### 성공 조건 2\n1) 분산적 리더십 (참여/책임 공유 문화 필요)\n2) 인적·재정적·물적 자원의 확보\n### 장점 3\n1) 학생의 학업성취도 향상 (교사들이 협력하며 새 아이디어 적용)\n2) 교사의 전문성 신장\n3) 학교 조직문화 개선 (협력적 문화로)"},
+    {"front": "[조직이론] 호이·미스켈의 조직문화의 수준 — 기본개념 & 수준-유형 3", "importance": "normal", "back": "### 기본개념\n- 조직문화의 수준을 크게 3가지로 구분\n### 수준-유형 3\n1) 표면적 수준 - 공유된 규범으로서의 문화 (겉으로 보이는 문화)\n2) 중간 수준 - 공유된 가치로서의 문화 (행동의 바탕이 되는 생각)\n3) 심층적 수준 - 묵시적 가정으로서의 문화 (말로 설명 어려운 깊은 무의식)"},
+    {"front": "[조직이론] 스타인호프·오웬스의 학교문화 유형론 — 기본개념 & 유형-비유 4", "importance": "normal", "back": "### 기본개념\n- 공립학교의 학교문화 유형을 4가지로 분류 & 비유 통해 설명\n### 유형-비유 4\n1) 가족문화 - 가정·팀 (구성원 서로 헌신 & 관심)\n2) 기계문화 - 기계 (교사를 목표 달성 수단으로 간주)\n3) 공연문화 - 공연장 (청중(학생) 반응 중요. 훌륭한 교장 지도로 멋진 가르침)\n4) 공포문화 - 전쟁터·악몽 (구성원 간 상호 적대적 분위기)"},
+    {"front": "[조직이론] 세티아·글리노우의 문화유형론 — 기본개념 & 분류 기준 2", "importance": "normal", "back": "### 기본개념\n- 조직의 관심이 인간 vs 성과 중 어디에 있느냐에 따라 조직문화 유형을 4가지로 분류\n### 분류 기준 2\n1) 인간에 대한 관심 (구성원 복지에 노력하는가)\n2) 성과에 대한 관심 (구성원 성과에 기대 있는가)"},
+    {"front": "[조직이론] 세티아·글리노우 — 조직문화 유형 4", "importance": "normal", "back": "1) 보호문화 (복지 관심 O & 성과 요구 X)\n2) 냉담문화 (복지 관심 X & 성과 요구 X)\n3) 통합문화 (복지 관심 O & 성과 요구 O)\n4) 실적문화 (복지 관심 X & 성과 요구 O)"},
+    {"front": "[조직이론] 핼핀·크로프트의 학교조직풍토론 — 기본개념 & 교사의 행동특성 4", "importance": "high", "back": "### 기본개념\n- 교사 & 교장의 행동특성을 자기평가(OCDQ) 형태로 조사 → 학교 조직풍토를 6가지로 분류\n### 교사의 행동특성 4\n1) 사기 (일에 성취감 느낌)\n2) 방해 (교장을 방해 존재로 인식)\n3) 친밀 (교사들과 우호적 인간관계 유지)\n4) 일탈 (업무에 얽매이지 않으려 함)"},
+    {"front": "[조직이론] 핼핀·크로프트 — 교장의 행동특성 4", "importance": "high", "back": "1) 추진 (솔선수범 보임)\n2) 배려 (직무 외에 교사를 인간적으로 도와주려 함)\n3) 냉담 (교사와 거리두고 원리원칙으로 대함)\n4) 과업 (과업 달성 강조하며 일방적 지시)"},
+    {"front": "[조직이론] 핼핀·크로프트 — 학교풍토 유형 6", "importance": "high", "back": "1) 개방적 풍토 (교장 추진성 & 교사 사기 높음 → 활기차고 생기있는 풍토) ★\n2) 자율적 풍토\n3) 통제적 풍토 (교장 냉담 & 과업 강조 / 교사는 교장을 방해로 느낌)\n4) 친교적 풍토 (교장 극히 배려적 & 과업 강조 X / 교사 친밀성 추구 & 일탈적)\n5) 간섭적 풍토\n6) 폐쇄적 풍토"},
+    {"front": "[조직이론] 호이·미스켈의 학교조직풍토론 — 기본개념 & 교사의 행동특성 3", "importance": "high", "back": "### 기본개념\n- 교사 & 교장의 행동특성을 개정된 조직문화풍토척도(OCDQ-RE)로 조사 → 학교 조직풍토를 4가지로 분류\n### 교사의 행동특성 3\n1) 협동적\n2) 친밀적\n3) 일탈적 (교사 간 소외/격리 조성)"},
+    {"front": "[조직이론] 호이·미스켈 학교조직풍토론 — 교장의 행동특성 3 & 학교풍토 유형 4", "importance": "high", "back": "### 교장의 행동특성 3\n1) 지원적 (교사에 관심 보이고 지원)\n2) 지시적 (교사에 과업 지향)\n3) 제한적\n### 학교풍토 유형 4\n1) 개방 풍토 (교사 개방 / 교장 개방)\n2) 참여 풍토 (교사 개방 / 교장 폐쇄)\n3) 일탈 풍토 (교사 폐쇄 / 교장 개방)\n4) 폐쇄 풍토 (교사 폐쇄 / 교장 폐쇄)"},
+    {"front": "[조직이론] 리커트의 관리체제 유형 — 기본개념 & 분류 기준 2", "importance": "high", "back": "### 기본개념\n- 상급자와 하급자 간의 관계를 측정 → 조직풍토를 4가지(체제1~체제4)로 분류\n### 분류 기준 2\n1) 부하에 대한 신뢰\n2) 의사결정 참여"},
+    {"front": "[조직이론] 리커트 — 관리체제 유형 4 (체제1~4)", "importance": "high", "back": "1) 체제1 - 수탈적 관리체제 (부하 신뢰 X / 의사결정 최고경영자 집중)\n2) 체제2 - 자비적 관리체제 (부하 다소 신뢰 / 의사결정 참여 안 시킴)\n3) 체제3 - 자문적 관리체제 (부하 상당 신뢰 / 의사결정 부분 참여)\n4) 체제4 - 참여적 관리체제 (부하 완전 신뢰 / 의사결정 부하 참여)"},
+    {"front": "[조직이론] 학교 내 갈등 — 발생 원인 & 순기능 3", "importance": "normal", "back": "### 발생 원인\n- 학교 구성원 간 의견 차이 / 목표 차이 / 이해관계 충돌 등으로 발생 (갈등은 부정적인 것만은 아님. 적절히 관리하면 조직/개인 성장에 도움)\n### 순기능 3\n1) 조직의 문제점 파악\n2) 조직의 변화와 혁신 촉진\n3) 새로운 화합의 계기 제공"},
+    {"front": "[조직이론] 학교 내 갈등 — 역기능 3", "importance": "normal", "back": "1) 정신적·육체적 고통 유발\n2) 조직의 안정성과 통일성 저하 (갈등 지속 시 학교 분위기 위축)\n3) 시간과 자원 낭비"},
+    {"front": "[조직이론] 토마스의 갈등해결모형 — 기본개념 & 독단성/협조성", "importance": "high", "back": "### 기본개념\n- 독단성과 협조성을 기준으로 조직 상황에 따른 갈등관리방식을 5가지로 분류\n### 독단성 / 협조성\n1) 독단성 = 자신의 욕구를 충족시키려는 정도\n2) 협조성 = 타인의 욕구를 충족시키려는 정도"},
+    {"front": "[조직이론] 토마스 갈등해결모형 — 갈등관리방식 5", "importance": "high", "back": "1) 경쟁형 (독단성↑, 협조성↓)\n2) 회피형 (독단성↓, 협조성↓)\n3) 타협형 (중간, 중간)\n4) 협력형 (독단성↑, 협조성↑)\n5) 순응형 (독단성↓, 협조성↑)"},
+    {"front": "[장학이론] 임상장학 — 기본개념 & 특징 4", "importance": "very_high", "back": "### 기본개념\n- 교사 수업기술 향상 & 전문적 성장을 목적으로 한 교사 중심적 장학\n### 특징 4\n1) 수업분석 중심\n2) 쌍방향 동료관계 (교사와 장학담당자는 동료관계 지향)\n3) 친밀한 인간관계 (속에서 진행)\n4) 교사의 자발적 노력 강조 (수업 개선 의지 있어야 효과적)"},
+    {"front": "[장학이론] 임상장학 — 절차 3 & 유의점 3", "importance": "very_high", "back": "### 절차 3\n1) 계획협의회 (교사 & 장학담당자가 구체적 계획 수립)\n2) 수업관찰\n3) 피드백협의회 (수집 자료로 협의 → 수업개선/기술전략 도모)\n### 유의점 3\n1) 교사 평가 지양\n2) 객관적인 자료 제공\n3) 임상장학의 필요성 이해 (하고 있어야 효과 굿)"},
+    {"front": "[장학이론] 마이크로티칭 — 기본개념 & 절차 3 & 장점 3 & 단점", "importance": "normal", "back": "### 기본개념\n- 임상장학의 축소 형태 (수업내용 & 수업기술 등 축소한 연습수업)\n### 절차 3\n1) 수업 → 2) 평가 → 3) 재수업의 과정 반복\n### 장점 3\n1) 즉각적 피드백 가능\n2) 단시간에 교수능력 향상 (모의수업으로 훈련시간 단축)\n3) 우호적인 환경 (새로운 기법 연습에 좋음)\n### 단점\n- (모의수업이므로) 실제 교수 상황으로의 전이가 어려울 수 있음"},
+    {"front": "[장학이론] 동료장학 — 기본개념 & 특징 3", "importance": "high", "back": "### 기본개념\n- 교사 수업기술 향상 & 전문적 성장을 목적으로 교사들이 서로 협동하는 장학형태\n### 특징 3\n1) 교사들의 자율성 & 협동성을 기초로 함\n2) 다양하고 융통성 있게 운영됨\n3) 동료관계 증진 통해 교사 개인적 발달 & 학교 조직적 발달 도모"},
+    {"front": "[장학이론] 동료장학 — 장점 3", "importance": "high", "back": "1) 이용의 편리성 (엄격한 훈련/협의회 안 거쳐도 됨)\n2) 자유로운 의사교환과 피드백 (계층적 거리감 적음)\n3) 수업 및 학교교육의 개선"},
+    {"front": "[장학이론] 자기장학 — 기본개념 & 특징 3", "importance": "high", "back": "### 기본개념\n- 교사 자신의 전문성 신장을 위해 스스로 계획을 수립 & 실천해나가는 자율 장학\n### 특징 3\n1) 교사 자신의 자율성과 자기발전 의지를 기초로 함\n2) 교사 스스로 계획을 세워 실천 & 자기반성함\n3) 자기실현 욕구 강하고 경험·능력 있는 교사에게 효과적"},
+    {"front": "[장학이론] 자기장학 — 자기장학 방법 3", "importance": "high", "back": "1) 수업 녹음, 녹화\n2) 의견조사 실시 (학생/학부모/동료 교사 피드백 받기)\n3) 상급 대학원 진학, 각종 세미나와 학회 참석"},
+    {"front": "[장학이론] 약식장학 — 기본개념 & 특징 3", "importance": "high", "back": "### 기본개념\n- 교장/교감이 잠깐 교실에 들러 교사의 수업 및 학급경영을 관찰 → 지도·조언하는 활동\n### 특징 3\n1) 교장/교감의 주도 하에 진행\n2) (간헐적) 짧은 시간 동안의 수업참관(or 학급순시) 중심 진행\n3) 교장/교감의 학교교육 전반 정보 파악에 도움"},
+    {"front": "[장학이론] 약식장학 — 한계점 & 극복 방안 2", "importance": "high", "back": "### 한계점\n- 교사에게 감시·통제로 비춰져 부담 & 불쾌감을 줄 수 있음\n### 극복 방안 2\n1) 교장/교감 - 교사 간의 충분한 신뢰관계 동반\n2) 교장/교감이 체계적인 계획 세워 진행 & 관찰내용 피드백 똑바로"},
+    {"front": "[장학이론] 컨설팅 장학 — 기본개념 & 원리 6", "importance": "very_high", "back": "### 기본개념\n- 학교 구성원의 자발적 의뢰(전문성 향상 위해) → 교내외 전문성 갖춘 장학 요원이 조언하는 활동\n### 원리 6\n1) 자발성\n2) 전문성 (전문가에게 요청)\n3) 자문성 (정답 제시보다 자문 역할)\n4) 한시성 (특정 문제 해결 위한 일시적 관계)\n5) 독립성 (컨설턴트와 의뢰인 상호독립적)\n6) 학습성"},
+    {"front": "[장학이론] 인간자원론적 장학 — 기본개념 & 특징 3", "importance": "high", "back": "### 기본개념\n- 교사들을 학교 의사결정 과정에 참여시키면 → 교사 직무 만족도가 증가한다고 봄 / 교사를 능동적 전문가로 보고 참여·자율 보장해 성장하게 돕는 장학 방식\n### 특징 3\n1) 교사 개인 욕구와 학교 목적(과업)을 통합하는 데 중점\n2) 교사를 학교 효과성 증대시킬 잠재 가능성을 가진 존재로 인식\n3) 학교 경영자는 교사들이 능력을 최대한 발휘하게 환경 조성해야 함"},
+    {"front": "[장학이론] 멘토링 장학 — 기본개념 & 필요성 2", "importance": "normal", "back": "### 기본개념\n- 경험/지식 있는 경력교사가 → 경험/지식 적은 교사를 도와주는 활동\n### 필요성 2\n1) 저경력교사의 전문성 신장과 학교 적응을 도움\n2) 저경력교사의 정서·심리적 안정을 도움"},
+    {"front": "[장학이론] 멘토링 장학 — 활성화 방안 3", "importance": "normal", "back": "1) (멘토조직 만들어) 멘토 정기교육 실시\n2) 멘토링 운영 매뉴얼 작성 & 공유\n3) 멘토링 우수 사례 발굴 & 사례집 발간"},
+    {"front": "[장학이론] 선택 장학 — 기본개념 & 방법 4", "importance": "normal", "back": "### 기본개념\n- (교사가 개인차를 고려해 여러 장학 대안 중) 자신에게 가장 적합한 장학지도를 선택하는 장학\n### 방법 4 (대상별)\n1) 임상장학 - 초임교사, 특별한 문제를 안고 있는 교사\n2) 동료장학 - 모든 교사\n3) 자기장학 - 경험 있고 자기분석/지도능력 지닌 교사\n4) 약식장학 - 모든 교사 (다른 장학을 원하지 않는 교사)"},
+    {"front": "[정책이론] 교육기획 — 기본개념 & 접근 방법 4", "importance": "normal", "back": "### 기본개념\n- 교육목표 효율적 달성을 위해 가능한 수단과 방법을 선택하는 사전 준비 과정\n### 접근 방법 4\n1) 사회수요에 의한 접근\n2) 인력수요에 의한 접근\n3) 수익률에 의한 접근\n4) 국제비교에 의한 접근"},
+    {"front": "[정책이론] 교육기획 — ① 사회수요 접근 (개념·장점2·단점2)", "importance": "normal", "back": "### 개념\n- 교육에 대한 개인적·사회적 수요를 기초로 교육계획 수립\n### 장점 2\n1) 사회적·정치적 안정에 기여\n2) 모든 사람에게 균등한 교육 기회 보장 가능\n### 단점 2\n1) 사회적 필요와 동떨어진 교육계획 수립 가능\n2) 재정적 제약에 대한 해결방안 제시 못함"},
+    {"front": "[정책이론] 교육기획 — ② 인력수요 접근 (개념·장점2·단점2)", "importance": "normal", "back": "### 개념\n- 경제 성장에 필요한 인력 수요를 예측해 교육 공급 조절\n### 장점 2\n1) 경제 인력을 안정적 공급 가능\n2) 교육 운영의 낭비를 줄여 효율성 증진\n### 단점 2\n1) 인력 수요의 추정 자체가 어려움\n2) 교육의 본질을 훼손할 수 있음 (외적 목적에 초점)"},
+    {"front": "[정책이론] 교육기획 — ③ 수익률 접근 (개념·장점2·단점2)", "importance": "normal", "back": "### 개념\n- 특정 분야 교육에 대한 경제적 수익률을 측정해 비교수익률 높은 방식을 채택\n### 장점 2\n1) 교육운영의 경제적 효율성 제고\n2) 교육투자의 합리성 제고\n### 단점 2\n1) 계획의 신뢰성 떨어질 수 있음 (수익률 가변적)\n2) 기술적 한계 (수익률 계산 어려움)"},
+    {"front": "[정책이론] 교육기획 — ④ 국제비교 접근 (개념·장점2·단점1)", "importance": "normal", "back": "### 개념\n- 경제·교육 발전이 유사한 국가의 교육정책과 비교해 교육을 기획\n### 장점 2\n1) 기획 수립 과정 단순화 가능 (외국 경험 모방)\n2) 문제 예측 및 처치를 효율적으로\n### 단점\n- 국가마다 교육제도·운영방식이 다름 (타국에 효과적인 게 자국엔 비효과적일 수도)"},
+    {"front": "[정책이론] 교육기획 — 교육기획의 장점 3 & 단점 3", "importance": "normal", "back": "### 장점 3\n1) 교육행정의 안정화에 기여 (방향과 지침 제공)\n2) 교육행정의 효율성/타당성 제고\n3) 한정된 재원의 합리적 배분\n### 단점 3\n1) 예측 어려움 (교육·사회수요 급변)\n2) 기술적 한계 (과거 기준 미래 추정의 한계)\n3) 교육본질의 훼손 (외적 목적에 초점)"},
+    {"front": "[정책이론] 교육정책 — 기본개념 & 결정 기준 8", "importance": "normal", "back": "### 기본개념\n- (교육목적 달성 위해) 국가가 공적으로 제시하는 교육 기본방침\n### 결정 기준 8\n1) 타당성 2) 효율성 3) 민주성 4) 전문성 5) 중립성\n6) 적응성 (상황 따라 적응) 7) 안정성 (일관성 유지) 8) 공평성 (교육기회/자원 균등분배)"},
+    {"front": "[정책이론] 의사결정모형 — 모형이란 & ① 합리성 모형 & ② 만족 모형", "importance": "very_high", "back": "### 의사결정모형이란\n- 교육행정 문제 해결을 위해 누가/어떻게/무엇 기준으로 결정하는지 설명하는 이론적 모형\n### ① 합리성 모형\n- 개념: 모든 대안 탐색 후 최선의 대안을 찾는 모형\n- 단점: 비현실적·이상적임\n### ② 만족 모형\n- 개념: (의사결정자 주관으로) 가장 만족스러운 대안 선택\n- 장점: 합리성 모형의 한계 극복 / 단점: 보편타당성 부족"},
+    {"front": "[정책이론] 의사결정모형 — ③ 점증 모형 & ④ 혼합 모형", "importance": "very_high", "back": "### ③ 점증 모형\n- 개념: 기존 정책보다 약간 개선된 대안 선택\n- 장점: 안정적 정책 결정 / 실현 가능성 높은 대안 선택\n- 단점: 개혁적·혁신적 의사결정에 부적절\n### ④ 혼합 모형\n- 개념: 기본 방향은 합리성 모형으로, 세부 문제해결은 점증 모형으로\n- 장점: 현실적 안정성 추구 / 장기·단기 변화를 동시에\n- 단점: 의사결정 과정이 다소 불분명 (이론적 독자성 떨어짐)"},
+    {"front": "[정책이론] 의사결정모형 — ⑤ 최적 모형 & ⑥ 쓰레기통 모형", "importance": "very_high", "back": "### ⑤ 최적 모형\n- 개념: 합리성과 초합리성을 함께 고려해 최적 대안 선택\n- 초합리성 종류 3: 직관적 판단 / 창의력 / 상상력\n- 장점: 창의적·혁신적 의사결정에 도움 / 단점: 비현실적·이상적 (불분명한 초합리성 의존)\n### ⑥ 쓰레기통 모형\n- 개념: 의사결정은 (쓰레기가 우연히 모이듯) 우연적·비합리적으로 일어난다는 모형\n- 장점: 문제가 해결 안 되는 이유 설명 가능 / 단점: 일반화 불가능"},
+    {"front": "[정책이론] 브리지스의 참여적 의사결정 모형 — 기본개념 & 참여 기준 2 & 수용영역", "importance": "high", "back": "### 기본개념\n- 상급자가 구성원을 의사결정에 참여시킬 때, 어떤 기준 따라 참여를 결정하고 상급자가 어떤 역할을 해야 하는지 설명하는 이론\n### 참여 기준 2\n1) 적절성 (구성원과 상관 있는가)\n2) 전문성 (구성원이 잘 아는가)\n### 수용영역\n- 상급자가 어떤 결정을 내려도 아무 의심 없이 기꺼이 받아들이는 영역"},
+    {"front": "[정책이론] 브리지스 모형 — 참여적 의사결정 형태 4 (적절성·전문성 조합)", "importance": "high", "back": "1) 적절성 O & 전문성 O → 수용영역 밖, 자주 참여 (의회형)\n2) 적절성 O & 전문성 X → 한계조건 상황, 제한적 참여 (민주적 중앙집권형)\n3) 적절성 X & 전문성 O → 한계조건 상황, 제한적 참여\n4) 적절성 X & 전문성 X → 수용영역 안, 참여 불필요"},
+    {"front": "[정책이론] 호이·타터의 참여적 의사결정 모형 — 기본개념 & 참여 기준 3", "importance": "high", "back": "### 기본개념\n- 상급자가 구성원을 의사결정에 참여시킬 때, 어떤 기준 따라 참여를 결정하고 상급자가 어떤 역할을 해야 하는지 설명하는 이론\n### 참여 기준 3\n1) 관련성 (구성원과 상관 있는가)\n2) 전문성 (구성원이 잘 아는가)\n3) 구성원의 신뢰 (구성원이 상급자를 믿는가)"},
+    {"front": "[정책이론] 호이·타터 모형 — 참여적 의사결정 형태 5", "importance": "high", "back": "1) 민주적 상황 (관련성·전문성 O, 신뢰 O) → 광범위하게 참여\n2) 갈등적 상황 (관련성·전문성 O, 신뢰 X) → 제한적 참여\n3) 이해관계자 상황 (관련성 O, 전문성 X) → 제한적 참여\n4) 전문가 상황 (관련성 X, 전문성 O) → 제한적 참여\n5) 비협동적 상황 (관련성·전문성 X) → 참여 배제"},
+    {"front": "[정책이론] 의사소통의 원칙 8", "importance": "normal", "back": "1) 명료성\n2) 일관성(일치성) (전후 모순 없어야 함)\n3) 통일성 (조직 전체에 동일하게 수용된 표현)\n4) 적시성\n5) 적응성(융통성) (현실 적합성)\n6) 적량성(적정성) (적당량 전달)\n7) 분포성(배포성) (모든 대상에게 골고루)\n8) 관심과 수용 (발신자가 수신자 관심 끌고 정보 수용되게)"},
+    {"front": "[정책이론] 의사소통의 종류 — 형식 2 & ① 공식적 의사소통 (개념·장점3·단점2)", "importance": "normal", "back": "### 형식 2\n1) 공식적 의사소통 2) 비공식적 의사소통\n### ① 공식적 의사소통\n- 개념: 공식조직 내 공식적 경로를 통한 의사소통\n- 장점 3: 확실한 의사전달 / 책임소재 분명 / 절차·방법 규격화로 관리 용이\n- 단점 2: 느린 전달 속도 / 개인 사정·감정 전달 불가"},
+    {"front": "[정책이론] 의사소통의 종류 — ② 비공식적 의사소통 (개념·장점2·단점3) & 방법 2", "importance": "normal", "back": "### ② 비공식적 의사소통\n- 개념: 친분/학연/지연 등을 통해 비공식적으로 이뤄지는 의사소통\n- 장점 2: 빠른 전달 속도 / 개인 사정·감정 전달 가능\n- 단점 3: 불확실한 의사전달 / 책임소재 불분명 / 왜곡된 정보 유통 가능\n### 의사소통 방법 2\n1) 언어적 의사소통 2) 비언어적 의사소통"},
+    {"front": "[정책이론] 조하리의 창 — 기본개념 & 4가지 의사소통 유형 4", "importance": "normal", "back": "### 기본개념\n- 사람은 타인과 의사소통할 때 4가지 유형이 있다는 이론\n### 4가지 의사소통 유형\n1) 열린 창 (민주형 의사소통)\n2) 보이지 않는 창 (독단형 의사소통)\n3) 숨겨진 창 (과묵형 의사소통)\n4) 미지의 창 (폐쇄형 의사소통)"},
+    {"front": "[정책이론] 조하리의 창 — 시사점 2", "importance": "normal", "back": "1) 효과적 의사소통을 위해선 개방적 영역을 넓혀야 함\n  → 방법: 자기노출 많이 하고 피드백 많이 받기\n2) 다른 사람과 관계 개선을 위해선 맹목적 영역에 주목\n  → 방법: 자신이 모르는 부분에 대해 피드백 요청 & 받아들이기"},
+    {"front": "[학교경영과 예산] 학교관리와 학교경영 — 학교관리란 & 학교경영이란", "importance": "normal", "back": "### 학교관리란\n- 교육법규 및 상부기관을 중심으로 수동적·의존적 활동을 통해 학교 운영에 필요한 인적·물적 자원을 관리(운용)하는 것\n### 학교경영이란\n- 학교장을 중심으로 교직원의 능동적·주체적 활동을 통해 (단위학교 특성을 살리며) 교육목표를 효율적 달성하려는 일련의 활동"},
+    {"front": "[학교경영과 예산] 단위학교 책임경영제 — 기본개념 & 장점 3", "importance": "very_high", "back": "### 기본개념\n- 학교의 운영권을 단위학교에 대폭 위임해 → 학교를 자율적으로 운영 & 그 결과에 책임 지도록 하는 제도\n### 장점 3\n1) 수요자 중심 교육 (각 학교/학생 특성 맞는 교육)\n2) 교육의 효율성 증대 (교육당사자 적극 참여)\n3) 교육자치제 실현 (예산 자율 운영 & 지역특색 맞는 교육)"},
+    {"front": "[학교경영과 예산] 단위학교 책임경영제 — 실현 방안 4", "importance": "very_high", "back": "1) 학교운영위원회 설치 (학부모/교원/지역인사 공동 참여)\n2) 도급경비제 (필요 따라 학교 예산 용도 변경 가능)\n3) 학교회계제도 (학교 자율적 예산 편성·운영)\n4) 공모교장제 및 초빙교사제 (학교 실정 맞는 교육 운영)"},
+    {"front": "[학교경영과 예산] 조직개발기법(OD) — 기본개념 & 실현 방안 4", "importance": "normal", "back": "### 기본개념\n- 행동과학적 지식/기술을 활용해 → 학교 목적과 개인 욕구를 연관시켜 → 조직 전체의 변화/발전을 도모하려는 기법\n### 실현 방안 4\n1) 팀 빌딩\n2) 의사소통 훈련 (서로 의사소통 관찰 & 피드백)\n3) 갈등 관리\n4) 조직문화 변화 (경직된 조직문화 해결 기회 마련)"},
+    {"front": "[학교경영과 예산] 정보관리체제(MIS) — 기본개념", "importance": "normal", "back": "- 의사결정자가 합리적 의사결정을 내릴 수 있게 (각종 자료를 수집/보관/평가하였다가) 필요 정보를 신속/정확히 제공하는 종합적 정보관리 체제"},
+    {"front": "[학교경영과 예산] 목표관리기법(MBO) — 기본개념 & 장점 3", "importance": "high", "back": "### 기본개념\n- 효율적으로 목표를 달성하기 위한 경영기법 (구성원 공동 참여 → 교육목표 설정 → 전략/절차 공유 → 효율적 목표 달성)\n### 장점 3\n1) 교육의 효율성 증대 (모든 활동을 교육목표에 집중)\n2) 역할 갈등의 해소 (목표와 책임 명료히 설정)\n3) 의사소통 활성화 (목표 설정에 모든 구성원 참여)"},
+    {"front": "[학교경영과 예산] 목표관리기법(MBO) — 단점 3", "importance": "high", "back": "1) 질적 교육 저해 (측정 가능한 목표만 설정 → 측정 어려운 전인교육 저하)\n2) 장기적·전인적 목표에 부적합 (단기/구체적 목표만 강조)\n3) 교직원의 업무 부담 가중 (목표 설정·성과 보고에 노력/시간 소요)"},
+    {"front": "[학교경영과 예산] 과업평가 계획기법(PERT) — 기본개념 & 장점 3 & 단점 2", "importance": "high", "back": "### 기본개념(절차)\n- (세부 작업 활동과 단계를 검토해) 플로차트를 작성해, 이에 따라 업무를 순차적으로 추진하는 관리기법\n### 장점 3\n1) 원만한 작업 수행 (작업요소별 책임부서 명확)\n2) 효율적 작업 수행\n3) 참여의식 향상 (작업 과정 작성에 구성원 전원 참여)\n### 단점 2\n1) 많은 시간과 노력 소요\n2) 계획 변경의 어려움"},
+    {"front": "[학교경영과 예산] 총체적 질 관리(TQM) — 기본개념 & 특징 3", "importance": "high", "back": "### 기본개념\n- 지속적인 품질관리를 위해 경영을 개선하려는 노력 (고객 만족 수준을 높이고자 모든 구성원을 조직화 & 참여시키는 경영기법)\n### 특징 3\n1) 총체적 참여 중시 (전 구성원 의사결정 참여 & 공동 업무수행)\n2) 수요자 중심 교육 강조 (수요자 요구 만족 위한 품질향상이 최우선)\n3) 지속적인 질 개선 강조"},
+    {"front": "[학교경영과 예산] 교육재정의 운영원리 — 운영과정 4", "importance": "very_high", "back": "1) 확보 단계\n2) 배분 단계\n3) 지출 단계\n4) 평가 단계"},
+    {"front": "[학교경영과 예산] 교육재정 운영원리 — ① 확보 단계 3 & ② 배분 단계 3", "importance": "very_high", "back": "### ① 확보 단계 원리 3\n1) 충족성 (필요 재원 충분히)\n2) 자구성 (필요 재원 스스로 확보할 제도적 장치)\n3) 안정성 (일관성 위해 안정적 재원 확보)\n### ② 배분 단계 원리 3\n1) 효율성 (최소 투자 최대 성과)\n2) 공정성 (특정 기준 따라 차등 배분)\n3) 균형성 (개인/지역간 동등 배분)"},
+    {"front": "[학교경영과 예산] 교육재정 운영원리 — ③ 지출 단계 3 & ④ 평가 단계 2", "importance": "very_high", "back": "### ③ 지출 단계 원리 3\n1) 자율성 (단위기관 자율성 보장)\n2) 투명성 (운영 과정 일반대중에 공개)\n3) 적정성 (의도한 교육결과 위해 적절한 지원)\n### ④ 평가 단계 원리 2\n1) 효과성 (재정 투자가 교육 질적 향상 가져와야 함)\n2) 책무성 (사용 경비에 납득 이유 있고 책임 질 수 있어야 함)"},
+    {"front": "[학교경영과 예산] 교육비 — 기본개념 & 교육비 종류 3", "importance": "normal", "back": "### 기본개념\n- (국가, 지방자치단체, 학부모가) 교육활동을 위해 지출하는 비용\n### 교육비 종류 3 (분류 기준별)\n1) 교육목적 따라 - 직접교육비 / 간접교육비\n2) 운영형태 따라 - 공교육비 / 사교육비\n3) 부담주체 따라 - 공부담 교육비 / 사부담 교육비"},
+    {"front": "[학교경영과 예산] 품목별 예산제도 — 기본개념 & 장점 3 & 단점 3", "importance": "high", "back": "### 기본개념\n- 지출 대상을 품목별로 분류해 → 지출 대상과 그 한계를 명확히 규정하는 예산제도\n### 장점 3\n1) 분명한 책임소재 2) 예산 남용 방지 3) 각종 정보 획득 (차기 예산에 도움)\n### 단점 3\n1) 전체 성과를 알기 어려움 (세부 지출대상에 중점)\n2) 탄력적 운영 어려움\n3) 우선순위 등한시 (예산 항목에만 관심)"},
+    {"front": "[학교경영과 예산] 성과주의 예산제도 — 기본개념 & 장점 3 & 단점 2", "importance": "normal", "back": "### 기본개념\n- 사업별로 예산 편성 & 올해 사업 성과로 → 내년 예산 편성하는 예산제도\n### 장점 3\n1) 생산성 향상 (사업 전체 성과 한눈에 파악)\n2) 신축성·융통성 향상 (사업별 예산 집행)\n3) 효율적 예산 편성 (올해 결과를 내년에 반영)\n### 단점 2\n1) 불분명한 회계 책임 (예산 통제 어려움)\n2) 성과 측정의 어려움 (질적 측면 파악 어려움)"},
+    {"front": "[학교경영과 예산] 기획(계획) 예산제도 — 기본개념 & 장점 3 & 단점 2", "importance": "normal", "back": "### 기본개념\n- 장기적 기획과 단기적 예산편성을 결합시켜 → 한정된 자원을 합리적으로 배분하는 제도\n### 장점 3\n1) 자원의 합리적 배분 (사업계획·예산편성 유기적 연결)\n2) 지출의 효율화 (우선순위 따라 예산 배분)\n3) 의사결정의 일원화 (고위층에서 한방에)\n### 단점 2\n1) 중앙집권적 성향 초래 (의사결정자에게 정보 집중)\n2) 계량화의 어려움 (목표달성 정도 계량화 어려움)"},
+    {"front": "[학교경영과 예산] 영기준 예산제도(ZBBS) — 기본개념 & 장점 3", "importance": "high", "back": "### 기본개념\n- 매 회계연도마다 모든 사업을 영(Zero)에서 새로 검토해 → 우선순위를 새로 고려한 후 예산 편성하는 제도\n### 장점 3\n1) 합리적 예산 분배 (우선 사업에 먼저 예산 배분)\n2) 합리적·과학적 경영 지원 (경영 계획과 예산 일치)\n3) 창의적·자발적 사업 구상 (전교직원 참여 유도)"},
+    {"front": "[학교경영과 예산] 영기준 예산제도(ZBBS) — 단점 3", "importance": "high", "back": "1) 많은 시간과 노력 요구 (전부 0부터 다시 분석)\n2) 시행착오 (교원이 예산업무/의사결정 전문성 부족 시)\n3) 비협조적 풍토 (자신이 제안한 사업이 평가절하되면 야기 가능)"},
+    {"front": "[학교경영과 예산] 단위학교 예산제도(SBBS) — 기본개념 & 특징 4", "importance": "very_high", "back": "### 기본개념\n- 교장이 예산과정의 중심적 역할을 담당하는 → 단위학교 중심의 분권화된 예산제도\n### 특징 4\n1) 학교회계연도: 3월 1일부터 다음 해 2월 말일까지\n2) 예산배부방식: 일상경비와 도급경비 구분 없이 총액으로 배부\n3) 예산배부시기: 학교회계연도 개시 50일 전\n4) 세출예산편성: 학교실정에 따라 자율적으로 편성"},
+    {"front": "[학교경영과 예산] 단위학교 예산제도(SBBS) — 장점 3", "importance": "very_high", "back": "1) 효율적 운영\n2) 투명성과 신뢰성 향상 (예산편성과정에 교사/학부모 참여)\n3) 교육의 질 향상 (자율적으로 필요한 교육활동에 지원 가능)"},
+    {"front": "[학교경영 실제] 학교의 재구조화 — 기본개념 & 종류 4", "importance": "normal", "back": "### 기본개념\n- 학교 조직 효율성 증대 위해 → 기존 학교 공간 & 운영 방식 개선 → 미래 사회에 적합한 교육 실현을 위한 일련의 노력\n### 종류 4\n1) 학교 공간 재구조화\n2) 교육과정 재구조화\n3) 학교 운영 재구조화\n4) 학교 업무 재구조화"},
+    {"front": "[학교경영 실제] 학교의 재구조화 — 방안 4", "importance": "normal", "back": "1) 지역사회와 학부모의 적극적 참여\n2) 단위학교 경영체제 구축\n3) 학교 운영에 교사의 참여 권한 증대\n4) 개방형 교실 환경 구축 (교사-학생 상호작용 증대)"},
+    {"front": "[학교경영 실제] 학교운영위원회 — 기본개념 & 설립 취지 3", "importance": "normal", "back": "### 기본개념\n- 학교 운영 의사결정에 학부모, 교원, 지역인사가 함께 참여함으로써 → 학교 정책 결정의 민주성/합리성 확보 & 교육목표 효율적 달성 위한 의사결정 기구\n### 설립 취지 3\n1) 학교 자치 실현 (교육당사자 참여)\n2) 수요자 중심 교육 (가정-학교-사회 협력체제)\n3) 학교공동체의 책무성 증대"},
+    {"front": "[학교경영 실제] 학교운영위원회 — 위원 구성 3 & 위원 기능 2 & 장점 3", "importance": "normal", "back": "### 위원 구성 3\n1) 학부모위원 2) 교원위원 3) 지역위원\n### 위원 기능 2\n1) 심의기능 (학생대표 의견 수렴해 제안 가능)\n2) 심의·의결기능\n### 장점 3\n1) 학교 의사결정 과정의 민주성 증진\n2) 단위학교의 자율성과 책무성 강화\n3) 수요자 중심의 학교 운영"},
+    {"front": "[학교경영 실제] 학급경영 — 기본개념 & 관점 3", "importance": "normal", "back": "### 기본개념\n- 교육목표 달성 위해 담임교사가 학급 내에서 실행하는 모든 활동\n### 관점 3\n1) 질서유지로서의 학급경영 (학급 내 문제 해결 위한 생활지도)\n2) 조건정비로서의 학급경영 (수업 위한 학습환경 조성)\n3) 교육경영으로서의 학급경영 (학급 운영 위한 조직 협동 활동)"},
+    {"front": "[학교경영 실제] 학급경영 — 원리 4", "importance": "normal", "back": "1) 교육적 학급경영 (학생 성장 지원해야 함)\n2) 학생이해의 학급경영 (학생 특성 파악해 맞춰 경영)\n3) 민주적 학급경영 (학생 참여/의사결정 존중)\n4) 효율적 학급경영 (자원 경제적 사용해 최대 성과/만족)"}
+  ]
+};
+const subjects = Object.keys(DATA);
+let curSub = subjects[0];
+let idx = 0;
+let flipped = false;
+const seen = {};
+const order = {};
+const shuffledOn = {};
+subjects.forEach(s=>{
+  seen[s]=new Set();
+  order[s]=DATA[s].map((_,i)=>i);
+  shuffledOn[s]=false;
+});
+// current subject's cards in working order
+function curCards(){ return order[curSub].map(i=>DATA[curSub][i]); }
+
+const el=id=>document.getElementById(id);
+
+// ---- theme : 항상 OS(시스템) 설정을 따라간다 ----
+// - 페이지 로드 시 무조건 시스템 테마로 시작 (저장값 없음)
+// - 시스템 다크/라이트 변경을 실시간 반영
+// - ☀️/🌙 버튼은 "이번 세션 동안만" 임시 미리보기. 새로고침하면 다시 OS 기준.
+const themeBtn=el('themeBtn');
+
+// 시스템이 라이트인지 여부. dark 쿼리를 우선 신뢰하고(삼성 인터넷 등 호환),
+// 둘 다 매칭 안 되면 dark를 기본값으로 둔다.
+function systemPrefersLight(){
+  if(window.matchMedia){
+    if(window.matchMedia('(prefers-color-scheme: dark)').matches) return false;
+    if(window.matchMedia('(prefers-color-scheme: light)').matches) return true;
+  }
+  return false; // 시스템 정보를 못 읽으면 다크
+}
+
+// 사용자가 이번 세션에 버튼으로 임시 지정한 값 (null이면 = OS 자동)
+let manualOverride = null;
+
+function applyTheme(t){
+  document.documentElement.setAttribute('data-theme', t);
+  themeBtn.textContent = (t==='dark') ? '🌙' : '☀️';
+}
+function syncToSystem(){
+  applyTheme(systemPrefersLight() ? 'light' : 'dark');
+}
+
+// 최초 적용: 무조건 OS 기준
+syncToSystem();
+
+// OS 설정이 바뀌면 실시간 반영 (단, 이번 세션에 버튼을 누른 상태면 그대로 둠)
+if(window.matchMedia){
+  try{
+    var mq = window.matchMedia('(prefers-color-scheme: dark)');
+    var handler = function(){ if(manualOverride===null) syncToSystem(); };
+    if(mq.addEventListener) mq.addEventListener('change', handler);
+    else if(mq.addListener) mq.addListener(handler); // 구형 브라우저 호환
+  }catch(e){}
+}
+
+// 버튼: 현재 화면 기준으로 반대 테마로 임시 전환 (저장하지 않음)
+themeBtn.onclick=()=>{
+  const cur=document.documentElement.getAttribute('data-theme');
+  manualOverride = (cur==='dark') ? 'light' : 'dark';
+  applyTheme(manualOverride);
+};
+const tabsEl=el('tabs'), card=el('card'), frontText=el('frontText'),
+  backText=el('backText'), counter=el('counter'), impEl=el('imp'),
+  dotsEl=el('dots'), prevBtn=el('prevBtn'), nextBtn=el('nextBtn'), flipBtn=el('flipBtn');
+
+function buildTabs(){
+  tabsEl.innerHTML='';
+  subjects.forEach(s=>{
+    const b=document.createElement('button');
+    b.className='tab'+(s===curSub?' active':'');
+    b.innerHTML=`${s}<span class="cnt">${DATA[s].length}</span>`;
+    b.onclick=()=>{curSub=s; idx=0; flipped=false; buildTabs(); updateOrderUI(); render();};
+    tabsEl.appendChild(b);
+  });
+}
+
+function esc(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+function renderBack(text, table){
+  const lines=text.split('\n');
+  let html='', listOpen=false;
+  const listMark=/^([-•]|[①-⑳]|[㉠-㉿]|[ⓐ-ⓩ]|[가-힣]\.|\d+[.)]|[ㄱ-ㅎ]\.)\s*/;
+  for(let raw of lines){
+    let line=raw.trimEnd();
+    if(!line.trim()){continue;}
+    if(line.startsWith('###')){
+      html+=`<h3>${esc(line.replace(/^###\s*/,''))}</h3>`; continue;
+    }
+    const m=line.match(listMark);
+    if(m){
+      const mk=m[1]; const rest=line.slice(m[0].length);
+      html+=`<div class="li"><span class="mk">${esc(mk)}</span><span class="tx">${stars(esc(rest))}</span></div>`;
+    } else {
+      html+=`<p>${stars(esc(line))}</p>`;
+    }
+  }
+  if(table){ html+=table; }
+  return html;
+}
+function stars(s){
+  s=s.replace(/★★+/g,m=>`<span class="star vh">${m}</span>`);
+  s=s.replace(/(^|[^v>])★/g,(_,p)=>`${p}<span class="star">★</span>`);
+  return s;
+}
+
+function render(){
+  const cards=curCards();
+  if(idx<0)idx=0; if(idx>=cards.length)idx=cards.length-1;
+  const c=cards[idx];
+  flipped=false; card.classList.remove('flipped');
+  frontText.textContent=c.front;
+  backText.innerHTML=renderBack(c.back||'', c.table||'');
+  counter.textContent=`${idx+1} / ${cards.length}`;
+  // importance badge
+  let imp='';
+  if(c.importance==='very_high') imp='<span class="badge vhigh">★★ 핵심</span>';
+  else if(c.importance==='high') imp='<span class="badge high">★ 중요</span>';
+  impEl.innerHTML=imp;
+  seen[curSub].add(idx);
+  // dots
+  dotsEl.innerHTML='';
+  cards.forEach((_,i)=>{
+    const d=document.createElement('div');
+    d.className='dot'+(i===idx?' cur':(seen[curSub].has(i)?' done':''));
+    d.onclick=()=>{idx=i; render();};
+    dotsEl.appendChild(d);
+  });
+  prevBtn.disabled=idx===0;
+  nextBtn.disabled=idx===cards.length-1;
+  flipBtn.textContent='정답 확인 ↻';
+  // reset scroll
+  document.querySelectorAll('.face').forEach(f=>f.scrollTop=0);
+}
+
+function doFlip(){
+  flipped=!flipped;
+  card.classList.toggle('flipped',flipped);
+  flipBtn.textContent=flipped?'문제 보기 ↻':'정답 확인 ↻';
+}
+card.onclick=doFlip;
+flipBtn.onclick=e=>{e.stopPropagation();doFlip();};
+prevBtn.onclick=()=>{if(idx>0){idx--;render();}};
+nextBtn.onclick=()=>{const n=curCards().length;if(idx<n-1){idx++;render();}};
+
+// ---- shuffle / reset ----
+const shuffleBtn=el('shuffleBtn'), resetBtn=el('resetBtn'), orderTag=el('orderTag');
+function shuffleArr(a){
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+function updateOrderUI(){
+  const on=shuffledOn[curSub];
+  shuffleBtn.classList.toggle('active',on);
+  orderTag.textContent = on ? '🔀 무작위 순서' : '';
+}
+shuffleBtn.onclick=()=>{
+  order[curSub]=shuffleArr(DATA[curSub].map((_,i)=>i));
+  shuffledOn[curSub]=true;
+  seen[curSub]=new Set();
+  idx=0; updateOrderUI(); render();
+};
+resetBtn.onclick=()=>{
+  order[curSub]=DATA[curSub].map((_,i)=>i);
+  shuffledOn[curSub]=false;
+  seen[curSub]=new Set();
+  idx=0; updateOrderUI(); render();
+};
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowLeft'){if(idx>0){idx--;render();}}
+  else if(e.key==='ArrowRight'){const n=curCards().length;if(idx<n-1){idx++;render();}}
+  else if(e.key===' '||e.key==='Enter'){e.preventDefault();doFlip();}
+});
+
+// swipe
+let sx=0;
+card.addEventListener('touchstart',e=>sx=e.touches[0].clientX,{passive:true});
+card.addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-sx;
+  if(Math.abs(dx)>60){
+    if(dx<0){const n=curCards().length;if(idx<n-1){idx++;render();}}
+    else {if(idx>0){idx--;render();}}
+  }
+},{passive:true});
+
+
+// ====== 검색 기능 ======
+const searchInput = el('searchInput');
+const searchClear = el('searchClear');
+const searchResults = el('searchResults');
+const wrapMain = document.querySelector('.wrap');
+// 카드 본문 영역(검색결과 제외 나머지) 토글용 - meta/toolbar/scene/controls/dots
+const normalEls = ['meta','toolbar','scene','controls','dots'].map(c=>document.querySelector('.'+c));
+
+// 검색 대상 텍스트: front + back + table(태그 제거)
+function plainText(c){
+  let t = (c.front||'') + ' ' + (c.back||'');
+  if(c.table){ t += ' ' + c.table.replace(/<[^>]+>/g,' '); }
+  return t.replace(/[#★]/g,'').replace(/\s+/g,' ');
+}
+function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function highlight(text, q){
+  const safe = escHtml(text);
+  if(!q) return safe;
+  const qe = q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  return safe.replace(new RegExp(qe,'gi'), m=>`<mark>${m}</mark>`);
+}
+// 매칭 위치 주변 스니펫 추출
+function snippet(c, q){
+  const body = ((c.back||'') + (c.table? ' '+c.table.replace(/<[^>]+>/g,' '):'')).replace(/[#★]/g,'').replace(/\n/g,' ').replace(/\s+/g,' ').trim();
+  if(!q) return body.slice(0,90);
+  const low = body.toLowerCase();
+  const pos = low.indexOf(q.toLowerCase());
+  if(pos<0) return body.slice(0,90);
+  const s = Math.max(0, pos-30);
+  const e = Math.min(body.length, pos+q.length+60);
+  return (s>0?'…':'') + body.slice(s,e) + (e<body.length?'…':'');
+}
+
+function runSearch(q){
+  q = q.trim();
+  searchClear.classList.toggle('show', q.length>0);
+  if(!q){ exitSearch(); return; }
+  // 검색 모드 진입: 카드 UI 숨김
+  normalEls.forEach(e=>{ if(e) e.style.display='none'; });
+  searchResults.style.display='flex';
+
+  const results = [];
+  subjects.forEach(s=>{
+    DATA[s].forEach((c,i)=>{
+      if(plainText(c).toLowerCase().includes(q.toLowerCase())){
+        results.push({subject:s, idx:i, card:c});
+      }
+    });
+  });
+
+  let html = `<div class="search-summary">검색결과 <b>${results.length}</b>개 · "${escHtml(q)}"</div>`;
+  if(results.length===0){
+    html += `<div class="search-empty">검색 결과가 없어요.<br>다른 키워드로 검색해 보세요.</div>`;
+  } else {
+    results.forEach(r=>{
+      let imp='';
+      if(r.card.importance==='very_high') imp=' <span class="badge vhigh" style="font-size:10px">★★ 핵심</span>';
+      else if(r.card.importance==='high') imp=' <span class="badge high" style="font-size:10px">★ 중요</span>';
+      html += `<div class="result-card" data-sub="${escHtml(r.subject)}" data-idx="${r.idx}">
+        <div class="rc-top"><span class="rc-subject">${escHtml(r.subject)}</span>${imp}</div>
+        <div class="rc-front">${highlight(r.card.front, q)}</div>
+        <div class="rc-snippet">${highlight(snippet(r.card,q), q)}</div>
+      </div>`;
+    });
+  }
+  searchResults.innerHTML = html;
+
+  // 결과 클릭 → 해당 카드로 이동
+  searchResults.querySelectorAll('.result-card').forEach(elc=>{
+    elc.onclick=()=>{
+      const sub = elc.getAttribute('data-sub');
+      const i = parseInt(elc.getAttribute('data-idx'),10);
+      // 원래 순서로 보정(섞여있을 수 있으므로 해당 카드 위치를 order에서 찾음)
+      curSub = sub;
+      // order 기준으로 idx 위치 찾기
+      const pos = order[curSub].indexOf(i);
+      idx = pos>=0 ? pos : 0;
+      flipped=false;
+      searchInput.value=''; searchClear.classList.remove('show');
+      exitSearch();
+      buildTabs(); updateOrderUI(); render();
+      window.scrollTo({top:0, behavior:'smooth'});
+    };
+  });
+}
+
+function exitSearch(){
+  searchResults.style.display='none';
+  searchResults.innerHTML='';
+  normalEls.forEach(e=>{ if(e) e.style.display=''; });
+}
+
+searchInput.addEventListener('input', e=>runSearch(e.target.value));
+searchClear.onclick=()=>{ searchInput.value=''; searchClear.classList.remove('show'); exitSearch(); searchInput.focus(); };
+
+
+buildTabs();
+updateOrderUI();
+render();
+</script>
+</body>
+</html>
