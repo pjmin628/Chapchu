@@ -1078,7 +1078,7 @@ function getSystemTheme(){
     var mqLight = window.matchMedia('(prefers-color-scheme: light)');
     if(mqLight && mqLight.matches) return 'light';
   }
-  return 'dark'; // 시스템 정보를 못 읽으면 기본 다크
+  return 'light'; // 시스템 정보를 못 읽으면 기본 라이트
 }
 function userPickedTheme(){
   try{ return localStorage.getItem('flashcard-theme'); }catch(e){ return null; }
